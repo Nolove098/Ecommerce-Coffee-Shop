@@ -1,16 +1,23 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Tác dụng là đăng ký các dịch vụ cần thiết cho ứng dụng MVC
 builder.Services.AddControllersWithViews();
+
+// Session để hỗ trợ giỏ hàng
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
-// Cấu hình để ứng dụng có thể phục vụ các tệp tĩnh như CSS, JavaScript, hình ảnh, v.v.
 app.UseStaticFiles();
-
 app.UseRouting();
+app.UseSession();
 
-// Route cho Area "Admin"  (/Admin/Controller/Action)
+// Route cho Area "Admin"
 app.MapControllerRoute(
     name: "admin",
     pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}",
@@ -18,7 +25,7 @@ app.MapControllerRoute(
     constraints: new { },
     dataTokens: new { area = "Admin" });
 
-// Route mặc định cho toàn bộ app
+// Route mặc định
 app.MapDefaultControllerRoute();
 
 app.Run();
