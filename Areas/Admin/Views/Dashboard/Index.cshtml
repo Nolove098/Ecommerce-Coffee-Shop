@@ -1,0 +1,224 @@
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    var recentOrders = (List<SaleStore.Models.Order>)ViewBag.RecentOrders;
+    var salesData = new[] {
+        new { time = "6 AM",  sales = 120 },
+        new { time = "8 AM",  sales = 450 },
+        new { time = "10 AM", sales = 680 },
+        new { time = "12 PM", sales = 890 },
+        new { time = "2 PM",  sales = 720 },
+        new { time = "4 PM",  sales = 850 },
+        new { time = "6 PM",  sales = 650 },
+        new { time = "8 PM",  sales = 320 },
+    };
+    var bestSellers = new[] {
+        new { name = "Caramel Macchiato", sales = 342, revenue = 22230000, trend = "+15%" },
+        new { name = "Cappuccino",        sales = 298, revenue = 16390000, trend = "+12%" },
+        new { name = "Iced Latte",        sales = 276, revenue = 15180000, trend = "+8%" },
+        new { name = "Espresso",          sales = 245, revenue =  9800000, trend = "+5%" },
+        new { name = "Mocha",             sales = 198, revenue = 11880000, trend = "+10%" },
+    };
+}
+
+<!-- Stat Cards -->
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+
+    <!-- Total Revenue -->
+    <div class="bg-gradient-to-br from-[#6F4E37] to-[#8B7355] text-white p-6 rounded-3xl shadow-md">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-white/70 text-xs bg-white/10 px-2 py-1 rounded-full">Tổng</span>
+        </div>
+        <p class="text-2xl font-bold">@((((decimal)ViewBag.TotalRevenue)).ToString("N0")) ₫</p>
+        <p class="text-white/70 text-sm mt-1">Doanh thu</p>
+    </div>
+
+    <!-- Today Revenue -->
+    <div class="bg-white border border-[#E8DFD8] p-6 rounded-3xl shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <span class="text-[#8B7355] text-xs bg-[#FAF8F5] border border-[#E8DFD8] px-2 py-1 rounded-full">Hôm nay</span>
+        </div>
+        <p class="text-2xl font-bold text-[#6F4E37]">@((((decimal)ViewBag.TodayRevenue)).ToString("N0")) ₫</p>
+        <p class="text-[#8B7355] text-sm mt-1">Doanh thu ngày</p>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="bg-white border border-[#E8DFD8] p-6 rounded-3xl shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <span class="text-[#8B7355] text-xs bg-[#FAF8F5] border border-[#E8DFD8] px-2 py-1 rounded-full">Tất cả</span>
+        </div>
+        <p class="text-2xl font-bold text-[#6F4E37]">@ViewBag.TotalOrders</p>
+        <p class="text-[#8B7355] text-sm mt-1">Đơn hàng</p>
+    </div>
+
+    <!-- Products -->
+    <div class="bg-white border border-[#E8DFD8] p-6 rounded-3xl shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <span class="text-[#8B7355] text-xs bg-[#FAF8F5] border border-[#E8DFD8] px-2 py-1 rounded-full">Active</span>
+        </div>
+        <p class="text-2xl font-bold text-[#6F4E37]">@ViewBag.ActiveProducts / @ViewBag.TotalProducts</p>
+        <p class="text-[#8B7355] text-sm mt-1">Sản phẩm</p>
+    </div>
+</div>
+
+<!-- Pending alert -->
+@if ((int)ViewBag.PendingOrders > 0)
+{
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <p class="text-sm text-amber-800">Có <strong>@ViewBag.PendingOrders đơn hàng</strong> đang chờ xử lý hoặc pha chế.</p>
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-status="Pending" class="ml-auto text-sm font-semibold text-amber-700 hover:underline">Xem ngay →</a>
+    </div>
+}
+
+<!-- Recent Orders -->
+<div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-[#E8DFD8]">
+        <h3 class="text-base font-bold text-[#6F4E37]">Đơn hàng gần đây</h3>
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="text-sm text-[#6F4E37] hover:underline font-medium">Xem tất cả →</a>
+    </div>
+    <table class="w-full admin-table text-sm">
+        <thead class="bg-[#FAF8F5] text-[#8B7355]">
+            <tr>
+                <th class="text-left px-6 py-3 font-semibold">#</th>
+                <th class="text-left px-6 py-3 font-semibold">Khách hàng</th>
+                <th class="text-left px-6 py-3 font-semibold">Tổng tiền</th>
+                <th class="text-left px-6 py-3 font-semibold">Trạng thái</th>
+                <th class="text-left px-6 py-3 font-semibold">Thời gian</th>
+                <th class="px-6 py-3"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-[#F5EBE0]">
+            @foreach (var order in recentOrders)
+            {
+                <tr>
+                    <td class="px-6 py-4 text-[#6F4E37] font-mono font-medium">#@order.OrderID.ToString("D4")</td>
+                    <td class="px-6 py-4 text-[#6F4E37] font-medium">@order.CustomerName</td>
+                    <td class="px-6 py-4 text-[#6F4E37] font-semibold">@order.Total.ToString("N0") ₫</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
+                    </td>
+                    <td class="px-6 py-4 text-[#8B7355]">@order.CreatedAt.ToString("HH:mm dd/MM")</td>
+                    <td class="px-6 py-4 text-right">
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.OrderID"
+                           class="text-sm text-[#6F4E37] hover:underline font-medium">Chi tiết</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- ===== Sales Chart + Best Sellers ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
+
+    <!-- Sales Chart -->
+    <div class="xl:col-span-2 bg-white rounded-3xl border border-[#E8DFD8] shadow-sm p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-base font-bold text-[#6F4E37]">Biểu đồ doanh thu hôm nay</h3>
+                <p class="text-xs text-[#8B7355] mt-0.5">Theo từng khung giờ</p>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-[#6F4E37]">@(salesData.Sum(x => x.sales).ToString("N0")) ₫</p>
+                <p class="text-xs text-green-600 font-medium mt-0.5">▲ +12.5% so với hôm qua</p>
+            </div>
+        </div>
+        <canvas id="adminSalesChart" height="100"></canvas>
+    </div>
+
+    <!-- Best Sellers -->
+    <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-[#E8DFD8]">
+            <h3 class="text-base font-bold text-[#6F4E37]">🏆 Bán chạy nhất</h3>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-xs text-[#8B7355] hover:text-[#6F4E37] font-medium">Quản lý →</a>
+        </div>
+        <div class="divide-y divide-[#F5EBE0]">
+            @{int bsRank = 0;}
+            @foreach (var item in bestSellers)
+            {
+                bsRank++;
+                <div class="flex items-center gap-4 px-5 py-4 hover:bg-[#FAF8F5] transition-colors">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#6F4E37] to-[#D4A574] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        @bsRank
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-[#6F4E37] text-sm truncate">@item.name</p>
+                        <p class="text-xs text-[#8B7355]">@item.sales đơn</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-xs font-bold text-[#6F4E37]">@((item.revenue / 1000000m).ToString("N1"))M ₫</p>
+                        <p class="text-xs text-green-600 font-semibold">@item.trend</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const ctx = document.getElementById('adminSalesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.time))),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.sales))),
+                borderColor: '#6F4E37',
+                backgroundColor: 'rgba(212,165,116,0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: '#D4A574',
+                pointBorderColor: '#6F4E37',
+                pointBorderWidth: 2,
+                pointHoverRadius: 7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'white',
+                    borderColor: '#E8DFD8',
+                    borderWidth: 1,
+                    titleColor: '#6F4E37',
+                    bodyColor: '#6F4E37',
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' ₫' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#E8DFD8' },
+                    ticks: { color: '#8B7355', font: { size: 11 }, callback: v => v.toLocaleString() + ' ₫' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#8B7355', font: { size: 11 } }
+                }
+            }
+        }
+    });
+</script>
+}

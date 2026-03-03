@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Suppress nullable dereference warnings in Razor-generated code (ViewBag dynamic) -->
+    <NoWarn>$(NoWarn);CS8602;CS8604</NoWarn>
+  </PropertyGroup>
+
+</Project>

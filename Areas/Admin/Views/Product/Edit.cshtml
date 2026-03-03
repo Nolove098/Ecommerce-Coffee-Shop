@@ -1,0 +1,80 @@
+@model SaleStore.Models.Product
+@{
+    ViewData["Title"] = "Chỉnh sửa: " + Model?.Name;
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+}
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+        <div class="px-8 py-6 border-b border-[#E8DFD8] bg-gradient-to-r from-[#FAF8F5] to-white flex items-center gap-4">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="w-14 h-14 rounded-2xl object-cover shadow-sm" alt="@Model.Name" />
+            }
+            <div>
+                <h3 class="text-lg font-bold text-[#6F4E37]">@Model.Name</h3>
+                <p class="text-sm text-[#8B7355]">Cập nhật thông tin sản phẩm</p>
+            </div>
+        </div>
+
+        <form asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductID" method="post" class="px-8 py-6 space-y-5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ProductID" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="md:col-span-2">
+                    <label asp-for="Name" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Name" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none" />
+                    <span asp-validation-for="Name" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Price" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Price" type="number" min="0" step="1000" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none" />
+                    <span asp-validation-for="Price" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Stock" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Stock" type="number" min="0" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none" />
+                    <span asp-validation-for="Stock" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="Category" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Category" list="category-list" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none" />
+                    <datalist id="category-list">
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat" />
+                        }
+                    </datalist>
+                    <span asp-validation-for="Category" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="ImageUrl" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="ImageUrl" type="url" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none" />
+                </div>
+
+                <div class="md:col-span-2">
+                    <label asp-for="Description" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <textarea asp-for="Description" rows="3" class="w-full border border-[#E8DFD8] rounded-xl px-4 py-2.5 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input asp-for="IsActive" type="checkbox" class="w-4 h-4 accent-[#6F4E37]" />
+                    <label asp-for="IsActive" class="text-sm font-semibold text-[#6F4E37]">Đang bán</label>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-[#E8DFD8]">
+                <button type="submit" class="flex items-center gap-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Lưu thay đổi
+                </button>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="bg-[#FAF8F5] border border-[#E8DFD8] text-[#6F4E37] px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#F5EBE0] transition-colors">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

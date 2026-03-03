@@ -1,0 +1,124 @@
+@model SaleStore.Models.Order
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Đơn hàng #" + (Model?.OrderID.ToString("D4") ?? "");
+    var allStatuses = Enum.GetValues<OrderStatus>();
+    var customerInitial = string.IsNullOrEmpty(Model?.CustomerName) ? "?" : Model.CustomerName[0].ToString();
+    // Determine the next logical status
+    var nextStatus = Model!.Status switch {
+        OrderStatus.Pending   => OrderStatus.Brewing,
+        OrderStatus.Brewing   => OrderStatus.Ready,
+        OrderStatus.Ready     => OrderStatus.Delivered,
+        _ => (OrderStatus?)null
+    };
+}
+
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <!-- Header card -->
+    <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <h3 class="text-xl font-bold text-[#6F4E37]">Đơn #@Model.OrderID.ToString("D4")</h3>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold @Model.Status.ToBadgeClass()">@Model.Status.ToVietnamese()</span>
+            </div>
+            <p class="text-sm text-[#8B7355]">Đặt lúc: @Model.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</p>
+        </div>
+        @if (nextStatus.HasValue)
+        {
+            <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.OrderID" />
+                <input type="hidden" name="status" value="@nextStatus.Value" />
+                <button type="submit" class="flex items-center gap-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                    Chuyển sang: @nextStatus.Value.ToVietnamese()
+                </button>
+            </form>
+        }
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Customer info -->
+        <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm p-6">
+            <h4 class="text-sm font-bold text-[#6F4E37] uppercase tracking-wide mb-4">Thông tin khách hàng</h4>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#F5EBE0] rounded-full flex items-center justify-center font-bold text-[#6F4E37]">
+                        @customerInitial
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#6F4E37]">@Model.CustomerName</p>
+                        <p class="text-sm text-[#8B7355]">@Model.CustomerPhone</p>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Note))
+                {
+                    <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm text-amber-800">
+                        <strong>Ghi chú:</strong> @Model.Note
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Status timeline -->
+        <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm p-6">
+            <h4 class="text-sm font-bold text-[#6F4E37] uppercase tracking-wide mb-4">Cập nhật trạng thái</h4>
+            <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post" class="flex gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.OrderID" />
+                <select name="status" class="flex-1 border border-[#E8DFD8] rounded-xl px-3 py-2 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none">
+                    @foreach (var s in allStatuses)
+                    {
+                        <option value="@s" selected="@(Model.Status == s ? "selected" : null)">@s.ToVietnamese()</option>
+                    }
+                </select>
+                <button type="submit" class="bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">Cập nhật</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order items -->
+    <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-[#E8DFD8]">
+            <h4 class="text-sm font-bold text-[#6F4E37] uppercase tracking-wide">Chi tiết đơn hàng</h4>
+        </div>
+        <table class="w-full text-sm admin-table">
+            <thead class="bg-[#FAF8F5] text-[#8B7355]">
+                <tr>
+                    <th class="text-left px-6 py-3 font-semibold">Sản phẩm</th>
+                    <th class="text-center px-6 py-3 font-semibold">SL</th>
+                    <th class="text-right px-6 py-3 font-semibold">Đơn giá</th>
+                    <th class="text-right px-6 py-3 font-semibold">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#F5EBE0]">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-6 py-4 font-medium text-[#6F4E37]">@item.ProductName</td>
+                        <td class="px-6 py-4 text-center text-[#6F4E37]">@item.Quantity</td>
+                        <td class="px-6 py-4 text-right text-[#8B7355]">@item.UnitPrice.ToString("N0") ₫</td>
+                        <td class="px-6 py-4 text-right font-semibold text-[#6F4E37]">@item.Subtotal.ToString("N0") ₫</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="bg-[#FAF8F5]">
+                <tr>
+                    <td colspan="3" class="px-6 py-4 text-right font-bold text-[#6F4E37]">Tổng cộng</td>
+                    <td class="px-6 py-4 text-right font-bold text-xl text-[#6F4E37]">@Model.Total.ToString("N0") ₫</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Back -->
+    <div>
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index"
+           class="inline-flex items-center gap-2 text-sm text-[#6F4E37] hover:underline font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Quay lại danh sách đơn hàng
+        </a>
+    </div>
+
+</div>
