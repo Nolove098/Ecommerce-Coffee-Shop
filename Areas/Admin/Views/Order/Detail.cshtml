@@ -1,9 +1,9 @@
 @model SaleStore.Models.Order
 @using SaleStore.Models
 @{
-    ViewData["Title"] = "Đơn hàng #" + (Model?.OrderID.ToString("D4") ?? "");
+    ViewData["Title"] = "Đơn hàng #" + (Model?.Id.ToString("D4") ?? "");
     var allStatuses = Enum.GetValues<OrderStatus>();
-    var customerInitial = string.IsNullOrEmpty(Model?.CustomerName) ? "?" : Model.CustomerName[0].ToString();
+    var customerInitial = string.IsNullOrEmpty(Model?.Customer?.FullName) ? "?" : Model.Customer?.FullName[0].ToString();
     // Determine the next logical status
     var nextStatus = Model!.Status switch {
         OrderStatus.Pending   => OrderStatus.Brewing,
@@ -19,7 +19,7 @@
     <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3 mb-1">
-                <h3 class="text-xl font-bold text-[#6F4E37]">Đơn #@Model.OrderID.ToString("D4")</h3>
+                <h3 class="text-xl font-bold text-[#6F4E37]">Đơn #@Model.Id.ToString("D4")</h3>
                 <span class="px-3 py-1 rounded-full text-xs font-semibold @Model.Status.ToBadgeClass()">@Model.Status.ToVietnamese()</span>
             </div>
             <p class="text-sm text-[#8B7355]">Đặt lúc: @Model.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</p>
@@ -28,7 +28,7 @@
         {
             <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post">
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.OrderID" />
+                <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="status" value="@nextStatus.Value" />
                 <button type="submit" class="flex items-center gap-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm whitespace-nowrap">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
@@ -48,8 +48,8 @@
                         @customerInitial
                     </div>
                     <div>
-                        <p class="font-semibold text-[#6F4E37]">@Model.CustomerName</p>
-                        <p class="text-sm text-[#8B7355]">@Model.CustomerPhone</p>
+                        <p class="font-semibold text-[#6F4E37]">@Model.Customer?.FullName</p>
+                        <p class="text-sm text-[#8B7355]">@Model.Customer?.Phone</p>
                     </div>
                 </div>
                 @if (!string.IsNullOrEmpty(Model.Note))
@@ -66,7 +66,7 @@
             <h4 class="text-sm font-bold text-[#6F4E37] uppercase tracking-wide mb-4">Cập nhật trạng thái</h4>
             <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post" class="flex gap-2">
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.OrderID" />
+                <input type="hidden" name="id" value="@Model.Id" />
                 <select name="status" class="flex-1 border border-[#E8DFD8] rounded-xl px-3 py-2 text-sm text-[#6F4E37] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none">
                     @foreach (var s in allStatuses)
                     {
@@ -93,20 +93,20 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#F5EBE0]">
-                @foreach (var item in Model.Items)
+                @foreach (var item in Model.OrderItems)
                 {
                     <tr>
                         <td class="px-6 py-4 font-medium text-[#6F4E37]">@item.ProductName</td>
                         <td class="px-6 py-4 text-center text-[#6F4E37]">@item.Quantity</td>
                         <td class="px-6 py-4 text-right text-[#8B7355]">@item.UnitPrice.ToString("N0") ₫</td>
-                        <td class="px-6 py-4 text-right font-semibold text-[#6F4E37]">@item.Subtotal.ToString("N0") ₫</td>
+                        <td class="px-6 py-4 text-right font-semibold text-[#6F4E37]">@item.LineTotal.ToString("N0") ₫</td>
                     </tr>
                 }
             </tbody>
             <tfoot class="bg-[#FAF8F5]">
                 <tr>
                     <td colspan="3" class="px-6 py-4 text-right font-bold text-[#6F4E37]">Tổng cộng</td>
-                    <td class="px-6 py-4 text-right font-bold text-xl text-[#6F4E37]">@Model.Total.ToString("N0") ₫</td>
+                    <td class="px-6 py-4 text-right font-bold text-xl text-[#6F4E37]">@Model.TotalAmount.ToString("N0") ₫</td>
                 </tr>
             </tfoot>
         </table>

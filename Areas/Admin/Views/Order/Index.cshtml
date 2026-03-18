@@ -52,21 +52,21 @@
             @foreach (var order in Model)
             {
                 <tr>
-                    <td class="px-6 py-4 font-mono font-semibold text-[#6F4E37]">#@order.OrderID.ToString("D4")</td>
+                    <td class="px-6 py-4 font-mono font-semibold text-[#6F4E37]">#@order.Id.ToString("D4")</td>
                     <td class="px-6 py-4">
-                        <p class="font-semibold text-[#6F4E37]">@order.CustomerName</p>
-                        <p class="text-xs text-[#8B7355]">@order.CustomerPhone</p>
+                        <p class="font-semibold text-[#6F4E37]">@order.Customer?.FullName</p>
+                        <p class="text-xs text-[#8B7355]">@order.Customer?.Phone</p>
                     </td>
                     <td class="px-6 py-4 text-[#8B7355]">
-                        @string.Join(", ", order.Items.Select(i => $"{i.ProductName} ×{i.Quantity}"))
+                        @string.Join(", ", order.OrderItems.Select(i => $"{i.ProductName} ×{i.Quantity}"))
                     </td>
-                    <td class="px-6 py-4 text-right font-bold text-[#6F4E37]">@order.Total.ToString("N0") ₫</td>
+                    <td class="px-6 py-4 text-right font-bold text-[#6F4E37]">@order.TotalAmount.ToString("N0") ₫</td>
                     <td class="px-6 py-4 text-center">
                         <span class="px-3 py-1 rounded-full text-xs font-semibold @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
                     </td>
                     <td class="px-6 py-4 text-[#8B7355] text-xs">@order.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</td>
                     <td class="px-6 py-4 text-right">
-                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.OrderID"
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
                            class="inline-flex items-center gap-1.5 text-[#6F4E37] hover:text-[#5D3A1A] font-semibold text-xs border border-[#E8DFD8] px-3 py-1.5 rounded-lg hover:bg-[#FAF8F5] transition-colors">
                             Chi tiết →
                         </a>
