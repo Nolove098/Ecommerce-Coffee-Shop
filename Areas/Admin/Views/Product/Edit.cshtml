@@ -17,9 +17,9 @@
             </div>
         </div>
 
-        <form asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductID" method="post" class="px-8 py-6 space-y-5">
+        <form asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id" method="post" class="px-8 py-6 space-y-5">
             @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="ProductID" />
+            <input type="hidden" asp-for="Id" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="md:col-span-2">

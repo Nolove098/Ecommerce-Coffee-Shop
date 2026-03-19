@@ -100,19 +100,22 @@
                 <th class="px-6 py-3"></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-[#F5EBE0]">
+<tbody class="divide-y divide-[#F5EBE0]">
             @foreach (var order in recentOrders)
             {
                 <tr>
-                    <td class="px-6 py-4 text-[#6F4E37] font-mono font-medium">#@order.OrderID.ToString("D4")</td>
-                    <td class="px-6 py-4 text-[#6F4E37] font-medium">@order.CustomerName</td>
-                    <td class="px-6 py-4 text-[#6F4E37] font-semibold">@order.Total.ToString("N0") ₫</td>
+                    <td class="px-6 py-4 text-[#6F4E37] font-mono font-medium">#@order.Id.ToString("D4")</td>
+                    
+                    <td class="px-6 py-4 text-[#6F4E37] font-medium">@(order.Customer?.FullName ?? "Khách lẻ")</td>
+                    
+                    <td class="px-6 py-4 text-[#6F4E37] font-semibold">@order.TotalAmount.ToString("N0") ₫</td>
+                    
                     <td class="px-6 py-4">
                         <span class="px-3 py-1 rounded-full text-xs font-semibold @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
                     </td>
                     <td class="px-6 py-4 text-[#8B7355]">@order.CreatedAt.ToString("HH:mm dd/MM")</td>
                     <td class="px-6 py-4 text-right">
-                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.OrderID"
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
                            class="text-sm text-[#6F4E37] hover:underline font-medium">Chi tiết</a>
                     </td>
                 </tr>

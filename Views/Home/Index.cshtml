@@ -1,3 +1,4 @@
+@inject SaleStore.Data.ApplicationDbContext _context
 @{
     Layout = null;
 }
@@ -171,7 +172,7 @@
                 <button onclick="filterCat(this,'@c')" class="cat-btn px-5 py-2.5 rounded-full border border-[#E8DFD8] text-sm font-semibold text-[#6F4E37] hover:border-[#6F4E37] hover:bg-[#6F4E37] hover:text-white transition-all @(c=="Tất cả"?"cat-active":"")">@c</button>
             }
         </div>
-        @{ var menuProducts = SaleStore.Data.MockDataStore.Products.Where(p=>p.IsActive).ToList(); }
+        @{ var menuProducts = _context.Products.Where(p=>p.IsActive).ToList(); }
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach(var p in menuProducts){
                 <div class="product-card bg-white rounded-3xl border border-[#E8DFD8] overflow-hidden group" data-cat="@p.Category">
@@ -194,7 +195,7 @@
                                 <span class="text-[#6F4E37] font-bold text-lg">@p.Price.ToString("N0")</span>
                                 <span class="text-[#8B7355] text-sm ml-0.5">₫</span>
                             </div>
-                            <button onclick="addToCart(@p.ProductID,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
+                            <button onclick="addToCart(@p.Id,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
                                     class="flex items-center gap-1.5 bg-[#6F4E37] hover:bg-[#5D3A1A] active:scale-95 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 Thêm
