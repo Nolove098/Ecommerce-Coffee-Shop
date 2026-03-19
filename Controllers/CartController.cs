@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SaleStore.Data; // Đổi thành Ecommerce_Coffee_Shop.Data nếu bạn dùng namespace đó
 using SaleStore.Models; // Đổi thành Ecommerce_Coffee_Shop.Models nếu bạn dùng namespace đó
 using SaleStore.Models.ViewModels;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace SaleStore.Controllers; // Đổi thành Ecommerce_Coffee_Shop.Controllers nếu cần
 
@@ -18,14 +20,32 @@ public class CartController : Controller
     }
 
     // GET: /Cart/Checkout
-    public IActionResult Checkout()
+    [Authorize]
+    [HttpGet]
+    [Route("Cart/Checkout")]
+    public async Task<IActionResult> Checkout()
     {
-        return View(new CheckoutViewModel());
+        var model = new CheckoutViewModel();
+        var email = User.FindFirstValue(ClaimTypes.Email);
+
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == email);
+            if (user != null)
+            {
+                model.CustomerName = user.FullName;
+                model.CustomerPhone = user.Phone ?? string.Empty;
+            }
+        }
+
+        return View(model);
     }
 
     // POST: /Cart/PlaceOrder
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("Cart/PlaceOrder")]
     public async Task<IActionResult> PlaceOrder(CheckoutViewModel model)
     {
         if (!ModelState.IsValid)
@@ -93,6 +113,8 @@ public class CartController : Controller
     }
 
     // GET: /Cart/Success/{id}
+    [HttpGet]
+    [Route("Cart/Success/{id:long}")]
     public async Task<IActionResult> Success(long id)
     {
         // 5. Lấy đơn hàng từ Supabase (Kéo theo cả thông tin Customer và OrderItems)

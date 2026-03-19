@@ -1,4 +1,6 @@
 using SaleStore.Data; // Đảm bảo gọi đúng namespace chứa ApplicationDbContext
+using SaleStore.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
            .UseSnakeCaseNamingConvention());
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.Cookie.Name = "salestore.auth";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<PasswordHasher>();
 builder.Services.AddControllersWithViews();
 
 // 2. Session để hỗ trợ giỏ hàng (Giữ nguyên của bạn)
@@ -21,8 +35,17 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
+    await AuthDbInitializer.EnsureCreatedAsync(dbContext, passwordHasher);
+}
+
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseSession();
 
 // 3. Route cho Area "Admin" (Giữ nguyên của bạn)
@@ -32,6 +55,13 @@ app.MapControllerRoute(
     defaults: new { area = "Admin" },
     constraints: new { },
     dataTokens: new { area = "Admin" });
+
+app.MapControllerRoute(
+    name: "staff",
+    pattern: "Staff/{controller=POS}/{action=Index}/{id?}",
+    defaults: new { area = "Staff" },
+    constraints: new { },
+    dataTokens: new { area = "Staff" });
 
 // 4. Route mặc định (Giữ nguyên của bạn)
 app.MapDefaultControllerRoute();

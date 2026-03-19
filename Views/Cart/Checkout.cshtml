@@ -51,7 +51,7 @@
         </div>
     }
 
-    <form asp-action="PlaceOrder" asp-controller="Cart" method="post" id="checkoutForm">
+    <form asp-area="" asp-action="PlaceOrder" asp-controller="Cart" method="post" id="checkoutForm">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="CartJson" id="cartJsonInput"/>
 

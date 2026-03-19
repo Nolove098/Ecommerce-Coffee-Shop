@@ -68,10 +68,43 @@
                 <span class="hidden sm:inline">Giỏ hàng</span>
                 <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-[#D4A574] text-[#1A0E08] text-xs font-bold rounded-full flex items-center justify-center hidden">0</span>
             </button>
-            <a href="/Admin" class="hidden md:flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                Admin
-            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="hidden lg:flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white">
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#D4A574] font-bold text-[#1A0E08]">@User.Identity.Name?.Substring(0, 1).ToUpperInvariant()</span>
+                    <div class="leading-tight">
+                        <p class="font-semibold">@User.Identity.Name</p>
+                        <p class="text-xs text-white/50">Thành viên SaleStore</p>
+                    </div>
+                </div>
+                <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="hidden sm:block">
+                    <button type="submit" class="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
+                        Đăng xuất
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a asp-area="" asp-controller="Auth" asp-action="Login" class="hidden sm:inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
+                    Đăng nhập
+                </a>
+                <a asp-area="" asp-controller="Auth" asp-action="Register" class="hidden sm:inline-flex items-center rounded-xl bg-[#D4A574] px-4 py-2.5 text-sm font-bold text-[#1A0E08] transition hover:bg-[#C4956A]">
+                    Đăng ký
+                </a>
+            }
+            @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
+            {
+                <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="hidden md:inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
+                    POS
+                </a>
+            }
+            @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
+            {
+                <a href="/Admin" class="hidden md:flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    Admin
+                </a>
+            }
         </div>
     </div>
 </nav>
@@ -328,10 +361,31 @@
         </div>
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 text-sm">
             <p>© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
-            <a href="/Admin" class="hover:text-[#D4A574] transition-colors flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                Admin Panel
-            </a>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="text-white/75">Xin chào, @User.Identity.Name</span>
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
+                        <button type="submit" class="hover:text-[#D4A574] transition-colors">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="hover:text-[#D4A574] transition-colors">Đăng nhập</a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Register" class="hover:text-[#D4A574] transition-colors">Đăng ký</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
+                {
+                    <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="hover:text-[#D4A574] transition-colors">POS</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
+                {
+                    <a href="/Admin" class="hover:text-[#D4A574] transition-colors flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Admin Panel
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </footer>

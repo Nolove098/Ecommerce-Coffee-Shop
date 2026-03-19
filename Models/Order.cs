@@ -7,6 +7,7 @@ namespace SaleStore.Models
     {
         public long Id { get; set; }
         public long CustomerId { get; set; }
+        public long? CreatedByUserId { get; set; }
         public string? ShippingAddress { get; set; }
         public string? Note { get; set; }
         public OrderStatus Status { get; set; }
@@ -15,6 +16,7 @@ namespace SaleStore.Models
 
         // Khai báo mối quan hệ (Navigation properties) giúp nối bảng dễ dàng hơn
         public Customer? Customer { get; set; }
+        public AppUser? CreatedByUser { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new();
     }
 }

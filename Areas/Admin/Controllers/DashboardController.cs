@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore; // Thêm dòng này để dùng các hàm Async của Database
 using SaleStore.Data;
 using SaleStore.Models;
@@ -6,6 +7,7 @@ using SaleStore.Models;
 namespace SaleStore.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = AppRoles.Admin)]
     public class DashboardController : Controller
     {
         // 1. Khai báo và "Tiêm" Database Context
