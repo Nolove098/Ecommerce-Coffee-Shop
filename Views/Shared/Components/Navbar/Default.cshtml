@@ -1,0 +1,83 @@
+@using System.Security.Claims;
+
+<!-- Navbar Component -->
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo & Brand -->
+            <div class="flex items-center space-x-3">
+                <a href="/" class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-[#D4A574] rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#2C1810]" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 11.894 1.789l-1.33.665 3.06 1.223a1 1 0 11-.76 1.854l-5.848-2.339v4.01H9V12.64L3.173 15.27a1 1 0 11-.894-1.789l1.599-.8L2.5 12.326V11a1 1 0 11-2 0V3a1 1 0 011-1h10z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-[#2C1810]">SaleStore</span>
+                </a>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/Pages/Menu" class="text-gray-700 hover:text-[#6F4E37] transition">☕ Thực đơn</a>
+                <a href="/Pages/About" class="text-gray-700 hover:text-[#6F4E37] transition">Về chúng tôi</a>
+                <a href="/Pages/Favorites" class="text-gray-700 hover:text-[#6F4E37] transition">❤️ Yêu thích</a>
+                <a href="/Pages/Contact" class="text-gray-700 hover:text-[#6F4E37] transition">Liên hệ</a>
+            </div>
+
+            <!-- Right Side - Auth & Cart -->
+            <div class="flex items-center space-x-4">
+                <!-- Cart Button -->
+                <button onclick="openCartSidebar()" class="relative flex items-center gap-2 px-4 py-2 text-[#2C1810] hover:bg-gray-100 rounded-lg transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19"/>
+                    </svg>
+                    <span class="hidden sm:inline font-medium">Giỏ hàng</span>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-[#D4A574] text-white text-xs font-bold rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="flex items-center space-x-3">
+                        <!-- User Name -->
+                        <span class="text-sm text-gray-700">
+                            Xin chào, <strong>@User.Identity?.Name</strong>
+                        </span>
+
+                        <!-- Dropdown Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+                                <div class="w-8 h-8 bg-[#D4A574] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    @(User.Identity?.Name?[0].ToString() ?? "U")
+                                </div>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Content -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block">
+                                <a href="/Admin" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                    Quản trị viên
+                                </a>
+                                <form method="post" action="/Auth/Logout" class="block">
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-lg">
+                                        Đăng xuất
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a href="/Auth/Login" class="px-4 py-2 text-[#2C1810] hover:bg-gray-100 rounded-lg transition">
+                        Đăng nhập
+                    </a>
+                    <a href="/Auth/Register" class="px-4 py-2 bg-[#D4A574] text-white rounded-lg hover:bg-[#C89968] transition">
+                        Đăng ký
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>

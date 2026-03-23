@@ -1,0 +1,70 @@
+@model SaleStore.Models.ViewModels.AdminCreateStaffViewModel
+@{
+    ViewData["Title"] = "Tạo Staff";
+}
+
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+        <div class="px-8 py-6 border-b border-[#E8DFD8] bg-[#FAF8F5]">
+            <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Internal Account</p>
+            <h1 class="mt-2 text-2xl font-bold text-[#6F4E37]">Tạo tài khoản nhân viên</h1>
+            <p class="mt-2 text-sm text-[#8B7355]">Tài khoản Staff sau khi đăng nhập sẽ được đưa thẳng vào màn hình POS bán hàng tại quầy.</p>
+        </div>
+
+        <form asp-area="Admin" asp-controller="UserManagement" asp-action="CreateStaff" method="post" class="px-8 py-6 space-y-5">
+            <div asp-validation-summary="ModelOnly" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="md:col-span-2">
+                    <label asp-for="FullName" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="FullName" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="FullName" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Username" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Username" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="Username" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Email" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Email" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="Email" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Phone" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Phone" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="Phone" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Password" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="Password" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="Password" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="ConfirmPassword" class="block text-sm font-semibold text-[#6F4E37] mb-1.5"></label>
+                    <input asp-for="ConfirmPassword" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30" />
+                    <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+            </div>
+
+            <label class="flex items-center gap-3 rounded-2xl bg-[#FAF8F5] px-4 py-3 text-sm text-[#6B5A4C]">
+                <input asp-for="IsActive" class="h-4 w-4 rounded border-[#D4A574] text-[#6F4E37] focus:ring-[#D4A574]" />
+                <span>Kích hoạt tài khoản ngay sau khi tạo</span>
+            </label>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-6 py-3 rounded-xl font-semibold text-sm transition-colors">Tạo tài khoản Staff</button>
+                <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index" class="bg-[#FAF8F5] border border-[#E8DFD8] text-[#6F4E37] px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#F5EBE0] transition-colors">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,22 @@
+@using SaleStore.Models;
+@model OrderStatus
+
+<!-- Status Badge Component -->
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold @GetBadgeClass(Model)">
+    @Model.ToVietnamese()
+</span>
+
+@{
+    string GetBadgeClass(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => "bg-yellow-100 text-yellow-800",
+            OrderStatus.Brewing => "bg-blue-100 text-blue-800",
+            OrderStatus.Ready => "bg-green-100 text-green-800",
+            OrderStatus.Delivered => "bg-indigo-100 text-indigo-800",
+            OrderStatus.Cancelled => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800"
+        };
+    }
+}

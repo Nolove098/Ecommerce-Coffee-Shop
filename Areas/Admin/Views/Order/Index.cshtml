@@ -1,0 +1,78 @@
+@model List<SaleStore.Models.Order>
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+    var statuses = Enum.GetValues<OrderStatus>();
+    var currentStatus = ViewBag.CurrentStatus as string ?? "";
+}
+
+<!-- Filter tabs -->
+<div class="flex items-center gap-2 mb-6 flex-wrap">
+    <a asp-area="Admin" asp-controller="Order" asp-action="Index"
+       class="px-4 py-2 rounded-xl text-sm font-semibold border transition-colors @(string.IsNullOrEmpty(currentStatus) ? "bg-[#6F4E37] text-white border-[#6F4E37]" : "bg-white text-[#6F4E37] border-[#E8DFD8] hover:bg-[#FAF8F5]")">
+        Tất cả
+        <span class="ml-1.5 text-xs bg-white/20 px-1.5 py-0.5 rounded-full">@Model.Count</span>
+    </a>
+    @foreach (var s in statuses)
+    {
+        var count = Model.Count(o => o.Status == s);
+        var isActive = currentStatus == s.ToString();
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-status="@s"
+           class="px-4 py-2 rounded-xl text-sm font-semibold border transition-colors @(isActive ? "bg-[#6F4E37] text-white border-[#6F4E37]" : "bg-white text-[#6F4E37] border-[#E8DFD8] hover:bg-[#FAF8F5]")">
+            @s.ToVietnamese()
+            <span class="ml-1.5 text-xs @(isActive ? "bg-white/30" : "bg-[#F5EBE0]") px-1.5 py-0.5 rounded-full">@count</span>
+        </a>
+    }
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+    <table class="w-full admin-table text-sm">
+        <thead class="bg-[#FAF8F5] text-[#8B7355]">
+            <tr>
+                <th class="text-left px-6 py-4 font-semibold">Đơn #</th>
+                <th class="text-left px-6 py-4 font-semibold">Khách hàng</th>
+                <th class="text-left px-6 py-4 font-semibold">Sản phẩm</th>
+                <th class="text-right px-6 py-4 font-semibold">Tổng tiền</th>
+                <th class="text-center px-6 py-4 font-semibold">Trạng thái</th>
+                <th class="text-left px-6 py-4 font-semibold">Thời gian</th>
+                <th class="px-6 py-4"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-[#F5EBE0]">
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-[#8B7355]">
+                        <svg class="w-10 h-10 mx-auto mb-3 text-[#D4A574]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Không có đơn hàng nào.
+                    </td>
+                </tr>
+            }
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td class="px-6 py-4 font-mono font-semibold text-[#6F4E37]">#@order.Id.ToString("D4")</td>
+                    <td class="px-6 py-4">
+                        <p class="font-semibold text-[#6F4E37]">@order.Customer?.FullName</p>
+                        <p class="text-xs text-[#8B7355]">@order.Customer?.Phone</p>
+                    </td>
+                    <td class="px-6 py-4 text-[#8B7355]">
+                        @string.Join(", ", order.OrderItems.Select(i => $"{i.ProductName} ×{i.Quantity}"))
+                    </td>
+                    <td class="px-6 py-4 text-right font-bold text-[#6F4E37]">@order.TotalAmount.ToString("N0") ₫</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
+                    </td>
+                    <td class="px-6 py-4 text-[#8B7355] text-xs">@order.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</td>
+                    <td class="px-6 py-4 text-right">
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
+                           class="inline-flex items-center gap-1.5 text-[#6F4E37] hover:text-[#5D3A1A] font-semibold text-xs border border-[#E8DFD8] px-3 py-1.5 rounded-lg hover:bg-[#FAF8F5] transition-colors">
+                            Chi tiết →
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

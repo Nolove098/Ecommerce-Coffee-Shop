@@ -1,0 +1,101 @@
+@page "/Pages/About"
+@model SaleStore.Pages.AboutModel
+@{
+    Layout = "/Pages/Shared/_PagesLayout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-[#6F4E37] to-[#2C1810] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl font-bold mb-4">Về Chúng Tôi</h1>
+        <p class="text-xl text-gray-300">Khám phá câu chuyện đằng sau những tách cà phê ngon nhất</p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- History -->
+        <div class="mb-16">
+            <h2 class="text-3xl font-bold text-[#2C1810] mb-6">Lịch sử chúng tôi</h2>
+            <p class="text-gray-700 text-lg leading-relaxed mb-4">
+                Cửa hàng Cà phê của chúng tôi được thành lập vào năm 2020 với một sứ mệnh đơn giản: 
+                mang những tách cà phê chất lượng cao nhất đến tay khách hàng.
+            </p>
+            <p class="text-gray-700 text-lg leading-relaxed">
+                Bắt đầu từ một quán nhỏ với chỉ 3 nhân viên, ngày nay chúng tôi đã phục vụ hàng ngàn 
+                khách hàng hài lòng mỗi tháng. Chúng tôi cam kết với chất lượng, dịch vụ tuyệt vời 
+                và trải nghiệm khách hàng không thể quên.
+            </p>
+        </div>
+
+        <!-- Mission & Vision -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <!-- Mission -->
+            <div class="bg-[#FAF8F5] p-8 rounded-lg border-l-4 border-[#D4A574]">
+                <h3 class="text-2xl font-bold text-[#2C1810] mb-4">🎯 Sứ mệnh</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    Cung cấp cà phê chất lượng cao, được rang xay tươi từ những hạt cà phê tốt nhất 
+                    từ khắp nơi trên thế giới, với dịch vụ chuyên nghiệp và thân thiện.
+                </p>
+            </div>
+
+            <!-- Vision -->
+            <div class="bg-[#FAF8F5] p-8 rounded-lg border-l-4 border-[#D4A574]">
+                <h3 class="text-2xl font-bold text-[#2C1810] mb-4">🌟 Tầm nhìn</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    Trở thành chuỗi cửa hàng cà phê hàng đầu tại Việt Nam, được yêu thích bởi sự 
+                    tập trung vào chất lượng, sáng tạo và những giá trị nhân văn.
+                </p>
+            </div>
+        </div>
+
+        <!-- Values -->
+        <div class="mb-16">
+            <h2 class="text-3xl font-bold text-[#2C1810] mb-8">Những giá trị cốt lõi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Value 1 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-[#D4A574] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">☕</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-[#2C1810] mb-2">Chất lượng</h4>
+                    <p class="text-gray-600">
+                        Mỗi tách cà phê được pha chế với các nguyên liệu tốt nhất và quy trình kỹ lưỡng
+                    </p>
+                </div>
+
+                <!-- Value 2 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-[#D4A574] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">🤝</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-[#2C1810] mb-2">Cộng đồng</h4>
+                    <p class="text-gray-600">
+                        Chúng tôi tin rằng cà phê là một cách để kết nối con người và xây dựng cộng đồng
+                    </p>
+                </div>
+
+                <!-- Value 3 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-[#D4A574] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">🌱</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-[#2C1810] mb-2">Bền vững</h4>
+                    <p class="text-gray-600">
+                        Chúng tôi cam kết bảo vệ môi trường và hỗ trợ các nhà sản xuất cà phê địa phương
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="bg-gradient-to-r from-[#D4A574] to-[#C89968] text-white p-8 rounded-lg text-center">
+            <h3 class="text-2xl font-bold mb-4">Muốn tìm hiểu thêm?</h3>
+            <p class="mb-6 text-lg">Hãy liên hệ với chúng tôi hoặc ghé thăm quán cà phê của kami</p>
+            <a href="/Pages/Contact" class="inline-block bg-white text-[#D4A574] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                Liên hệ ngay
+            </a>
+        </div>
+    </div>
+</section>

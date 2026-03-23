@@ -1,0 +1,7 @@
+@model SaleStore.ViewComponents.UserAvatarViewModel
+
+<!-- User Avatar Component -->
+<div class="@Model.CssClass bg-[#D4A574] rounded-full flex items-center justify-center text-white font-bold text-sm hover:shadow-lg transition cursor-pointer"
+     title="@Model.UserName">
+    @(Model.UserName[0].ToString().ToUpper())
+</div>

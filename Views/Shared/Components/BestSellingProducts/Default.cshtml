@@ -1,0 +1,92 @@
+@model List<SaleStore.Models.Product>
+
+<!-- Best Selling Products Component -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-[#2C1810] mb-2">Sản phẩm bán chạy nhất</h2>
+            <p class="text-gray-600">Những sản phẩm yêu thích của khách hàng</p>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-12">
+                <p class="text-gray-500">Chưa có sản phẩm nào</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var product in Model)
+                {
+                    <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+                        <!-- Product Image -->
+                        <div class="relative bg-gray-200 h-48 rounded-t-lg flex items-center justify-center overflow-hidden">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover" />
+                            }
+                            else
+                            {
+                                <div class="text-gray-400">
+                                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                            }
+
+                            <!-- Stock Badge -->
+                            @if (product.Stock <= 0)
+                            {
+                                <div class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    Hết hàng
+                                </div>
+                            }
+                            else if (product.Stock < 5)
+                            {
+                                <div class="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    Sắp hết
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="p-4">
+                            <h3 class="font-semibold text-[#2C1810] text-lg mb-2 line-clamp-2">@product.Name</h3>
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2">@product.Description</p>
+
+                            <!-- Price -->
+                            <div class="flex items-baseline justify-between mb-4">
+                                <span class="text-2xl font-bold text-[#D4A574]">
+                                    @product.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                </span>
+                            </div>
+
+                            <!-- Add to Cart Button -->
+                            <button class="w-full bg-[#D4A574] text-white py-2 rounded-lg font-semibold hover:bg-[#C89968] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onclick="addToCart(@product.Id, '@product.Name')"
+                                    disabled="@(product.Stock <= 0)">
+                                @if (product.Stock > 0)
+                                {
+                                    <span>Thêm vào giỏ hàng</span>
+                                }
+                                else
+                                {
+                                    <span>Hết hàng</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<script>
+function addToCart(productId, productName) {
+    console.log(`Added ${productName} (ID: ${productId}) to cart`);
+    // TODO: Implement actual add to cart logic
+    alert(`Đã thêm ${productName} vào giỏ hàng!`);
+}
+</script>

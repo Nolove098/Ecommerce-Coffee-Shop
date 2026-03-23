@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – SaleStore Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Badge styles for order status */
+        .badge-pending   { background:#FEF3C7; color:#92400E; }
+        .badge-brewing   { background:#DBEAFE; color:#1E40AF; }
+        .badge-ready     { background:#D1FAE5; color:#065F46; }
+        .badge-delivered { background:#F3F4F6; color:#374151; }
+        .badge-cancelled { background:#FEE2E2; color:#991B1B; }
+
+        /* Sidebar active state */
+        .nav-active { background:rgba(255,255,255,0.18); color:#fff; font-weight:600; }
+
+        /* Smooth transitions */
+        * { transition-property: background-color, border-color, color, box-shadow; transition-duration: 150ms; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FAF8F5; }
+        ::-webkit-scrollbar-thumb { background: #D4A574; border-radius: 3px; }
+
+        /* Table row hover */
+        .admin-table tr:hover td { background:#FAF8F5; }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            ring: 2px;
+            border-color: #D4A574;
+            box-shadow: 0 0 0 3px rgba(212,165,116,0.25);
+        }
+    </style>
+</head>
+<body class="bg-[#FAF8F5] font-sans">
+
+<div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_AdminSidebar.cshtml")
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- Top bar -->
+        <header class="bg-white border-b border-[#E8DFD8] px-8 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+                <h2 class="text-xl font-bold text-[#6F4E37]">@(ViewData["Title"] ?? "Admin")</h2>
+                <p class="text-xs text-[#8B7355] mt-0.5">@DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN"))</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Toast notification zone -->
+                @if (TempData["Success"] != null)
+                {
+                    <div id="toast" class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-xl text-sm font-medium shadow-sm">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        @TempData["Success"]
+                    </div>
+                    <script>setTimeout(()=>{ const t=document.getElementById('toast'); if(t) t.style.display='none'; }, 4000);</script>
+                }
+                <!-- Avatar -->
+                <div class="flex items-center gap-3 bg-[#FAF8F5] border border-[#E8DFD8] rounded-2xl px-3 py-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-[#6F4E37] to-[#D4A574] rounded-full flex items-center justify-center text-white text-xs font-bold">AD</div>
+                    <div class="leading-tight">
+                        <p class="text-sm font-semibold text-[#6F4E37]">@(User.Identity?.Name ?? "Admin")</p>
+                        <p class="text-xs text-[#8B7355]">@((User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "Quản trị viên" : "Người dùng nội bộ"))</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            @RenderBody()
+        </main>
+
+    </div>
+</div>
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>

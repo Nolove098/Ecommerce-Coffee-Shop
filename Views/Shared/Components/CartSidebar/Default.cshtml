@@ -1,0 +1,168 @@
+@model SaleStore.ViewComponents.CartSidebarViewModel
+
+<!-- Cart Sidebar Component -->
+<div id="cartSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <div class="flex flex-col h-full">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-[#6F4E37] text-white">
+            <div>
+                <h2 class="text-lg font-bold">Giỏ hàng</h2>
+                <p class="text-xs text-white/70">@Model.ItemCount sản phẩm</p>
+            </div>
+            <button onclick="closeCartSidebar()" class="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Cart Items -->
+        <div class="flex-1 overflow-y-auto p-4">
+            @if (Model.CartItems == null || !Model.CartItems.Any())
+            {
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                    <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19"/>
+                    </svg>
+                    <p class="text-gray-500 text-lg font-semibold mb-2">Giỏ hàng trống</p>
+                    <p class="text-gray-400 text-sm">Thêm sản phẩm vào giỏ hàng để tiếp tục</p>
+                </div>
+            }
+            else
+            {
+                <div class="space-y-4">
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                            <div class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.ProductName" class="w-full h-full object-cover"/>
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full flex items-center justify-center text-2xl">☕</div>
+                                }
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-sm text-gray-800 truncate">@item.ProductName</h3>
+                                <p class="text-xs text-gray-500 mb-1">@item.Category</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[#6F4E37] font-bold text-sm">@item.Price.ToString("N0") ₫</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="updateCartQuantity(@item.ProductId, -1)" class="w-6 h-6 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xs font-bold">-</button>
+                                        <span class="text-sm font-semibold w-6 text-center">@item.Quantity</span>
+                                        <button onclick="updateCartQuantity(@item.ProductId, 1)" class="w-6 h-6 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xs font-bold">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="removeFromCart(@item.ProductId)" class="text-red-500 hover:text-red-700 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Footer -->
+        @if (Model.CartItems != null && Model.CartItems.Any())
+        {
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-gray-600 font-medium">Tổng cộng:</span>
+                    <span class="text-2xl font-bold text-[#6F4E37]">@Model.TotalAmount.ToString("N0") ₫</span>
+                </div>
+                <a href="/Pages/Checkout" class="block w-full bg-[#6F4E37] hover:bg-[#5D3A1A] text-white text-center py-3 rounded-lg font-semibold transition mb-2">
+                    Thanh toán
+                </a>
+                <button onclick="closeCartSidebar()" class="block w-full border-2 border-[#6F4E37] text-[#6F4E37] hover:bg-[#6F4E37] hover:text-white text-center py-3 rounded-lg font-semibold transition">
+                    Tiếp tục mua hàng
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Overlay -->
+<div id="cartOverlay" onclick="closeCartSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+<script>
+function openCartSidebar() {
+    const sidebar = document.getElementById('cartSidebar');
+    const overlay = document.getElementById('cartOverlay');
+    
+    // Show sidebar and overlay
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
+        sidebar.classList.remove('translate-x-full');
+    }, 10);
+}
+
+function closeCartSidebar() {
+    const sidebar = document.getElementById('cartSidebar');
+    const overlay = document.getElementById('cartOverlay');
+    
+    sidebar.classList.add('translate-x-full');
+    overlay.classList.remove('opacity-100');
+    overlay.classList.add('opacity-0');
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, 300);
+}
+
+function updateCartQuantity(productId, change) {
+    fetch('/Cart/UpdateQuantity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: productId, change: change })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function removeFromCart(productId) {
+    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+    
+    fetch('/Cart/RemoveFromCart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function updateCartBadge(count) {
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+}
+
+// Load cart count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/Cart/GetCart')
+        .then(response => response.json())
+        .then(data => {
+            updateCartBadge(data.itemCount);
+        });
+});
+</script>

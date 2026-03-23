@@ -1,0 +1,69 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Coffee Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="bg-[#FAF8F5]">
+    <!-- Navbar -->
+    @await Component.InvokeAsync("Navbar")
+
+    <!-- Main Content -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Cart Sidebar -->
+    @await Component.InvokeAsync("CartSidebar")
+
+    <!-- Footer -->
+    <footer class="bg-[#2C1810] text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- About -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Về chúng tôi</h4>
+                    <p class="text-gray-300 text-sm">
+                        Cửa hàng cà phê chuyên phục vụ những loại cà phê ngon nhất
+                        được lựa chọn kỹ càng và rang xay tươi mới hàng ngày.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Liên kết nhanh</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="text-gray-300 hover:text-[#D4A574] transition">Trang chủ</a></li>
+                        <li><a href="/Pages/About" class="text-gray-300 hover:text-[#D4A574] transition">Giới thiệu</a></li>
+                        <li><a href="/Pages/Contact" class="text-gray-300 hover:text-[#D4A574] transition">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Liên hệ với chúng tôi</h4>
+                    <p class="text-gray-300 text-sm mb-2">📍 123 Đường Cà phê, TP.HCM</p>
+                    <p class="text-gray-300 text-sm mb-2">📞 (028) 1234 5678</p>
+                    <p class="text-gray-300 text-sm">📧 hello@coffeeshop.vn</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
+                <p>&copy; 2024 Cửa hàng Cà phê. Tất cả các quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

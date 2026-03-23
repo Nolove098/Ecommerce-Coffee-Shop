@@ -1,0 +1,89 @@
+@model List<SaleStore.Models.AppUser>
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Tài khoản";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <p class="text-sm text-[#8B7355]">Quản lý tài khoản nội bộ và người dùng hệ thống.</p>
+    </div>
+    <a asp-area="Admin" asp-controller="UserManagement" asp-action="CreateStaff"
+       class="flex items-center gap-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+        Tạo tài khoản Staff
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+    <div class="bg-white border border-[#E8DFD8] rounded-3xl p-6 shadow-sm">
+        <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Tổng tài khoản</p>
+        <p class="mt-2 text-3xl font-bold text-[#6F4E37]">@Model.Count</p>
+    </div>
+    <div class="bg-white border border-[#E8DFD8] rounded-3xl p-6 shadow-sm">
+        <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Nhân viên</p>
+        <p class="mt-2 text-3xl font-bold text-[#6F4E37]">@Model.Count(x => x.Role == AppRoles.Staff)</p>
+    </div>
+    <div class="bg-white border border-[#E8DFD8] rounded-3xl p-6 shadow-sm">
+        <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Khách hàng</p>
+        <p class="mt-2 text-3xl font-bold text-[#6F4E37]">@Model.Count(x => x.Role == AppRoles.User)</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
+    <table class="w-full admin-table text-sm">
+        <thead class="bg-[#FAF8F5] text-[#8B7355]">
+            <tr>
+                <th class="text-left px-6 py-4 font-semibold">Tài khoản</th>
+                <th class="text-left px-6 py-4 font-semibold">Thông tin</th>
+                <th class="text-left px-6 py-4 font-semibold">Vai trò</th>
+                <th class="text-left px-6 py-4 font-semibold">Trạng thái</th>
+                <th class="text-left px-6 py-4 font-semibold">Đăng nhập gần nhất</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-[#F5EBE0]">
+            @foreach (var user in Model)
+            {
+                var roleClass = user.Role switch
+                {
+                    AppRoles.Admin => "bg-red-50 text-red-700 border-red-100",
+                    AppRoles.Staff => "bg-blue-50 text-blue-700 border-blue-100",
+                    _ => "bg-[#F5EBE0] text-[#6F4E37] border-[#E8DFD8]"
+                };
+
+                <tr>
+                    <td class="px-6 py-4">
+                        <div>
+                            <p class="font-semibold text-[#6F4E37]">@user.Username</p>
+                            <p class="text-xs text-[#8B7355]">@user.Email</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-[#1A0E08]">@user.FullName</p>
+                        <p class="text-xs text-[#8B7355]">@(string.IsNullOrWhiteSpace(user.Phone) ? "Không có số điện thoại" : user.Phone)</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold @roleClass">@user.Role</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        @if (user.IsActive)
+                        {
+                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                Đang hoạt động
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                Đã khóa
+                            </span>
+                        }
+                    </td>
+                    <td class="px-6 py-4 text-[#8B7355]">@(user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy") : "Chưa đăng nhập")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

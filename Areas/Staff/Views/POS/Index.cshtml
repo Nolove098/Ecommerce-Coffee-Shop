@@ -1,0 +1,358 @@
+@model SaleStore.Models.ViewModels.PosIndexViewModel
+@{
+    ViewData["Title"] = "POS Bán Hàng";
+    var jsonOptions = new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    };
+    var productsJson = System.Text.Json.JsonSerializer.Serialize(Model.Products, jsonOptions);
+    var categoriesJson = System.Text.Json.JsonSerializer.Serialize(Model.Categories, jsonOptions);
+}
+
+<div class="h-full min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-6 p-6">
+    <section class="min-h-0 flex flex-col gap-5">
+        <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] gap-4">
+            <div class="bg-white border border-[#E8DFD8] rounded-[2rem] px-5 py-4 shadow-sm">
+                <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Operator</p>
+                <div class="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold serif text-[#1A0E08]">Xin chào, @Model.OperatorName</h2>
+                        <p class="text-sm text-[#8B7355] mt-1">Chọn món, điều chỉnh hóa đơn và tạo đơn tại quầy trong một màn hình duy nhất.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#6F4E37]">
+                        <span class="rounded-full bg-[#F5EBE0] px-3 py-2">Live cart</span>
+                        <span class="rounded-full bg-[#F5EBE0] px-3 py-2">Thanh toán AJAX</span>
+                        <span class="rounded-full bg-[#F5EBE0] px-3 py-2">Không reload</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-[#6F4E37] to-[#2C1810] text-white rounded-[2rem] px-5 py-4 shadow-sm">
+                <p class="text-xs uppercase tracking-[0.22em] text-white/50 font-bold">Shift Summary</p>
+                <p class="mt-4 text-3xl font-bold serif" id="posCartTotalTop">0 ₫</p>
+                <p class="mt-2 text-sm text-white/70">Tổng giá trị hóa đơn đang xử lý</p>
+            </div>
+        </div>
+
+        <div class="bg-white border border-[#E8DFD8] rounded-[2rem] p-4 shadow-sm flex flex-col gap-4 min-h-0 h-full overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+                <div class="relative flex-1">
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <input id="posSearchInput" type="text" placeholder="Tìm nhanh theo tên món..." class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] pl-12 pr-4 py-3.5 text-sm outline-none focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                </div>
+                <div id="posCategoryFilters" class="flex gap-2 overflow-x-auto pb-1"></div>
+            </div>
+
+            <div id="posProductGrid" class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 overflow-y-auto pr-1 min-h-0 flex-1 content-start"></div>
+        </div>
+    </section>
+
+    <aside class="bg-white border border-[#E8DFD8] rounded-[2rem] shadow-sm flex flex-col min-h-0 h-full max-h-full overflow-hidden xl:max-h-[calc(100vh-7rem)]">
+        <div class="px-5 py-5 border-b border-[#E8DFD8] bg-[#FAF8F5] flex-shrink-0">
+            <p class="text-xs uppercase tracking-[0.22em] text-[#8B7355] font-bold">Hóa đơn tại quầy</p>
+            <h2 class="mt-2 text-2xl font-bold serif text-[#6F4E37]">Giỏ hàng POS</h2>
+        </div>
+
+        <div class="px-5 py-4 space-y-4 border-b border-[#E8DFD8] flex-shrink-0">
+            <div>
+                <label class="block text-sm font-semibold text-[#6F4E37] mb-1.5">Tên khách (tùy chọn)</label>
+                <input id="posCustomerName" type="text" placeholder="Khách tại quầy" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/20" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#6F4E37] mb-1.5">Số điện thoại (tùy chọn)</label>
+                <input id="posCustomerPhone" type="text" placeholder="0901 234 567" class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/20" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#6F4E37] mb-1.5">Ghi chú barista</label>
+                <textarea id="posOrderNote" rows="2" placeholder="Ví dụ: ít đá, ít ngọt..." class="w-full rounded-xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3 text-sm outline-none resize-none focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/20"></textarea>
+            </div>
+        </div>
+
+        <div id="posCartItems" class="flex-1 min-h-0 overflow-y-auto px-5 py-4 space-y-3 bg-white">
+            <div class="rounded-2xl border border-dashed border-[#E8DFD8] bg-[#FAF8F5] px-4 py-10 text-center text-sm text-[#8B7355]">
+                Chưa có món nào trong hóa đơn. Chọn món từ menu bên trái để bắt đầu.
+            </div>
+        </div>
+
+        <div class="border-t border-[#E8DFD8] px-5 py-5 bg-[#FCFAF8] space-y-3 flex-shrink-0 sticky bottom-0">
+            <div class="flex items-center justify-between text-sm text-[#8B7355]">
+                <span>Tạm tính</span>
+                <span id="posSubtotalDisplay">0 ₫</span>
+            </div>
+            <div class="flex items-center justify-between text-sm text-[#8B7355]">
+                <span>Thuế</span>
+                <span id="posTaxDisplay">0 ₫</span>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-[#E8DFD8]">
+                <span class="text-base font-bold text-[#1A0E08]">Tổng cộng</span>
+                <span id="posTotalDisplay" class="text-2xl font-bold text-[#6F4E37] serif">0 ₫</span>
+            </div>
+
+            <div id="posCheckoutMessage" class="hidden rounded-2xl px-4 py-3 text-sm"></div>
+
+            <form id="posAntiForgeryForm">@Html.AntiForgeryToken()</form>
+
+            <button id="posCheckoutButton" type="button" class="w-full rounded-2xl bg-[#6F4E37] px-5 py-4 text-base font-bold text-white shadow-xl transition hover:bg-[#5D3A1A] disabled:opacity-50 disabled:cursor-not-allowed">
+                Thanh toán / Tạo đơn
+            </button>
+            <button id="posClearCartButton" type="button" class="w-full rounded-2xl border border-[#E8DFD8] px-5 py-3 text-sm font-semibold text-[#6F4E37] hover:bg-[#FAF8F5] transition-colors">
+                Xóa toàn bộ hóa đơn
+            </button>
+        </div>
+    </aside>
+</div>
+
+@section Scripts {
+<script>
+    const posProducts = @Html.Raw(productsJson);
+    const posCategories = @Html.Raw(categoriesJson);
+    const posState = {
+        cart: [],
+        search: '',
+        category: 'Tất cả',
+        taxRate: 0.08,
+        processing: false
+    };
+
+    const categoryFiltersEl = document.getElementById('posCategoryFilters');
+    const productGridEl = document.getElementById('posProductGrid');
+    const cartItemsEl = document.getElementById('posCartItems');
+    const searchInputEl = document.getElementById('posSearchInput');
+    const subtotalEl = document.getElementById('posSubtotalDisplay');
+    const taxEl = document.getElementById('posTaxDisplay');
+    const totalEl = document.getElementById('posTotalDisplay');
+    const totalTopEl = document.getElementById('posCartTotalTop');
+    const checkoutButtonEl = document.getElementById('posCheckoutButton');
+    const clearCartButtonEl = document.getElementById('posClearCartButton');
+    const messageEl = document.getElementById('posCheckoutMessage');
+    const antiForgeryToken = document.querySelector('#posAntiForgeryForm input[name="__RequestVerificationToken"]').value;
+
+    function formatCurrency(value) {
+        return value.toLocaleString('vi-VN') + ' ₫';
+    }
+
+    function setMessage(type, text) {
+        if (!text) {
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+            messageEl.className = 'hidden rounded-2xl px-4 py-3 text-sm';
+            return;
+        }
+
+        messageEl.className = 'rounded-2xl px-4 py-3 text-sm';
+        messageEl.classList.add(type === 'success' ? 'bg-green-50' : 'bg-red-50');
+        messageEl.classList.add(type === 'success' ? 'text-green-700' : 'text-red-700');
+        messageEl.classList.remove('hidden');
+        messageEl.textContent = text;
+    }
+
+    function getFilteredProducts() {
+        return posProducts.filter(product => {
+            const matchesCategory = posState.category === 'Tất cả' || product.category === posState.category;
+            const search = posState.search.trim().toLowerCase();
+            const productName = (product.name || '').toLowerCase();
+            const productDescription = (product.description || '').toLowerCase();
+            const matchesSearch = !search || productName.includes(search) || productDescription.includes(search);
+            return matchesCategory && matchesSearch;
+        });
+    }
+
+    function renderCategoryFilters() {
+        const categories = ['Tất cả', ...posCategories];
+        categoryFiltersEl.innerHTML = categories.map(category => {
+            const activeClass = posState.category === category
+                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+                : 'bg-[#FAF8F5] text-[#6F4E37] border-[#E8DFD8] hover:border-[#6F4E37] hover:bg-[#F5EBE0]';
+
+            return `<button type="button" data-category="${category}" class="whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${activeClass}">${category}</button>`;
+        }).join('');
+    }
+
+    function renderProducts() {
+        const filteredProducts = getFilteredProducts();
+
+        if (filteredProducts.length === 0) {
+            productGridEl.innerHTML = `<div class="col-span-full rounded-[1.75rem] border border-dashed border-[#E8DFD8] bg-[#FAF8F5] px-6 py-12 text-center text-sm text-[#8B7355]">Không tìm thấy món phù hợp với bộ lọc hiện tại.</div>`;
+            return;
+        }
+
+        productGridEl.innerHTML = filteredProducts.map(product => {
+            const hasImage = !!product.imageUrl;
+            return `
+                <article class="rounded-[1.75rem] border border-[#E8DFD8] bg-[#FFFEFC] p-4 shadow-sm hover:shadow-lg transition-shadow">
+                    <div class="relative overflow-hidden rounded-[1.4rem] bg-[#F5EBE0] h-40 mb-4">
+                        ${hasImage
+                            ? `<img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover" />`
+                            : `<div class="w-full h-full flex items-center justify-center text-5xl">☕</div>`}
+                        <span class="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold text-[#6F4E37] shadow-sm">${product.category}</span>
+                    </div>
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="text-base font-bold text-[#1A0E08] serif">${product.name}</h3>
+                            <p class="mt-1 text-xs leading-5 text-[#8B7355] min-h-[2.5rem]">${product.description || 'Đồ uống pha tại quầy.'}</p>
+                        </div>
+                        <span class="rounded-full bg-[#F5EBE0] px-3 py-1 text-xs font-semibold text-[#6F4E37]">Còn ${product.stock}</span>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between gap-3">
+                        <p class="text-lg font-bold text-[#6F4E37]">${formatCurrency(product.price)}</p>
+                        <button type="button" data-product-id="${product.id}" class="rounded-xl bg-[#6F4E37] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#5D3A1A] transition-colors">Thêm món</button>
+                    </div>
+                </article>`;
+        }).join('');
+    }
+
+    function renderCart() {
+        if (posState.cart.length === 0) {
+            cartItemsEl.innerHTML = `<div class="rounded-2xl border border-dashed border-[#E8DFD8] bg-[#FAF8F5] px-4 py-10 text-center text-sm text-[#8B7355]">Chưa có món nào trong hóa đơn. Chọn món từ menu bên trái để bắt đầu.</div>`;
+        } else {
+            cartItemsEl.innerHTML = posState.cart.map(item => `
+                <div class="rounded-[1.5rem] border border-[#E8DFD8] bg-[#FFFEFC] p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold text-[#1A0E08]">${item.name}</p>
+                            <p class="text-xs text-[#8B7355] mt-1">${item.category} • ${formatCurrency(item.price)}</p>
+                        </div>
+                        <button type="button" data-remove-id="${item.id}" class="text-sm font-semibold text-red-500 hover:text-red-700">Xóa</button>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between gap-4">
+                        <div class="inline-flex items-center rounded-full border border-[#E8DFD8] bg-[#FAF8F5] p-1">
+                            <button type="button" data-decrease-id="${item.id}" class="w-9 h-9 rounded-full text-[#6F4E37] hover:bg-[#F0E4D7]">-</button>
+                            <span class="min-w-[2.5rem] text-center text-sm font-bold text-[#1A0E08]">${item.quantity}</span>
+                            <button type="button" data-increase-id="${item.id}" class="w-9 h-9 rounded-full text-[#6F4E37] hover:bg-[#F0E4D7]">+</button>
+                        </div>
+                        <p class="text-base font-bold text-[#6F4E37]">${formatCurrency(item.price * item.quantity)}</p>
+                    </div>
+                </div>`).join('');
+        }
+
+        const subtotal = posState.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const tax = Math.round(subtotal * posState.taxRate);
+        const total = subtotal + tax;
+
+        subtotalEl.textContent = formatCurrency(subtotal);
+        taxEl.textContent = formatCurrency(tax);
+        totalEl.textContent = formatCurrency(total);
+        totalTopEl.textContent = formatCurrency(total);
+        checkoutButtonEl.disabled = posState.processing || posState.cart.length === 0;
+    }
+
+    function addToCart(productId) {
+        const product = posProducts.find(item => item.id === productId);
+        if (!product) return;
+
+        const existingItem = posState.cart.find(item => item.id === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            posState.cart.push({
+                id: product.id,
+                name: product.name,
+                category: product.category,
+                price: product.price,
+                quantity: 1
+            });
+        }
+
+        renderCart();
+    }
+
+    function updateQuantity(productId, delta) {
+        const item = posState.cart.find(cartItem => cartItem.id === productId);
+        if (!item) return;
+
+        item.quantity += delta;
+        if (item.quantity <= 0) {
+            posState.cart = posState.cart.filter(cartItem => cartItem.id !== productId);
+        }
+
+        renderCart();
+    }
+
+    function removeFromCart(productId) {
+        posState.cart = posState.cart.filter(item => item.id !== productId);
+        renderCart();
+    }
+
+    async function checkout() {
+        if (posState.processing || posState.cart.length === 0) return;
+
+        posState.processing = true;
+        setMessage('', '');
+        renderCart();
+
+        try {
+            const response = await fetch('@Url.Action("CreateOrder", "POS", new { area = "Staff" })', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': antiForgeryToken
+                },
+                body: JSON.stringify({
+                    customerName: document.getElementById('posCustomerName').value,
+                    customerPhone: document.getElementById('posCustomerPhone').value,
+                    note: document.getElementById('posOrderNote').value,
+                    items: posState.cart.map(item => ({ productId: item.id, quantity: item.quantity, price: item.price }))
+                })
+            });
+
+            const payload = await response.json();
+            if (!response.ok) {
+                throw new Error(payload.message || 'Không thể tạo đơn hàng POS.');
+            }
+
+            setMessage('success', payload.message || `Đã tạo đơn #${payload.orderId} • ${payload.statusText} • ${payload.createdAt}`);
+            posState.cart = [];
+            document.getElementById('posCustomerName').value = '';
+            document.getElementById('posCustomerPhone').value = '';
+            document.getElementById('posOrderNote').value = '';
+            renderCart();
+        } catch (error) {
+            setMessage('error', error.message || 'Không thể tạo đơn hàng POS.');
+        } finally {
+            posState.processing = false;
+            renderCart();
+        }
+    }
+
+    searchInputEl.addEventListener('input', event => {
+        posState.search = event.target.value;
+        renderProducts();
+    });
+
+    categoryFiltersEl.addEventListener('click', event => {
+        const button = event.target.closest('[data-category]');
+        if (!button) return;
+
+        posState.category = button.dataset.category;
+        renderCategoryFilters();
+        renderProducts();
+    });
+
+    productGridEl.addEventListener('click', event => {
+        const button = event.target.closest('[data-product-id]');
+        if (!button) return;
+        addToCart(Number(button.dataset.productId));
+    });
+
+    cartItemsEl.addEventListener('click', event => {
+        const increaseButton = event.target.closest('[data-increase-id]');
+        const decreaseButton = event.target.closest('[data-decrease-id]');
+        const removeButton = event.target.closest('[data-remove-id]');
+
+        if (increaseButton) updateQuantity(Number(increaseButton.dataset.increaseId), 1);
+        if (decreaseButton) updateQuantity(Number(decreaseButton.dataset.decreaseId), -1);
+        if (removeButton) removeFromCart(Number(removeButton.dataset.removeId));
+    });
+
+    checkoutButtonEl.addEventListener('click', checkout);
+    clearCartButtonEl.addEventListener('click', () => {
+        posState.cart = [];
+        setMessage('', '');
+        renderCart();
+    });
+
+    renderCategoryFilters();
+    renderProducts();
+    renderCart();
+</script>
+}

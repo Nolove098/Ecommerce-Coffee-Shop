@@ -1,0 +1,141 @@
+@model SaleStore.Models.ViewModels.RegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng ký";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký - SaleStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .register-bg {
+            background:
+                linear-gradient(135deg, rgba(212,165,116,0.22), transparent 36%),
+                linear-gradient(225deg, rgba(111,78,55,0.18), transparent 30%),
+                linear-gradient(140deg, #FAF8F5 0%, #F3E7DA 46%, #E7D4BF 100%);
+        }
+        .card-glow { box-shadow: 0 28px 80px rgba(111, 78, 55, 0.18); }
+    </style>
+</head>
+<body class="min-h-screen register-bg text-[#1A0E08]">
+    <div class="mx-auto grid min-h-screen max-w-[1600px] lg:grid-cols-[0.92fr_1.08fr]">
+        <section class="flex items-center px-6 py-10 lg:px-10 lg:py-12">
+            <div class="w-full rounded-[2rem] border border-white/70 bg-white/85 p-7 backdrop-blur-xl card-glow sm:p-9">
+                <div class="flex items-center justify-between gap-4">
+                    <a asp-controller="Home" asp-action="Index" class="inline-flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-[#6F4E37] flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-[#F8E6D0]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                                <line x1="6" y1="1" x2="6" y2="4" /><line x1="10" y1="1" x2="10" y2="4" /><line x1="14" y1="1" x2="14" y2="4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold serif tracking-wide text-[#1A0E08]">SaleStore</p>
+                            <p class="text-xs text-[#8B7355]">Create your coffee account</p>
+                        </div>
+                    </a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="rounded-2xl border border-[#E8DFD8] px-4 py-2 text-sm font-semibold text-[#6F4E37] transition hover:border-[#D4A574] hover:bg-[#FAF8F5]">Đăng nhập</a>
+                </div>
+
+                <div class="mt-8 mb-8">
+                    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D4A574]">Đăng ký</p>
+                    <h1 class="mt-2 text-4xl font-bold serif text-[#1A0E08]">Tạo tài khoản thành viên</h1>
+                    <p class="mt-3 max-w-xl text-sm leading-7 text-[#7A6758]">Đăng ký để lưu thông tin liên hệ, truy cập nhanh hơn vào thanh toán và bắt đầu hành trình mua sắm đồng nhất cùng SaleStore.</p>
+                </div>
+
+                <form asp-area="" asp-action="Register" asp-controller="Auth" method="post" class="space-y-5">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+                    }
+
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <div class="md:col-span-2">
+                            <label asp-for="FullName" class="mb-2 block text-sm font-semibold text-[#6F4E37]"></label>
+                            <input asp-for="FullName" placeholder="Nguyễn Văn A" class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3.5 text-sm outline-none transition focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                            <span asp-validation-for="FullName" class="mt-1 block text-xs text-red-500"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Email" class="mb-2 block text-sm font-semibold text-[#6F4E37]"></label>
+                            <input asp-for="Email" placeholder="you@example.com" class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3.5 text-sm outline-none transition focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                            <span asp-validation-for="Email" class="mt-1 block text-xs text-red-500"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Phone" class="mb-2 block text-sm font-semibold text-[#6F4E37]"></label>
+                            <input asp-for="Phone" placeholder="0901 234 567" class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3.5 text-sm outline-none transition focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                            <span asp-validation-for="Phone" class="mt-1 block text-xs text-red-500"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Password" class="mb-2 block text-sm font-semibold text-[#6F4E37]"></label>
+                            <input asp-for="Password" placeholder="Tối thiểu 6 ký tự" class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3.5 text-sm outline-none transition focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                            <span asp-validation-for="Password" class="mt-1 block text-xs text-red-500"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="ConfirmPassword" class="mb-2 block text-sm font-semibold text-[#6F4E37]"></label>
+                            <input asp-for="ConfirmPassword" placeholder="Nhập lại mật khẩu" class="w-full rounded-2xl border border-[#E8DFD8] bg-[#FDFAF8] px-4 py-3.5 text-sm outline-none transition focus:border-[#D4A574] focus:ring-4 focus:ring-[#D4A574]/20" />
+                            <span asp-validation-for="ConfirmPassword" class="mt-1 block text-xs text-red-500"></span>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[1.75rem] border border-[#E8DFD8] bg-[#FAF8F5] p-5 text-sm text-[#6B5A4C]">
+                        <p class="font-semibold text-[#1A0E08]">Tài khoản mới của bạn sẽ có:</p>
+                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            <div class="rounded-2xl bg-white px-4 py-3">Lưu thông tin đăng nhập an toàn</div>
+                            <div class="rounded-2xl bg-white px-4 py-3">Truy cập nhanh vào trang thanh toán</div>
+                            <div class="rounded-2xl bg-white px-4 py-3">Theo dõi lịch sử đăng nhập cơ bản</div>
+                            <div class="rounded-2xl bg-white px-4 py-3">Quản lý thông tin thành viên thuận tiện</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-2xl bg-[#6F4E37] px-5 py-4 text-base font-bold text-white shadow-xl transition hover:bg-[#5D3A1A]">
+                        Tạo tài khoản ngay
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-[#8B7355]">
+                    Đã có tài khoản?
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="font-bold text-[#6F4E37] hover:text-[#5D3A1A]">Đăng nhập tại đây</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center px-8 py-12">
+            <div class="absolute left-12 top-12 h-40 w-40 rounded-full bg-[#D4A574]/25 blur-3xl"></div>
+            <div class="absolute bottom-8 right-8 h-52 w-52 rounded-full bg-[#6F4E37]/15 blur-3xl"></div>
+
+            <div class="relative ml-auto max-w-2xl">
+                <div class="rounded-[2.25rem] bg-[#1A0E08] p-5 shadow-[0_30px_90px_rgba(26,14,8,0.25)]">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&auto=format&fit=crop" alt="Warm coffee moment" class="h-[34rem] w-full rounded-[1.8rem] object-cover" />
+                </div>
+
+                <div class="absolute -left-10 top-10 max-w-xs rounded-[2rem] border border-white/70 bg-white/90 p-6 backdrop-blur-xl shadow-2xl">
+                    <p class="text-xs font-bold uppercase tracking-[0.24em] text-[#D4A574]">New Member Kit</p>
+                    <h2 class="mt-3 text-3xl font-bold serif text-[#1A0E08]">Một tài khoản, trọn trải nghiệm</h2>
+                    <p class="mt-4 text-sm leading-7 text-[#7A6758]">Thiết kế đăng ký theo cùng ngôn ngữ thị giác của SaleStore: nâu espresso, kem sữa và điểm nhấn caramel.</p>
+                </div>
+
+                <div class="absolute -bottom-8 right-6 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-[1.75rem] bg-[#6F4E37] p-5 text-white shadow-xl">
+                        <p class="text-4xl font-bold serif text-[#F4D8B7]">2</p>
+                        <p class="mt-2 text-sm text-white/70">Bảng dữ liệu cho tài khoản và lịch sử đăng nhập</p>
+                    </div>
+                    <div class="rounded-[1.75rem] border border-[#E8DFD8] bg-[#FAF8F5] p-5 shadow-xl">
+                        <p class="text-4xl font-bold serif text-[#6F4E37]">14d</p>
+                        <p class="mt-2 text-sm text-[#7A6758]">Ghi nhớ đăng nhập bằng cookie khi người dùng chọn</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+@page "/Pages/Favorites"
+@model SaleStore.Pages.FavoritesModel
+@{
+    Layout = "/Pages/Shared/_PagesLayout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-[#6F4E37] to-[#2C1810] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl font-bold mb-4">❤️ Sản Phẩm Yêu Thích</h1>
+        <p class="text-xl text-gray-300">Những sản phẩm được yêu thích nhất của bạn</p>
+    </div>
+</section>
+
+<!-- Empty State -->
+<section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="mb-8">
+            <span class="text-6xl">📄</span>
+        </div>
+        
+        <h2 class="text-3xl font-bold text-[#2C1810] mb-4">Chưa có sản phẩm yêu thích</h2>
+        <p class="text-xl text-gray-600 mb-8">
+            Bạn chưa thêm sản phẩm nào vào danh sách yêu thích. 
+            Hãy khám phá thực đơn của chúng tôi và thêm những sản phẩm bạn thích!
+        </p>
+
+        <div class="space-x-4">
+            <a href="/Pages/Menu" class="inline-block px-8 py-3 bg-[#D4A574] text-white rounded-lg font-semibold hover:bg-[#C89968] transition">
+                ☕ Xem Thực Đơn
+            </a>
+            <a href="/" class="inline-block px-8 py-3 border-2 border-[#D4A574] text-[#D4A574] rounded-lg hover:bg-[#D4A574] hover:text-white transition">
+                🏠 Về Trang Chủ
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-[#FAF8F5]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-3xl font-bold text-[#2C1810] text-center mb-12">Lợi Ích Của Danh Sách Yêu Thích</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="text-5xl mb-4">💾</div>
+                <h4 class="text-xl font-bold text-[#2C1810] mb-2">Lưu Sản Phẩm</h4>
+                <p class="text-gray-600">Lưu những sản phẩm yêu thích của bạn để mua sau</p>
+            </div>
+
+            <div class="text-center">
+                <div class="text-5xl mb-4">🔔</div>
+                <h4 class="text-xl font-bold text-[#2C1810] mb-2">Thông Báo Giá</h4>
+                <p class="text-gray-600">Nhận thông báo khi sản phẩm giảm giá</p>
+            </div>
+
+            <div class="text-center">
+                <div class="text-5xl mb-4">🚀</div>
+                <h4 class="text-xl font-bold text-[#2C1810] mb-2">Mua Nhanh</h4>
+                <p class="text-gray-600">Mua lại các sản phẩm yêu thích một cách nhanh chóng</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-[#2C1810] text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Đã sẵn sàng chưa?</h2>
+        <p class="text-xl text-gray-300 mb-8">
+            Hãy khám phá bộ sưu tập cà phê tuyệt vời của chúng tôi ngay bây giờ!
+        </p>
+        <a href="/Pages/Menu" class="inline-block px-8 py-3 bg-[#D4A574] text-white rounded-lg font-semibold hover:bg-[#C89968] transition">
+            ☕ Xem Thực Đơn Ngay
+        </a>
+    </div>
+</section>
