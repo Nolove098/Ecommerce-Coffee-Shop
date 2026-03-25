@@ -1,0 +1,117 @@
+@model List<SaleStore.Models.Product>
+@{
+    ViewData["Title"] = "Quản lý Sản phẩm";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <p class="small text-muted-custom">Tổng cộng <strong>@Model.Count</strong> sản phẩm</p>
+    </div>
+    <a asp-area="Admin" asp-controller="Product" asp-action="Create"
+       class="btn btn-primary d-flex align-items-center gap-2">
+        <svg class="me-1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        Thêm sản phẩm
+    </a>
+</div>
+
+<!-- Search / Filter -->
+<form method="get" class="d-flex gap-3 mb-4">
+    <div class="position-relative flex-grow-1" style="max-width: 20rem;">
+        <svg class="position-absolute top-50 translate-middle-y ms-3" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="left: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input name="search" value="@ViewBag.Search" type="text" placeholder="Tìm tên sản phẩm..."
+               class="form-control ps-5" style="padding-left: 2.5rem;" />
+    </div>
+    <select name="category" class="form-select" style="width: auto;">
+        <option value="">Tất cả danh mục</option>
+        @foreach (var cat in categories)
+        {
+            <option value="@cat" selected="@(ViewBag.Category as string == cat ? "selected" : null)">@cat</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-primary">Lọc</button>
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string) || !string.IsNullOrWhiteSpace(ViewBag.Category as string))
+    {
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">Xóa lọc</a>
+    }
+</form>
+
+<!-- Table -->
+<div class="table-responsive bg-white rounded-2xl border shadow-soft overflow-hidden mb-5">
+    <table class="table table-striped table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th class="px-4 py-3">Sản phẩm</th>
+                <th class="px-4 py-3">Danh mục</th>
+                <th class="px-4 py-3">Giá</th>
+                <th class="px-4 py-3">Tồn kho</th>
+                <th class="text-center px-4 py-3">Trạng thái</th>
+                <th class="px-4 py-3"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <svg class="mx-auto mb-3 text-secondary" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4m0-10l8 4m-8-4v10M4 12v10l8 4 8-4V12"/></svg>
+                        Không tìm thấy sản phẩm nào.
+                    </td>
+                </tr>
+            }
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            @if (!string.IsNullOrEmpty(p.ImageUrl))
+                            {
+                                <img src="@p.ImageUrl" alt="@p.Name" class="rounded-xl flex-shrink-0" style="width: 48px; height: 48px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-xl bg-light-brown d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <svg width="24" height="24" class="text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
+                                </div>
+                            }
+                            <div>
+                                <p class="fw-semibold text-coffee mb-0">@p.Name</p>
+                                @if (!string.IsNullOrEmpty(p.Description))
+                                {
+                                    <p class="small text-muted mb-0 text-truncate" style="max-width: 20rem;">@p.Description</p>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="badge bg-light-brown text-coffee">@p.Category</span>
+                    </td>
+                    <td class="px-4 py-3 text-end text-coffee fw-semibold">@p.Price.ToString("N0") ₫</td>
+                    <td class="px-4 py-3 text-end @(p.Stock < 20 ? "text-danger fw-bold" : "text-coffee")">@p.Stock</td>
+                    <td class="px-4 py-3 text-center">
+                        @if (p.IsActive)
+                        {
+                            <span class="badge bg-success">Đang bán</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Tạm ẩn</span>
+                        }
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id"
+                               class="btn btn-outline-primary" title="Sửa">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </a>
+                            <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@p.Id"
+                               class="btn btn-outline-danger" title="Xóa">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

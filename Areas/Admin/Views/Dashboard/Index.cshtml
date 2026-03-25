@@ -1,0 +1,253 @@
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    var recentOrders = (List<SaleStore.Models.Order>)ViewBag.RecentOrders;
+    var salesData = new[] {
+        new { time = "6 AM",  sales = 120 },
+        new { time = "8 AM",  sales = 450 },
+        new { time = "10 AM", sales = 680 },
+        new { time = "12 PM", sales = 890 },
+        new { time = "2 PM",  sales = 720 },
+        new { time = "4 PM",  sales = 850 },
+        new { time = "6 PM",  sales = 650 },
+        new { time = "8 PM",  sales = 320 },
+    };
+    var bestSellers = new[] {
+        new { name = "Caramel Macchiato", sales = 342, revenue = 22230000, trend = "+15%" },
+        new { name = "Cappuccino",        sales = 298, revenue = 16390000, trend = "+12%" },
+        new { name = "Iced Latte",        sales = 276, revenue = 15180000, trend = "+8%" },
+        new { name = "Espresso",          sales = 245, revenue =  9800000, trend = "+5%" },
+        new { name = "Mocha",             sales = 198, revenue = 11880000, trend = "+10%" },
+    };
+}
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-5">
+
+    <!-- Total Revenue -->
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="card text-white shadow-sm bg-gradient-dashboard-revenue">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-25" style="width: 2.5rem; height: 2.5rem;">
+                        <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 small">Tổng</span>
+                </div>
+                <p class="fs-4 fw-bold mb-1">@((((decimal)ViewBag.TotalRevenue)).ToString("N0")) ₫</p>
+                <p class="text-white-50 small mb-0">Doanh thu</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today Revenue -->
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-warning bg-opacity-10" style="width: 2.5rem; height: 2.5rem;">
+                        <svg class="text-warning" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <span class="badge rounded-pill bg-cream border small text-muted-custom">Hôm nay</span>
+                </div>
+                <p class="fs-4 fw-bold text-primary mb-1">@((((decimal)ViewBag.TodayRevenue)).ToString("N0")) ₫</p>
+                <p class="text-muted-custom small mb-0">Doanh thu ngày</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-info bg-opacity-10" style="width: 2.5rem; height: 2.5rem;">
+                        <svg class="text-info" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <span class="badge rounded-pill bg-cream border small text-muted-custom">Tất cả</span>
+                </div>
+                <p class="fs-4 fw-bold text-primary mb-1">@ViewBag.TotalOrders</p>
+                <p class="text-muted-custom small mb-0">Đơn hàng</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-3 bg-success bg-opacity-10" style="width: 2.5rem; height: 2.5rem;">
+                        <svg class="text-success" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                    </div>
+                    <span class="badge rounded-pill bg-cream border small text-muted-custom">Active</span>
+                </div>
+                <p class="fs-4 fw-bold text-primary mb-1">@ViewBag.ActiveProducts / @ViewBag.TotalProducts</p>
+                <p class="text-muted-custom small mb-0">Sản phẩm</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending alert -->
+@if ((int)ViewBag.PendingOrders > 0)
+{
+    <div class="alert alert-warning d-flex align-items-center gap-3 rounded-3 mb-4" role="alert">
+        <svg class="flex-shrink-0" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <p class="mb-0 small">Có <strong>@ViewBag.PendingOrders đơn hàng</strong> đang chờ xử lý hoặc pha chế.</p>
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-status="Pending" class="ms-auto text-decoration-none fw-semibold small">Xem ngay →</a>
+    </div>
+}
+
+<!-- Recent Orders -->
+<div class="card rounded-3 shadow-sm overflow-hidden">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+        <h3 class="mb-0 fw-bold text-primary">Đơn hàng gần đây</h3>
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="text-decoration-none text-primary fw-medium small">Xem tất cả →</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="bg-light-brown text-muted-custom">
+                <tr>
+                    <th class="px-4 py-3 fw-semibold">#</th>
+                    <th class="px-4 py-3 fw-semibold">Khách hàng</th>
+                    <th class="px-4 py-3 fw-semibold">Tổng tiền</th>
+                    <th class="px-4 py-3 fw-semibold">Trạng thái</th>
+                    <th class="px-4 py-3 fw-semibold">Thời gian</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in recentOrders)
+                {
+                    <tr>
+                        <td class="px-4 py-3 text-primary fw-medium font-monospace">#@order.Id.ToString("D4")</td>
+                        
+                        <td class="px-4 py-3 text-primary fw-medium">@(order.Customer?.FullName ?? "Khách lẻ")</td>
+                        
+                        <td class="px-4 py-3 text-primary fw-semibold">@order.TotalAmount.ToString("N0") ₫</td>
+                        
+                        <td class="px-4 py-3">
+                            <span class="badge rounded-pill @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
+                        </td>
+                        <td class="px-4 py-3 text-muted-custom">@order.CreatedAt.ToString("HH:mm dd/MM")</td>
+                        <td class="px-4 py-3 text-end">
+                            <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
+                               class="text-decoration-none text-primary fw-medium small">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ===== Sales Chart + Best Sellers ===== -->
+<div class="row g-4 mt-4">
+
+    <!-- Sales Chart -->
+    <div class="col-12 col-xl-8">
+        <div class="card rounded-3 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h3 class="mb-1 fw-bold text-primary">Biểu đồ doanh thu hôm nay</h3>
+                        <p class="mb-0 small text-muted-custom">Theo từng khung giờ</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="fs-4 fw-bold text-primary mb-0">@(salesData.Sum(x => x.sales).ToString("N0")) ₫</p>
+                        <p class="small text-success fw-medium mb-0 mt-1">▲ +12.5% so với hôm qua</p>
+                    </div>
+                </div>
+                <canvas id="adminSalesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Sellers -->
+    <div class="col-12 col-xl-4">
+        <div class="card rounded-3 shadow-sm overflow-hidden">
+            <div class="card-header bg-white d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+                <h3 class="mb-0 fw-bold text-primary">🏆 Bán chạy nhất</h3>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-decoration-none text-muted-custom fw-medium small">Quản lý →</a>
+            </div>
+            <div class="card-body p-0">
+                @{int bsRank = 0;}
+                @foreach (var item in bestSellers)
+                {
+                    bsRank++;
+                    <div class="d-flex align-items-center gap-3 px-4 py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold flex-shrink-0 bg-gradient-secondary-primary" style="width: 1.75rem; height: 1.75rem; font-size: 0.75rem;">
+                            @bsRank
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <p class="fw-semibold text-primary small mb-0 text-truncate">@item.name</p>
+                            <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">@item.sales đơn</p>
+                        </div>
+                        <div class="text-end flex-shrink-0">
+                            <p class="fw-bold text-primary mb-0" style="font-size: 0.75rem;">@((item.revenue / 1000000m).ToString("N1"))M ₫</p>
+                            <p class="text-success fw-semibold mb-0" style="font-size: 0.75rem;">@item.trend</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+@section Scripts {
+<script>
+    const ctx = document.getElementById('adminSalesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.time))),
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.sales))),
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary').trim(),
+                backgroundColor: 'rgba(212,165,116,0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-secondary').trim(),
+                pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary').trim(),
+                pointBorderWidth: 2,
+                pointHoverRadius: 7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'white',
+                    borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim(),
+                    borderWidth: 1,
+                    titleColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary').trim(),
+                    bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary').trim(),
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' ₫' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim() },
+                    ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--color-medium-brown').trim(), font: { size: 11 }, callback: v => v.toLocaleString() + ' ₫' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--color-medium-brown').trim(), font: { size: 11 } }
+                }
+            }
+        }
+    });
+</script>
+}

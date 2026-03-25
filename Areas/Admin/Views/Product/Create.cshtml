@@ -1,0 +1,76 @@
+@model SaleStore.Models.Product
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+}
+
+<div class="container" style="max-width: 800px;">
+    <div class="card rounded-2xl shadow-soft border-0">
+        <div class="card-header bg-cream border-bottom">
+            <h3 class="h5 fw-bold text-coffee mb-1">Thông tin sản phẩm</h3>
+            <p class="small text-muted-custom mb-0">Điền đầy đủ các trường bắt buộc bên dưới</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form asp-area="Admin" asp-controller="Product" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Ví dụ: Caramel Macchiato" />
+                        <div asp-validation-for="Name" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Price" class="form-label"></label>
+                        <input asp-for="Price" type="number" min="0" step="1000" class="form-control" placeholder="55000" />
+                        <div asp-validation-for="Price" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Stock" class="form-label"></label>
+                        <input asp-for="Stock" type="number" min="0" class="form-control" placeholder="100" />
+                        <div asp-validation-for="Stock" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Category" class="form-label"></label>
+                        <input asp-for="Category" list="category-list" class="form-control" placeholder="Chọn hoặc nhập danh mục..." />
+                        <datalist id="category-list">
+                            @foreach (var cat in (List<string>)ViewBag.Categories)
+                            {
+                                <option value="@cat" />
+                            }
+                        </datalist>
+                        <div asp-validation-for="Category" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="ImageUrl" class="form-label"></label>
+                        <input asp-for="ImageUrl" type="url" class="form-control" placeholder="https://..." />
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" rows="3" class="form-control" placeholder="Mô tả ngắn về sản phẩm..."></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input asp-for="IsActive" type="checkbox" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">Đang bán</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 pt-4 mt-2 border-top">
+                    <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
+                        <svg class="bi" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        Lưu sản phẩm
+                    </button>
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
