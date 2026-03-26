@@ -60,6 +60,8 @@
                 <li class="nav-item"><a href="#about" class="nav-link text-white-50 small fw-medium">Về chúng tôi</a></li>
                 <li class="nav-item"><a href="#popular" class="nav-link text-white-50 small fw-medium">Yêu thích</a></li>
                 <li class="nav-item"><a href="#contact" class="nav-link text-white-50 small fw-medium">Liên hệ</a></li>
+                <li class="nav-item"><a href="/tech-check" class="nav-link text-white-50 small fw-medium">Razor Pages</a></li>
+                <li class="nav-item"><a href="/spa" class="nav-link text-white-50 small fw-medium">Blazor SPA</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button onclick="toggleCart()" class="btn btn-outline-light btn-sm position-relative d-flex align-items-center gap-2 rounded-xl">
@@ -190,6 +192,8 @@
         </div>
     </div>
 </section>
+
+@await Component.InvokeAsync("FeaturedProducts", new { count = 4 })
 
 <!-- ===== MENU ===== -->
 <section id="menu" class="py-5 bg-white">

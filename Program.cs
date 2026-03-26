@@ -23,6 +23,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<PasswordHasher>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 
 // 2. Session để hỗ trợ giỏ hàng (Giữ nguyên của bạn)
 builder.Services.AddDistributedMemoryCache();
@@ -65,5 +67,8 @@ app.MapControllerRoute(
 
 // 4. Route mặc định (Giữ nguyên của bạn)
 app.MapDefaultControllerRoute();
+app.MapRazorPages();
+app.MapBlazorHub();
+app.MapFallbackToPage("/spa/{*path:nonfile}", "/_SpaHost");
 
 app.Run();

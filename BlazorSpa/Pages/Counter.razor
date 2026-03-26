@@ -1,0 +1,33 @@
+@page "/counter"
+
+<div class="mb-4">
+    <h2 class="h3 fw-bold">Counter (Blazor SPA)</h2>
+    <p class="text-muted">Trang nay minh hoa state trong component Blazor.</p>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4" style="max-width: 480px;">
+    <div class="card-body p-4">
+        <p class="text-muted small mb-2">Gia tri hien tai</p>
+        <p class="display-6 fw-bold mb-4">@currentCount</p>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-success" @onclick="Increment">Tang +1</button>
+            <button class="btn btn-outline-danger" @onclick="Reset">Reset</button>
+            <a class="btn btn-link" href="/spa">Quay lai trang SPA</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int currentCount;
+
+    private void Increment()
+    {
+        currentCount++;
+    }
+
+    private void Reset()
+    {
+        currentCount = 0;
+    }
+}

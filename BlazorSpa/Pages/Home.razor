@@ -1,0 +1,39 @@
+@page "/"
+
+<div class="mb-4">
+    <p class="text-uppercase text-muted small fw-bold mb-2" style="letter-spacing: 0.14em;">Blazor Server SPA</p>
+    <h1 class="display-6 fw-bold">Tong quan SPA cua SaleStore</h1>
+    <p class="text-muted mb-0">Khu vuc nay chay duoi dang single page app voi route /spa/* va khong can reload trang.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <TechCard Title="Routing" Value="Hoat dong" />
+    </div>
+    <div class="col-12 col-md-4">
+        <TechCard Title="State" Value="Interactive" />
+    </div>
+    <div class="col-12 col-md-4">
+        <TechCard Title="Render mode" Value="ServerPrerendered" />
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" href="/spa/counter">Mo Counter</a>
+    <a class="btn btn-outline-secondary" href="/tech-check">Razor Page Checklist</a>
+    <a class="btn btn-outline-dark" href="/">Ve MVC Home</a>
+    <button class="btn btn-outline-success" @onclick="IncrementClickCount">Test Interactive (@clickCount)</button>
+    @if (clickCount > 0)
+    {
+        <span class="align-self-center text-success fw-semibold">SPA da cap nhat UI ma khong reload.</span>
+    }
+</div>
+
+@code {
+    private int clickCount;
+
+    private void IncrementClickCount()
+    {
+        clickCount++;
+    }
+}

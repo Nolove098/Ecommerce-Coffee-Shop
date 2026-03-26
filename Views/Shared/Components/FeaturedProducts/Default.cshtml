@@ -1,0 +1,36 @@
+@model IReadOnlyList<SaleStore.Models.Product>
+
+<section class="py-5 bg-white border-top">
+    <div class="container-xxl px-4">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+            <div>
+                <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">View Component</span>
+                <h2 class="h3 fw-bold text-dark mt-2 serif mb-0">Sản phẩm nổi bật</h2>
+            </div>
+            <a href="#menu" class="btn btn-outline-primary btn-sm rounded-pill">Xem toàn bộ menu</a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <p class="text-muted mb-0">Hiện chưa có sản phẩm nổi bật.</p>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var product in Model)
+                {
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="p-3 d-flex flex-column h-100">
+                                <p class="small text-muted mb-1">@product.Category</p>
+                                <h3 class="h6 fw-bold mb-2">@product.Name</h3>
+                                <p class="text-primary fw-bold mb-0">@product.Price.ToString("N0") ₫</p>
+                                <p class="small text-muted mb-0">Tồn kho: @product.Stock</p>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

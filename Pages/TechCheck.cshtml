@@ -1,0 +1,38 @@
+@page "/tech-check"
+@model SaleStore.Pages.TechCheckModel
+@{
+    ViewData["Title"] = "Technology Checklist";
+}
+
+<div class="container py-5">
+    <h1 class="h3 mb-3">Technology Checklist</h1>
+    <p class="text-muted">Trang Razor Pages mẫu để xác nhận project đã có Razor Pages.</p>
+
+    <ul class="list-group mt-4">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Middleware
+            <span class="badge bg-success">Done</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Tag Helper
+            <span class="badge bg-success">Done</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Razor Pages
+            <span class="badge bg-success">Done</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            View Component
+            <span class="badge bg-success">Done</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            Blazor SPA
+            <span class="badge bg-success">Done</span>
+        </li>
+    </ul>
+
+    <div class="mt-4">
+        <a href="/" class="btn btn-outline-primary">Ve trang chu</a>
+        <a href="/spa" class="btn btn-primary ms-2">Mo Blazor SPA</a>
+    </div>
+</div>
