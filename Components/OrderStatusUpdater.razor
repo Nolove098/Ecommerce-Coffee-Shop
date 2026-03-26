@@ -1,0 +1,115 @@
+@inject IServiceScopeFactory ScopeFactory
+
+<div class="card shadow-soft h-100">
+    <div class="card-body p-4">
+        <h4 class="small fw-bold text-coffee text-uppercase mb-3">Cập nhật trạng thái</h4>
+        <div class="d-flex gap-2">
+            <select class="form-select flex-grow-1" @onchange="OnSelectChanged" disabled="@isUpdating">
+                @foreach (var s in allStatuses)
+                {
+                    <option value="@s" selected="@(currentStatus == s)">@s.ToVietnamese()</option>
+                }
+            </select>
+            <button class="btn btn-primary text-nowrap" disabled="@(isUpdating || selectedStatus == currentStatus)" @onclick="ApplyStatus">
+                @if (isUpdating)
+                {
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                }
+                Cập nhật
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert @(isError ? "alert-danger" : "alert-success") d-flex align-items-center gap-2 py-2 mt-3 mb-0 small" role="alert">
+                @if (isError)
+                {
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+                }
+                else
+                {
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+                }
+                <span>@message</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public long OrderId { get; set; }
+
+    [Parameter]
+    public string InitialStatus { get; set; } = nameof(OrderStatus.Pending);
+
+    private OrderStatus currentStatus;
+    private OrderStatus[] allStatuses = Enum.GetValues<OrderStatus>();
+    private string message = "";
+    private bool isError;
+    private bool isUpdating;
+
+    protected override void OnParametersSet()
+    {
+        if (Enum.TryParse<OrderStatus>(InitialStatus, out var parsed))
+            currentStatus = parsed;
+    }
+
+    private OrderStatus selectedStatus;
+
+    protected override void OnInitialized()
+    {
+        selectedStatus = currentStatus;
+    }
+
+    private void OnSelectChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<OrderStatus>(e.Value?.ToString(), out var parsed))
+            selectedStatus = parsed;
+    }
+
+    private async Task ApplyStatus()
+    {
+        if (selectedStatus == currentStatus || isUpdating)
+            return;
+        await ChangeStatus(selectedStatus);
+    }
+
+    private async Task ChangeStatus(OrderStatus newStatus)
+    {
+        if (isUpdating)
+            return;
+
+        isUpdating = true;
+        message = "";
+        isError = false;
+
+        try
+        {
+            using var scope = ScopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var order = await db.Orders.FindAsync(OrderId);
+
+            if (order == null)
+            {
+                message = "Không tìm thấy đơn hàng.";
+                isError = true;
+                return;
+            }
+
+            order.Status = newStatus;
+            await db.SaveChangesAsync();
+            currentStatus = newStatus;
+            message = $"Đã cập nhật thành \"{newStatus.ToVietnamese()}\" thành công!";
+        }
+        catch
+        {
+            message = "Có lỗi xảy ra khi cập nhật trạng thái.";
+            isError = true;
+        }
+        finally
+        {
+            isUpdating = false;
+        }
+    }
+}

@@ -96,12 +96,6 @@
                 - gap-2: Spacing between icon and text
             -->
             <div class="d-flex align-items-center gap-2">
-                <a href="/tech-check" class="btn btn-outline-secondary btn-sm rounded-2xl d-inline-flex align-items-center gap-2">
-                    Tech Check
-                </a>
-                <a href="/spa" class="btn btn-outline-primary btn-sm rounded-2xl d-inline-flex align-items-center gap-2">
-                    Blazor SPA
-                </a>
                 <!-- Admin Dashboard link (only visible to Admin role) -->
                 @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
                 {

@@ -1,7 +1,6 @@
 @using SaleStore.Models
 @{
     ViewData["Title"] = "Dashboard";
-    var recentOrders = (List<SaleStore.Models.Order>)ViewBag.RecentOrders;
     var salesData = new[] {
         new { time = "6 AM",  sales = 120 },
         new { time = "8 AM",  sales = 450 },
@@ -99,48 +98,8 @@
     </div>
 }
 
-<!-- Recent Orders -->
-<div class="card rounded-3 shadow-sm overflow-hidden">
-    <div class="card-header bg-white d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
-        <h3 class="mb-0 fw-bold text-primary">Đơn hàng gần đây</h3>
-        <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="text-decoration-none text-primary fw-medium small">Xem tất cả →</a>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 small">
-            <thead class="bg-light-brown text-muted-custom">
-                <tr>
-                    <th class="px-4 py-3 fw-semibold">#</th>
-                    <th class="px-4 py-3 fw-semibold">Khách hàng</th>
-                    <th class="px-4 py-3 fw-semibold">Tổng tiền</th>
-                    <th class="px-4 py-3 fw-semibold">Trạng thái</th>
-                    <th class="px-4 py-3 fw-semibold">Thời gian</th>
-                    <th class="px-4 py-3"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var order in recentOrders)
-                {
-                    <tr>
-                        <td class="px-4 py-3 text-primary fw-medium font-monospace">#@order.Id.ToString("D4")</td>
-                        
-                        <td class="px-4 py-3 text-primary fw-medium">@(order.Customer?.FullName ?? "Khách lẻ")</td>
-                        
-                        <td class="px-4 py-3 text-primary fw-semibold">@order.TotalAmount.ToString("N0") ₫</td>
-                        
-                        <td class="px-4 py-3">
-                            <span class="badge rounded-pill @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
-                        </td>
-                        <td class="px-4 py-3 text-muted-custom">@order.CreatedAt.ToString("HH:mm dd/MM")</td>
-                        <td class="px-4 py-3 text-end">
-                            <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
-                               class="text-decoration-none text-primary fw-medium small">Chi tiết</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+<!-- Recent Orders (View Component) -->
+@await Component.InvokeAsync("RecentOrders", new { count = 5 })
 
 <!-- ===== Sales Chart + Best Sellers ===== -->
 <div class="row g-4 mt-4">

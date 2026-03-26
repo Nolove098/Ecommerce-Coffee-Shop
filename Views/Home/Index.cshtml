@@ -60,8 +60,6 @@
                 <li class="nav-item"><a href="#about" class="nav-link text-white-50 small fw-medium">Về chúng tôi</a></li>
                 <li class="nav-item"><a href="#popular" class="nav-link text-white-50 small fw-medium">Yêu thích</a></li>
                 <li class="nav-item"><a href="#contact" class="nav-link text-white-50 small fw-medium">Liên hệ</a></li>
-                <li class="nav-item"><a href="/tech-check" class="nav-link text-white-50 small fw-medium">Razor Pages</a></li>
-                <li class="nav-item"><a href="/spa" class="nav-link text-white-50 small fw-medium">Blazor SPA</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button onclick="toggleCart()" class="btn btn-outline-light btn-sm position-relative d-flex align-items-center gap-2 rounded-xl">
@@ -193,8 +191,6 @@
     </div>
 </section>
 
-@await Component.InvokeAsync("FeaturedProducts", new { count = 4 })
-
 <!-- ===== MENU ===== -->
 <section id="menu" class="py-5 bg-white">
     <div class="container-xxl px-4">
@@ -213,7 +209,7 @@
         <div id="productGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
             @foreach(var p in menuProducts){
                 <div class="col product-card" data-cat="@p.Category">
-                    <div class="card h-100 border rounded-4 overflow-hidden shadow-sm">
+                    <div class="card h-100 border rounded-4 overflow-hidden shadow-sm position-relative" style="cursor:pointer; transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
                         <div class="position-relative bg-light-brown" style="height: 208px;">
                             @if(!string.IsNullOrEmpty(p.ImageUrl)){
                                 <img src="@p.ImageUrl" alt="@p.Name" class="w-100 h-100 object-fit-cover"/>
@@ -224,7 +220,9 @@
                             @if(p.Stock < 20){ <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-white rounded-pill small fw-bold">Sắp hết</span> }
                         </div>
                         <div class="card-body">
-                            <h3 class="card-title fw-bold text-dark small mb-1 serif">@p.Name</h3>
+                            <h3 class="card-title fw-bold small mb-1 serif">
+                                <a href="/san-pham/@p.Id" class="text-decoration-none text-dark stretched-link">@p.Name</a>
+                            </h3>
                             @if(!string.IsNullOrEmpty(p.Description)){
                                 <p class="card-text text-muted line-clamp-2 mb-3" style="font-size: 0.75rem;">@p.Description</p>
                             }else{ <div class="mb-3"></div> }
@@ -233,8 +231,8 @@
                                     <span class="text-primary fw-bold fs-5">@p.Price.ToString("N0")</span>
                                     <span class="text-muted-custom small">₫</span>
                                 </div>
-                                <button onclick="addToCart(@p.Id,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
-                                        class="btn btn-primary btn-sm rounded-xl d-flex align-items-center gap-1 fw-semibold shadow-sm">
+                                <button onclick="event.stopPropagation();event.preventDefault();addToCart(@p.Id,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
+                                        class="btn btn-primary btn-sm rounded-xl d-flex align-items-center gap-1 fw-semibold shadow-sm position-relative" style="z-index:2;">
                                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                     Thêm
                                 </button>

@@ -69,6 +69,5 @@ app.MapControllerRoute(
 app.MapDefaultControllerRoute();
 app.MapRazorPages();
 app.MapBlazorHub();
-app.MapFallbackToPage("/spa/{*path:nonfile}", "/_SpaHost");
 
 app.Run();

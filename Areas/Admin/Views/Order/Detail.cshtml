@@ -2,7 +2,6 @@
 @using SaleStore.Models
 @{
     ViewData["Title"] = "Đơn hàng #" + (Model?.Id.ToString("D4") ?? "");
-    var allStatuses = Enum.GetValues<OrderStatus>();
     var customerInitial = string.IsNullOrEmpty(Model?.Customer?.FullName) ? "?" : Model.Customer?.FullName[0].ToString();
     // Determine the next logical status
     var nextStatus = Model!.Status switch {
@@ -69,24 +68,10 @@
             </div>
         </div>
 
-        <!-- Status timeline -->
+        <!-- Status timeline (Blazor interactive component) -->
         <div class="col-12 col-md-6">
-            <div class="card shadow-soft h-100">
-                <div class="card-body p-4">
-                    <h4 class="small fw-bold text-coffee text-uppercase mb-3">Cập nhật trạng thái</h4>
-                    <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post" class="d-flex gap-2">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id" />
-                        <select name="status" class="form-select flex-grow-1">
-                            @foreach (var s in allStatuses)
-                            {
-                                <option value="@s" selected="@(Model.Status == s ? "selected" : null)">@s.ToVietnamese()</option>
-                            }
-                        </select>
-                        <button type="submit" class="btn btn-primary text-nowrap">Cập nhật</button>
-                    </form>
-                </div>
-            </div>
+            <component type="typeof(SaleStore.Components.OrderStatusUpdater)" render-mode="ServerPrerendered"
+                       param-OrderId="Model.Id" param-InitialStatus="@Model.Status.ToString()" />
         </div>
     </div>
 

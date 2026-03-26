@@ -39,13 +39,6 @@ namespace SaleStore.Areas.Admin.Controllers
             ViewBag.TotalRevenue     = await _context.Orders
                 .Where(o => o.Status == OrderStatus.Delivered)
                 .SumAsync(o => o.TotalAmount);
-                
-            // Lấy 5 đơn hàng mới nhất (Kéo theo thông tin Khách hàng để hiển thị Tên)
-            ViewBag.RecentOrders     = await _context.Orders
-                .Include(o => o.Customer)
-                .OrderByDescending(o => o.CreatedAt)
-                .Take(5)
-                .ToListAsync();
 
             return View();
         }

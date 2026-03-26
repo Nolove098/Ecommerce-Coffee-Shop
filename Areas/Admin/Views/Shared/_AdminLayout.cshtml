@@ -78,8 +78,6 @@
             
             <!-- Right side: Notifications and user profile -->
             <div class="d-flex align-items-center gap-3">
-                <a href="/tech-check" class="btn btn-outline-secondary btn-sm rounded-pill">Tech Check</a>
-                <a href="/spa" class="btn btn-outline-primary btn-sm rounded-pill">Blazor SPA</a>
                 <!-- 
                     Success Alert Notification
                     Bootstrap alert component with auto-dismiss functionality.
@@ -138,6 +136,9 @@
     Integrity hash ensures CDN file hasn't been tampered with.
 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<!-- Blazor Server JS: Required for interactive Blazor components embedded in MVC views -->
+<script src="_framework/blazor.server.js"></script>
 
 <!-- 
     Bootstrap Component Initialization
