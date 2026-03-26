@@ -119,10 +119,10 @@
         <!-- 
             Main Content Area
             flex-fill: Takes remaining vertical space after header
-            overflow-hidden: Prevents scrolling on this container (child elements handle scrolling)
-            This is where page-specific POS content (@RenderBody()) is displayed
+            overflow-auto: Allows scrolling when content overflows on smaller screens
+            This is where page-specific POS content is displayed
         -->
-        <main class="flex-fill overflow-hidden">
+        <main class="flex-fill overflow-auto">
             @RenderBody()
         </main>
     </div>
