@@ -6,21 +6,52 @@
     var currentStatus = ViewBag.CurrentStatus as string ?? "";
 }
 
+<style>
+    .order-filter-btn {
+        border: 1px solid var(--bs-primary);
+        color: var(--bs-primary);
+        background-color: #fff;
+        font-weight: 600;
+    }
+
+    .order-filter-btn:hover {
+        color: #fff;
+        background-color: #5D3A1A;
+        border-color: #5D3A1A;
+    }
+
+    .order-filter-btn.order-filter-btn-active {
+        color: #fff;
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+
+    .order-filter-badge {
+        background-color: var(--color-light-brown);
+        color: var(--bs-primary);
+    }
+
+    .order-filter-btn.order-filter-btn-active .order-filter-badge {
+        background-color: rgba(255, 255, 255, .25);
+        color: #fff;
+    }
+</style>
+
 <!-- Filter tabs -->
 <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
     <a asp-area="Admin" asp-controller="Order" asp-action="Index"
-       class="btn btn-sm rounded-xl @(string.IsNullOrEmpty(currentStatus) ? "btn-primary" : "btn-outline-primary")">
+       class="btn btn-sm rounded-xl order-filter-btn @(string.IsNullOrEmpty(currentStatus) ? "order-filter-btn-active" : "")">
         Tất cả
-        <span class="badge rounded-pill @(string.IsNullOrEmpty(currentStatus) ? "bg-white bg-opacity-25 text-white" : "bg-light-brown") ms-2">@Model.Count</span>
+        <span class="badge rounded-pill order-filter-badge ms-2">@Model.Count</span>
     </a>
     @foreach (var s in statuses)
     {
         var count = Model.Count(o => o.Status == s);
         var isActive = currentStatus == s.ToString();
         <a asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-status="@s"
-           class="btn btn-sm rounded-xl @(isActive ? "btn-primary" : "btn-outline-primary")">
+           class="btn btn-sm rounded-xl order-filter-btn @(isActive ? "order-filter-btn-active" : "")">
             @s.ToVietnamese()
-            <span class="badge rounded-pill @(isActive ? "bg-white bg-opacity-25 text-white" : "bg-light-brown") ms-2">@count</span>
+            <span class="badge rounded-pill order-filter-badge ms-2">@count</span>
         </a>
     }
 </div>

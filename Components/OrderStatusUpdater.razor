@@ -4,13 +4,13 @@
     <div class="card-body p-4">
         <h4 class="small fw-bold text-coffee text-uppercase mb-3">Cập nhật trạng thái</h4>
         <div class="d-flex gap-2">
-            <select class="form-select flex-grow-1" @onchange="OnSelectChanged" disabled="@isUpdating">
+            <select class="form-select flex-grow-1" @bind="selectedStatusValue" disabled="@isUpdating">
                 @foreach (var s in allStatuses)
                 {
-                    <option value="@s" selected="@(currentStatus == s)">@s.ToVietnamese()</option>
+                    <option value="@s.ToString()">@s.ToVietnamese()</option>
                 }
             </select>
-            <button class="btn btn-primary text-nowrap" disabled="@(isUpdating || selectedStatus == currentStatus)" @onclick="ApplyStatus">
+            <button class="btn btn-coffee text-nowrap" type="button" disabled="@(isUpdating || selectedStatusValue == currentStatus.ToString())" @onclick="ApplyStatus">
                 @if (isUpdating)
                 {
                     <span class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -36,6 +36,27 @@
     </div>
 </div>
 
+<style>
+    .btn-coffee {
+        background-color: #6F4E37;
+        border-color: #6F4E37;
+        color: #fff;
+    }
+
+    .btn-coffee:hover,
+    .btn-coffee:focus {
+        background-color: #5D3A1A;
+        border-color: #5D3A1A;
+        color: #fff;
+    }
+
+    .btn-coffee:disabled {
+        background-color: #9c7f68;
+        border-color: #9c7f68;
+        color: #f8f9fa;
+    }
+</style>
+
 @code {
     [Parameter]
     public long OrderId { get; set; }
@@ -52,27 +73,28 @@
     protected override void OnParametersSet()
     {
         if (Enum.TryParse<OrderStatus>(InitialStatus, out var parsed))
+        {
             currentStatus = parsed;
+            selectedStatusValue = parsed.ToString();
+        }
     }
 
-    private OrderStatus selectedStatus;
+    private string selectedStatusValue = nameof(OrderStatus.Pending);
 
     protected override void OnInitialized()
     {
-        selectedStatus = currentStatus;
-    }
-
-    private void OnSelectChanged(ChangeEventArgs e)
-    {
-        if (Enum.TryParse<OrderStatus>(e.Value?.ToString(), out var parsed))
-            selectedStatus = parsed;
+        selectedStatusValue = currentStatus.ToString();
     }
 
     private async Task ApplyStatus()
     {
-        if (selectedStatus == currentStatus || isUpdating)
+        if (isUpdating || selectedStatusValue == currentStatus.ToString())
             return;
-        await ChangeStatus(selectedStatus);
+
+        if (!Enum.TryParse<OrderStatus>(selectedStatusValue, out var newStatus))
+            return;
+
+        await ChangeStatus(newStatus);
     }
 
     private async Task ChangeStatus(OrderStatus newStatus)
@@ -100,6 +122,7 @@
             order.Status = newStatus;
             await db.SaveChangesAsync();
             currentStatus = newStatus;
+            selectedStatusValue = newStatus.ToString();
             message = $"Đã cập nhật thành \"{newStatus.ToVietnamese()}\" thành công!";
         }
         catch
