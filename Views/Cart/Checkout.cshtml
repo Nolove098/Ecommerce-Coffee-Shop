@@ -9,45 +9,50 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Thanh toán – SaleStore</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .serif { font-family: 'Playfair Display', serif; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #D4A574; border-radius: 3px; }
-    </style>
+    
+    <!-- Custom CSS -->
+    <link href="~/css/custom.css" rel="stylesheet"/>
 </head>
-<body class="bg-[#FAF8F5] min-h-screen">
+<body class="bg-cream min-vh-100">
 
 <!-- Header -->
-<header class="bg-[#1A0E08] shadow-xl">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-[#D4A574] rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-[#1A0E08]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
-                    <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-                </svg>
-            </div>
-            <span class="text-white font-bold text-lg serif">SaleStore</span>
-        </a>
-        <!-- Breadcrumb -->
-        <div class="hidden md:flex items-center gap-2 text-sm">
-            <a href="/" class="text-white/50 hover:text-white transition-colors">Trang chủ</a>
-            <span class="text-white/30">›</span>
-            <span class="text-[#D4A574] font-semibold">Thanh toán</span>
+<header class="bg-dark shadow-lg">
+    <div class="container" style="max-width: 1200px;">
+        <div class="d-flex align-items-center justify-content-between py-3 px-3 px-md-0">
+            <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+                <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl" style="width: 36px; height: 36px;">
+                    <svg class="text-dark" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+                        <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                    </svg>
+                </div>
+                <span class="text-white fw-bold fs-5 serif">SaleStore</span>
+            </a>
+            <!-- Breadcrumb -->
+            <nav class="d-none d-md-flex" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Trang chủ</a></li>
+                    <li class="breadcrumb-item active text-caramel" aria-current="page">Thanh toán</li>
+                </ol>
+            </nav>
         </div>
     </div>
 </header>
 
-<main class="max-w-5xl mx-auto px-6 py-10">
-    <h1 class="text-3xl font-bold text-[#1A0E08] mb-8 serif">Thanh toán đơn hàng</h1>
+<main class="container py-5" style="max-width: 1200px;">
+    <h1 class="fs-2 fw-bold text-dark mb-4 serif">Thanh toán đơn hàng</h1>
 
     @if (ViewBag.Error != null)
     {
-        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-red-700 text-sm">
-            @ViewBag.Error
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <strong>Lỗi!</strong> @ViewBag.Error
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
@@ -55,114 +60,123 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="CartJson" id="cartJsonInput"/>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div class="row g-4">
 
             <!-- ===== LEFT: Form ===== -->
-            <div class="lg:col-span-3 space-y-5">
-                <div class="bg-white rounded-3xl border border-[#E8DFD8] p-7 shadow-sm">
-                    <h2 class="text-base font-bold text-[#6F4E37] uppercase tracking-wide mb-5 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        Thông tin khách hàng
-                    </h2>
+            <div class="col-12 col-lg-7">
+                <div class="mb-4">
+                    <div class="card border rounded-2xl shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="card-title h6 fw-bold text-coffee text-uppercase mb-4 d-flex align-items-center gap-2">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                Thông tin khách hàng
+                            </h2>
 
-                    <div class="space-y-4">
-                        <!-- Name -->
-                        <div>
-                            <label asp-for="CustomerName" class="block text-sm font-semibold text-[#6F4E37] mb-1.5">
-                                Họ và tên <span class="text-red-500">*</span>
-                            </label>
-                            <input asp-for="CustomerName" placeholder="Nguyễn Văn A"
-                                   class="w-full border border-[#E8DFD8] rounded-xl px-4 py-3 text-sm text-[#1A0E08] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none transition-all bg-[#FDFAF8]"/>
-                            <span asp-validation-for="CustomerName" class="text-red-500 text-xs mt-1 block"></span>
-                        </div>
+                            <div class="row g-3">
+                                <!-- Name -->
+                                <div class="col-12">
+                                    <label asp-for="CustomerName" class="form-label small fw-semibold text-coffee">
+                                        Họ và tên <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="CustomerName" placeholder="Nguyễn Văn A" class="form-control"/>
+                                    <span asp-validation-for="CustomerName" class="invalid-feedback d-block"></span>
+                                </div>
 
-                        <!-- Phone -->
-                        <div>
-                            <label asp-for="CustomerPhone" class="block text-sm font-semibold text-[#6F4E37] mb-1.5">
-                                Số điện thoại <span class="text-red-500">*</span>
-                            </label>
-                            <input asp-for="CustomerPhone" placeholder="0901 234 567" type="tel"
-                                   class="w-full border border-[#E8DFD8] rounded-xl px-4 py-3 text-sm text-[#1A0E08] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none transition-all bg-[#FDFAF8]"/>
-                            <span asp-validation-for="CustomerPhone" class="text-red-500 text-xs mt-1 block"></span>
-                        </div>
+                                <!-- Phone -->
+                                <div class="col-12">
+                                    <label asp-for="CustomerPhone" class="form-label small fw-semibold text-coffee">
+                                        Số điện thoại <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="CustomerPhone" placeholder="0901 234 567" type="tel" class="form-control"/>
+                                    <span asp-validation-for="CustomerPhone" class="invalid-feedback d-block"></span>
+                                </div>
 
-                        <!-- Address -->
-                        <div>
-                            <label asp-for="Address" class="block text-sm font-semibold text-[#6F4E37] mb-1.5">
-                                Địa chỉ giao hàng
-                            </label>
-                            <input asp-for="Address" placeholder="123 Đường ABC, Quận 1, TP.HCM"
-                                   class="w-full border border-[#E8DFD8] rounded-xl px-4 py-3 text-sm text-[#1A0E08] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none transition-all bg-[#FDFAF8]"/>
-                        </div>
+                                <!-- Address -->
+                                <div class="col-12">
+                                    <label asp-for="Address" class="form-label small fw-semibold text-coffee">
+                                        Địa chỉ giao hàng
+                                    </label>
+                                    <input asp-for="Address" placeholder="123 Đường ABC, Quận 1, TP.HCM" class="form-control"/>
+                                </div>
 
-                        <!-- Note -->
-                        <div>
-                            <label asp-for="Note" class="block text-sm font-semibold text-[#6F4E37] mb-1.5">
-                                Ghi chú
-                            </label>
-                            <textarea asp-for="Note" rows="3" placeholder="Ít đường, không đá, v.v..."
-                                      class="w-full border border-[#E8DFD8] rounded-xl px-4 py-3 text-sm text-[#1A0E08] focus:border-[#D4A574] focus:ring-2 focus:ring-[#D4A574]/30 outline-none transition-all resize-none bg-[#FDFAF8]"></textarea>
+                                <!-- Note -->
+                                <div class="col-12">
+                                    <label asp-for="Note" class="form-label small fw-semibold text-coffee">
+                                        Ghi chú
+                                    </label>
+                                    <textarea asp-for="Note" rows="3" placeholder="Ít đường, không đá, v.v..." class="form-control"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Payment method (display only) -->
-                <div class="bg-white rounded-3xl border border-[#E8DFD8] p-7 shadow-sm">
-                    <h2 class="text-base font-bold text-[#6F4E37] uppercase tracking-wide mb-4 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                        Phương thức thanh toán
-                    </h2>
-                    <div class="flex items-center gap-3 bg-[#FAF8F5] border border-[#D4A574] rounded-2xl p-4">
-                        <div class="w-10 h-10 bg-[#D4A574]/20 rounded-xl flex items-center justify-center">
-                            <svg class="w-5 h-5 text-[#D4A574]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-[#6F4E37] text-sm">Thanh toán khi nhận hàng (COD)</p>
-                            <p class="text-xs text-[#8B7355]">Thanh toán bằng tiền mặt khi nhận đơn</p>
-                        </div>
-                        <div class="ml-auto w-5 h-5 border-2 border-[#D4A574] rounded-full flex items-center justify-center">
-                            <div class="w-2.5 h-2.5 bg-[#D4A574] rounded-full"></div>
+                <div class="card border rounded-2xl shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="card-title h6 fw-bold text-coffee text-uppercase mb-3 d-flex align-items-center gap-2">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                            Phương thức thanh toán
+                        </h2>
+                        <div class="d-flex align-items-center gap-3 bg-cream border border-secondary rounded-2xl p-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-xl bg-secondary-soft-20" style="width: 40px; height: 40px;">
+                                <svg class="text-caramel" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="fw-semibold text-coffee small mb-0">Thanh toán khi nhận hàng (COD)</p>
+                                <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">Thanh toán bằng tiền mặt khi nhận đơn</p>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center border border-2 border-secondary rounded-circle" style="width: 20px; height: 20px;">
+                                <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- ===== RIGHT: Order Summary ===== -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm sticky top-6 overflow-hidden">
-                    <div class="px-6 py-5 border-b border-[#E8DFD8] bg-[#FAF8F5]">
-                        <h2 class="text-base font-bold text-[#6F4E37]">Đơn hàng của bạn</h2>
+            <div class="col-12 col-lg-5">
+                <div class="card border rounded-2xl shadow-sm position-sticky" style="top: 1.5rem;">
+                    <div class="card-header bg-cream border-bottom p-4">
+                        <h2 class="h6 fw-bold text-coffee mb-0">Đơn hàng của bạn</h2>
                     </div>
 
-                    <div id="orderSummaryItems" class="px-6 py-4 space-y-4 max-h-[340px] overflow-y-auto">
+                    <div id="orderSummaryItems" class="card-body p-4" style="max-height: 340px; overflow-y: auto;">
                         <!-- Populated by JS -->
-                        <p class="text-gray-400 text-sm text-center py-4">Đang tải giỏ hàng...</p>
+                        <p class="text-muted text-center py-4 mb-0">Đang tải giỏ hàng...</p>
                     </div>
 
-                    <div id="orderSummaryEmpty" class="px-6 py-8 text-center hidden">
-                        <p class="text-[#8B7355] text-sm">Giỏ hàng trống.</p>
-                        <a href="/" class="inline-block mt-3 text-[#6F4E37] text-sm font-semibold hover:underline">← Quay lại chọn món</a>
+                    <div id="orderSummaryEmpty" class="card-body p-4 text-center d-none">
+                        <p class="text-muted-custom small mb-0">Giỏ hàng trống.</p>
+                        <a href="/" class="d-inline-block mt-3 text-coffee small fw-semibold text-decoration-none">← Quay lại chọn món</a>
                     </div>
 
-                    <div class="px-6 pb-6 border-t border-[#E8DFD8] pt-5 space-y-3">
-                        <div class="flex justify-between text-sm text-[#8B7355]">
+                    <div class="card-footer bg-white border-top p-4">
+                        <div class="d-flex justify-content-between small text-muted-custom mb-2">
                             <span>Tạm tính</span>
                             <span id="subtotalDisplay">0 ₫</span>
                         </div>
-                        <div class="flex justify-between text-sm text-[#8B7355]">
+                        <div class="d-flex justify-content-between small text-muted-custom mb-3">
                             <span>Phí giao hàng</span>
-                            <span class="text-green-600 font-semibold">Miễn phí</span>
+                            <span class="text-success fw-semibold">Miễn phí</span>
                         </div>
-                        <div class="flex justify-between font-bold text-[#1A0E08] text-lg border-t border-[#E8DFD8] pt-3">
+                        <div class="d-flex justify-content-between fw-bold text-dark fs-5 border-top pt-3 mb-3">
                             <span>Tổng cộng</span>
-                            <span id="totalDisplay" class="text-[#6F4E37]">0 ₫</span>
+                            <span id="totalDisplay" class="text-coffee">0 ₫</span>
                         </div>
-                        <button type="submit" id="placeOrderBtn"
-                                class="w-full mt-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white py-4 rounded-2xl font-bold text-base transition-colors shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <button type="submit" id="placeOrderBtn" class="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
                             Đặt hàng ngay
                         </button>
-                        <a href="/" class="block text-center text-sm text-[#8B7355] hover:text-[#6F4E37] transition-colors mt-1">← Thêm món khác</a>
+                        <a href="/" class="d-block text-center small text-muted-custom text-decoration-none mt-2">← Thêm món khác</a>
                     </div>
                 </div>
             </div>
@@ -186,8 +200,8 @@
     const btn       = document.getElementById('placeOrderBtn');
 
     if (cart.length === 0) {
-        summaryEl.classList.add('hidden');
-        emptyEl.classList.remove('hidden');
+        summaryEl.classList.add('d-none');
+        emptyEl.classList.remove('d-none');
         btn.disabled = true;
     } else {
         const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -196,19 +210,22 @@
         cartInput.value = JSON.stringify(cart);
 
         summaryEl.innerHTML = cart.map(item => `
-            <div class="flex items-center gap-3">
+            <div class="d-flex align-items-center gap-3 mb-3">
                 ${item.imageUrl
-                    ? `<img src="${item.imageUrl}" alt="${item.productName}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0"/>`
-                    : `<div class="w-14 h-14 rounded-xl bg-[#F5EBE0] flex items-center justify-center text-xl flex-shrink-0">☕</div>`}
-                <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-[#1A0E08] text-sm truncate">${item.productName}</p>
-                    <p class="text-xs text-[#8B7355]">x${item.quantity}</p>
+                    ? `<img src="${item.imageUrl}" alt="${item.productName}" class="rounded-xl object-fit-cover flex-shrink-0" style="width: 56px; height: 56px;"/>`
+                    : `<div class="rounded-xl bg-light-brown d-flex align-items-center justify-content-center flex-shrink-0 fs-4" style="width: 56px; height: 56px;">☕</div>`}
+                <div class="flex-grow-1 overflow-hidden">
+                    <p class="fw-semibold text-dark small mb-0 text-truncate">${item.productName}</p>
+                    <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">x${item.quantity}</p>
                 </div>
-                <p class="font-bold text-[#6F4E37] text-sm flex-shrink-0">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
+                <p class="fw-bold text-coffee small mb-0 flex-shrink-0">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
             </div>
-        `).join('<div class="border-t border-[#F5EBE0]"></div>');
+        `).join('<hr class="my-2 border-light-brown">');
     }
 </script>
+
+<!-- Bootstrap 5.3 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 
 </body>
 </html>

@@ -1,0 +1,644 @@
+/* ============================================
+   SaleStore Custom Theme for Bootstrap 5
+   ============================================
+   
+   This file contains custom CSS that extends and overrides Bootstrap 5.3.8 defaults
+   to implement the SaleStore coffee-themed brand identity.
+   
+   Purpose:
+   - Override Bootstrap's default color scheme with coffee-themed brand colors
+   - Define custom CSS variables for consistent theming across the application
+   - Add custom utility classes not provided by Bootstrap
+   - Enhance Bootstrap components with brand-specific styling
+   
+   Loading Order:
+   This file MUST be loaded AFTER Bootstrap CSS to ensure overrides take effect.
+   See layout files: _AdminLayout.cshtml, _POSLayout.cshtml
+   
+   Bootstrap Version: 5.3.8
+   Brand Colors: Coffee Brown (#6F4E37), Caramel (#B8884D), Cream (#FAF8F5)
+   Typography: Inter (body), Playfair Display (headings)
+*/
+
+/* --------------------------------------------
+   1. CSS Custom Properties (Variables)
+   --------------------------------------------
+   
+   CSS Custom Properties (CSS Variables) allow us to override Bootstrap's default
+   color scheme without modifying Bootstrap's source code. These variables are
+   referenced throughout the application using var(--variable-name).
+   
+   Why use CSS Variables?
+   - Centralized color management (change once, apply everywhere)
+   - Override Bootstrap defaults cleanly without !important
+   - Enable dynamic theming if needed in the future
+   - Better maintainability and consistency
+*/
+:root {
+    /* Brand Colors - Override Bootstrap Primary and Secondary */
+    /* 
+       --bs-primary: Main brand color (Coffee Brown)
+       Used for: Primary buttons, links, navbar brand, headings
+       Overrides Bootstrap's default blue (#0d6efd)
+    */
+    --bs-primary: #6F4E37;           /* Coffee brown */
+    --bs-primary-rgb: 111, 78, 55;   /* RGB values for rgba() usage */
+    
+    /* 
+       --bs-secondary: Secondary brand color (Darker Caramel)
+       Used for: Secondary buttons, badges, accents
+       Overrides Bootstrap's default gray (#6c757d)
+       Note: Darkened from #D4A574 to #B8884D for better WCAG contrast compliance
+    */
+    --bs-secondary: #B8884D;         /* Darker caramel for better contrast */
+    --bs-secondary-rgb: 184, 136, 77;
+    
+    /* Additional Brand Colors - Custom palette for coffee theme */
+    --color-cream: #FAF8F5;          /* Light background color */
+    --color-dark-brown: #1A0E08;     /* Dark text color */
+    --color-medium-brown: #6B5744;   /* Muted text (darkened for contrast) */
+    --color-light-brown: #F5EBE0;    /* Light accent backgrounds */
+    --color-border: #E8DFD8;         /* Subtle borders */
+    --color-caramel-light: #F4D8B7;  /* Light caramel tint */
+    
+    /* Typography - Google Fonts */
+    /* 
+       Font families loaded via Google Fonts in layout files.
+       Inter: Modern, readable sans-serif for body text
+       Playfair Display: Elegant serif for headings and branding
+    */
+    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    
+    /* Spacing - Bootstrap default documented for reference */
+    /* 
+       Bootstrap uses a spacing scale: 0, 0.25rem, 0.5rem, 1rem, 1.5rem, 3rem
+       Accessed via utility classes: m-0 through m-5, p-0 through p-5
+       We keep Bootstrap's default spacing scale for consistency
+    */
+    --bs-spacer: 1rem;
+    
+    /* Border Radius - Custom values for softer, more modern appearance */
+    --border-radius-lg: 1.5rem;      /* Large rounded corners */
+    --border-radius-xl: 2rem;        /* Extra large rounded corners */
+    
+    /* Shadows - Custom soft shadows for depth and elevation */
+    /* 
+       Soft shadows create subtle depth without harsh edges.
+       Used on cards, buttons, modals for modern, elevated appearance.
+    */
+    --shadow-soft: 0 10px 40px rgba(26, 14, 8, 0.08);
+    --shadow-medium: 0 20px 60px rgba(26, 14, 8, 0.12);
+    --shadow-strong: 0 30px 80px rgba(26, 14, 8, 0.15);
+}
+
+/* --------------------------------------------
+   2. Typography Overrides
+   --------------------------------------------
+   
+   Override Bootstrap's default typography to use our custom fonts.
+   This ensures consistent brand typography across all text elements.
+*/
+
+/* Body text uses Inter for readability */
+body {
+    font-family: var(--font-body);
+    color: var(--color-dark-brown);
+    background-color: var(--color-cream);
+}
+
+/* All headings use Playfair Display for elegance and brand identity */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+/* Utility class for applying serif font to any element */
+.serif {
+    font-family: var(--font-heading);
+}
+
+/* --------------------------------------------
+   3. Component Overrides
+   --------------------------------------------
+   
+   These styles override Bootstrap's default component styling to match
+   the SaleStore brand. We enhance buttons, cards, forms, and other
+   components with custom colors, shadows, and interactions.
+*/
+
+/* Buttons - Enhanced with custom colors, rounded corners, and hover effects */
+.btn {
+    border-radius: var(--border-radius-lg);  /* Softer rounded corners */
+    font-weight: 600;                        /* Slightly bolder text */
+    padding: 0.75rem 1.5rem;                 /* More generous padding */
+    transition: all 0.2s ease;               /* Smooth transitions on hover */
+}
+
+/* Primary button uses coffee brown brand color */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Primary button hover state - darker shade with lift effect */
+.btn-primary:hover {
+    background-color: #5D3A1A;               /* Darker coffee brown */
+    border-color: #5D3A1A;
+    transform: translateY(-1px);             /* Subtle lift on hover */
+    box-shadow: var(--shadow-soft);          /* Add shadow for depth */
+}
+
+/* Secondary button uses caramel brand color */
+.btn-secondary {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+    color: var(--color-dark-brown);          /* Dark text for contrast */
+}
+
+/* Secondary button hover state */
+.btn-secondary:hover {
+    background-color: #C4956A;               /* Lighter caramel */
+    border-color: #C4956A;
+}
+
+/* Cards - Enhanced with custom shadows and rounded corners */
+.card {
+    border-radius: var(--border-radius-xl);  /* Extra rounded corners */
+    border-color: var(--color-border);       /* Subtle border */
+    box-shadow: var(--shadow-soft);          /* Soft shadow for depth */
+    transition: box-shadow 0.3s ease;        /* Smooth shadow transition */
+}
+
+/* Card hover effect - enhanced shadow for interactivity */
+.card:hover {
+    box-shadow: var(--shadow-medium);        /* Deeper shadow on hover */
+}
+
+/* Card images maintain rounded corners at top */
+.card-img-top {
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+}
+
+/* Forms - Enhanced with custom colors and focus states */
+.form-control,
+.form-select {
+    border-radius: var(--border-radius-lg);  /* Rounded input fields */
+    border-color: var(--color-border);       /* Subtle border */
+    background-color: #FDFAF8;               /* Slightly off-white background */
+    padding: 0.875rem 1rem;                  /* Comfortable padding */
+}
+
+/* Form control focus state - caramel accent color */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--bs-secondary);       /* Caramel border on focus */
+    box-shadow: 0 0 0 0.25rem rgba(212, 165, 116, 0.25);  /* Caramel glow */
+}
+
+/* Form labels - coffee brown for brand consistency */
+.form-label {
+    font-weight: 600;
+    color: var(--bs-primary);                /* Coffee brown labels */
+    margin-bottom: 0.5rem;
+}
+
+/* Badges - Rounded with custom padding */
+.badge {
+    border-radius: 1rem;                     /* Pill-shaped badges */
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+}
+
+/* Order Status Badges - Custom colors for each status */
+/* 
+   These custom badge classes provide semantic colors for order statuses.
+   They don't use Bootstrap's contextual classes to allow for precise
+   color control that matches the design requirements.
+*/
+.badge-pending {
+    background-color: #FEF3C7;               /* Light yellow background */
+    color: #92400E;                          /* Dark yellow text */
+}
+
+.badge-brewing {
+    background-color: #DBEAFE;               /* Light blue background */
+    color: #1E40AF;                          /* Dark blue text */
+}
+
+.badge-ready {
+    background-color: #D1FAE5;               /* Light green background */
+    color: #065F46;                          /* Dark green text */
+}
+
+.badge-delivered {
+    background-color: #F3F4F6;               /* Light gray background */
+    color: #374151;                          /* Dark gray text */
+}
+
+.badge-cancelled {
+    background-color: #FEE2E2;               /* Light red background */
+    color: #991B1B;                          /* Dark red text */
+}
+
+/* Tables - Enhanced with custom colors */
+.table {
+    color: var(--color-dark-brown);
+}
+
+/* Table hover effect - cream background */
+.table-hover tbody tr:hover {
+    background-color: var(--color-cream);
+}
+
+/* Table header - light brown background with coffee brown text */
+.table thead {
+    background-color: var(--color-light-brown);
+    color: var(--bs-primary);
+}
+
+/* Navbar - Soft shadow for separation */
+.navbar {
+    box-shadow: var(--shadow-soft);
+}
+
+/* Navbar brand - serif font with coffee brown color */
+.navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--bs-primary);
+}
+
+/* Modals - Enhanced with rounded corners and strong shadow */
+.modal-content {
+    border-radius: var(--border-radius-xl);  /* Rounded modal */
+    border: none;                            /* Remove default border */
+    box-shadow: var(--shadow-strong);        /* Strong shadow for prominence */
+}
+
+/* Modal header - cream background with subtle border */
+.modal-header {
+    border-bottom-color: var(--color-border);
+    background-color: var(--color-cream);
+}
+
+/* Modal footer - subtle border */
+.modal-footer {
+    border-top-color: var(--color-border);
+}
+
+/* --------------------------------------------
+   4. Custom Utility Classes
+   --------------------------------------------
+   
+   These utility classes extend Bootstrap's built-in utilities with
+   brand-specific styles. They follow Bootstrap's naming conventions
+   for consistency and ease of use.
+*/
+
+/* Rounded corners - Extended sizes beyond Bootstrap's defaults */
+.rounded-xl {
+    border-radius: var(--border-radius-lg);
+}
+
+.rounded-2xl {
+    border-radius: var(--border-radius-xl);
+}
+
+/* Text colors - Brand color utilities */
+.text-coffee {
+    color: var(--bs-primary);
+}
+
+.text-caramel {
+    color: var(--bs-secondary);
+}
+
+.text-muted-custom {
+    color: var(--color-medium-brown);
+}
+
+.text-dark-brown {
+    color: var(--color-dark-brown);
+}
+
+/* Background colors - Brand color utilities */
+.bg-cream {
+    background-color: var(--color-cream);
+}
+
+.bg-light-brown {
+    background-color: var(--color-light-brown);
+}
+
+.bg-dark-brown {
+    background-color: var(--color-dark-brown);
+}
+
+/* Soft/transparent backgrounds - For subtle overlays and accents */
+/* 
+   These classes use rgba() with CSS variables to create semi-transparent
+   backgrounds. Useful for hover states, overlays, and subtle highlights.
+*/
+.bg-primary-soft {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.bg-primary-soft-10 {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.bg-primary-soft-15 {
+    background-color: rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.bg-primary-soft-20 {
+    background-color: rgba(var(--bs-primary-rgb), 0.2);
+}
+
+.bg-secondary-soft {
+    background-color: rgba(var(--bs-secondary-rgb), 0.05);
+}
+
+.bg-secondary-soft-20 {
+    background-color: rgba(var(--bs-secondary-rgb), 0.2);
+}
+
+.bg-secondary-soft-25 {
+    background-color: rgba(var(--bs-secondary-rgb), 0.25);
+}
+
+/* Gradient backgrounds - For hero sections, cards, and visual interest */
+/* 
+   Linear gradients create depth and visual interest. Each gradient is
+   designed for specific use cases (hero sections, cards, auth pages, etc.)
+   and uses brand colors for consistency.
+*/
+
+/* Hero section gradient - Dark to light coffee brown */
+.bg-gradient-hero {
+    background: linear-gradient(135deg, var(--color-dark-brown) 0%, #3D2010 45%, var(--bs-primary) 100%);
+}
+
+/* Primary gradient - Coffee brown fade */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--bs-primary), var(--color-dark-brown));
+}
+
+/* Primary card gradient - For dashboard stat cards */
+.bg-gradient-primary-card {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #2C1810 100%);
+}
+
+/* Secondary gradient - Caramel fade */
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, var(--bs-secondary), #C4956A);
+}
+
+/* Secondary to primary gradient - Warm color transition */
+.bg-gradient-secondary-primary {
+    background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
+}
+
+/* Testimonial gradient - Dark coffee tones */
+.bg-gradient-testimonial {
+    background: linear-gradient(135deg, var(--color-dark-brown), var(--bs-primary));
+}
+
+/* Auth page gradient - Login page background */
+.bg-gradient-auth {
+    background: linear-gradient(135deg, var(--color-dark-brown) 0%, #3D2010 48%, var(--bs-primary) 100%);
+}
+
+/* Register page gradient - Subtle radial overlays on cream */
+.bg-gradient-register {
+    background: 
+        radial-gradient(circle at top left, rgba(var(--bs-secondary-rgb), 0.22), transparent 36%),
+        radial-gradient(circle at bottom right, rgba(var(--bs-primary-rgb), 0.18), transparent 30%),
+        linear-gradient(140deg, var(--color-cream) 0%, #F3E7DA 46%, #E7D4BF 100%);
+}
+
+/* POS interface gradient - Light, clean background */
+.bg-gradient-pos {
+    background: linear-gradient(135deg, #F8F2EC 0%, var(--color-cream) 52%, #F0E4D7 100%);
+}
+
+/* Dashboard revenue card gradient */
+.bg-gradient-dashboard-revenue {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--color-medium-brown) 100%);
+}
+
+/* Floating element gradient - Subtle accent */
+.bg-gradient-floating {
+    background: linear-gradient(135deg, rgba(var(--bs-secondary-rgb), 0.2), rgba(var(--bs-primary-rgb), 0.1));
+}
+
+/* Border colors - Brand color borders */
+.border-light-brown {
+    border-color: var(--color-border);
+}
+
+.border-secondary-soft {
+    border-color: rgba(var(--bs-secondary-rgb), 0.3);
+}
+
+/* Shadows - Custom shadow utilities */
+.shadow-soft {
+    box-shadow: var(--shadow-soft);
+}
+
+.shadow-medium {
+    box-shadow: var(--shadow-medium);
+}
+
+.shadow-strong {
+    box-shadow: var(--shadow-strong);
+}
+
+/* Success/status colors - For success messages and indicators */
+.bg-success-soft {
+    background-color: #D1FAE5;
+}
+
+.text-success-dark {
+    color: #059669;
+}
+
+/* SVG fill colors - For inline SVG icons */
+.fill-cream {
+    fill: var(--color-cream);
+}
+
+/* --------------------------------------------
+   5. Custom Scrollbar
+   --------------------------------------------
+   
+   Custom scrollbar styling for WebKit browsers (Chrome, Safari, Edge).
+   Uses brand colors for a cohesive look throughout the application.
+   
+   Note: These styles only work in WebKit browsers. Firefox and other
+   browsers will use their default scrollbar styling.
+*/
+::-webkit-scrollbar {
+    width: 8px;                              /* Scrollbar width */
+    height: 8px;                             /* Horizontal scrollbar height */
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-cream);          /* Track uses cream background */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary);         /* Thumb uses caramel color */
+    border-radius: 4px;                      /* Rounded scrollbar thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary);           /* Darker on hover (coffee brown) */
+}
+
+/* --------------------------------------------
+   6. Transitions
+   --------------------------------------------
+   
+   Global transition settings for smooth animations.
+   Applies to common properties that change on interaction.
+   
+   Why use global transitions?
+   - Consistent animation timing across the application
+   - Smooth color changes, hover effects, and transformations
+   - Better user experience with visual feedback
+   
+   Note: Individual components can override these with specific transitions.
+*/
+* {
+    transition-property: background-color, border-color, color, box-shadow, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+/* --------------------------------------------
+   7. Admin Area Specific Styles
+   --------------------------------------------
+   
+   Styles specific to the admin area that enhance the sidebar navigation
+   and admin interface. These styles work with Bootstrap components to
+   create a professional admin dashboard appearance.
+*/
+
+/* Admin sidebar - Dark gradient background */
+.admin-sidebar {
+    background: linear-gradient(180deg, var(--bs-primary) 0%, #2C1810 100%);
+    min-height: 100vh;                       /* Full viewport height */
+}
+
+/* Admin sidebar navigation links */
+.admin-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);         /* Semi-transparent white */
+    border-radius: 0.75rem;                  /* Rounded link backgrounds */
+    margin-bottom: 0.25rem;                  /* Spacing between links */
+    transition: all 0.2s ease;               /* Smooth hover transitions */
+}
+
+/* Admin sidebar link hover state */
+.admin-sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);  /* Light overlay on hover */
+    color: white;                            /* Full white text on hover */
+}
+
+/* Admin sidebar active link state */
+.admin-sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.18); /* Stronger overlay for active */
+    color: white;                            /* Full white text */
+    font-weight: 600;                        /* Bolder text for emphasis */
+}
+
+/* Category filter button active state - Homepage */
+.cat-btn.active {
+    background-color: var(--bs-primary);     /* Coffee brown background */
+    border-color: var(--bs-primary);         /* Coffee brown border */
+    color: white;                            /* White text for contrast */
+}
+
+/* --------------------------------------------
+   8. POS Area Specific Styles
+   --------------------------------------------
+   
+   Styles specific to the Point of Sale interface that enhance
+   product cards and cart functionality for retail operations.
+*/
+
+/* POS product cards - Interactive hover effect */
+.pos-product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* POS product card hover - Lift and shadow effect */
+.pos-product-card:hover {
+    transform: translateY(-4px);             /* Lift card up on hover */
+    box-shadow: var(--shadow-medium);        /* Enhanced shadow for depth */
+}
+
+/* POS cart sidebar - Clean white background with border */
+.pos-cart-sidebar {
+    background-color: white;
+    border-left: 1px solid var(--color-border);
+}
+
+/* --------------------------------------------
+   9. Responsive Adjustments
+   --------------------------------------------
+   
+   Media queries for responsive design adjustments.
+   These override default styles at specific breakpoints to ensure
+   optimal appearance on mobile devices.
+   
+   Bootstrap Breakpoints:
+   - xs: <576px (extra small, mobile)
+   - sm: ≥576px (small, mobile landscape)
+   - md: ≥768px (medium, tablet)
+   - lg: ≥992px (large, desktop)
+   - xl: ≥1200px (extra large, wide desktop)
+   - xxl: ≥1400px (extra extra large)
+*/
+
+/* Mobile adjustments (below 768px) */
+@media (max-width: 767.98px) {
+    /* Smaller buttons on mobile for better touch targets */
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Less rounded corners on mobile to maximize screen space */
+    .card {
+        border-radius: 1.25rem;
+    }
+    
+    .modal-content {
+        border-radius: 1.25rem;
+    }
+}
+
+/* --------------------------------------------
+   10. Print Styles
+   --------------------------------------------
+   
+   Styles for printing pages (invoices, reports, etc.).
+   Hides navigation and interactive elements, optimizes for paper.
+*/
+@media print {
+    /* Hide non-printable elements */
+    .navbar,
+    .admin-sidebar,
+    .btn,
+    .modal {
+        display: none;
+    }
+    
+    /* Use white background for printing */
+    body {
+        background-color: white;
+    }
+}

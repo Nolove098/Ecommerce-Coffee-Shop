@@ -6,14 +6,20 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 "/>
     <title>@(ViewData["Title"] ?? "SaleStore")</title>
     <meta name="description" content="SaleStore – Cà phê & Thức uống chọn lọc"/>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom CSS -->
+    <link href="~/css/custom.css" rel="stylesheet"/>
+    
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .serif { font-family: 'Playfair Display', serif; }
         html { scroll-behavior: smooth; }
         @@keyframes fadeUp {
             from { opacity:0; transform:translateY(20px); }
@@ -27,164 +33,158 @@
         .slide-in { animation: slideIn 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both; }
         @@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
         .floating { animation: float 3.5s ease-in-out infinite; }
-        .hero-bg { background: linear-gradient(135deg,#1A0E08 0%,#3D2010 45%,#6F4E37 100%); }
         .nav-solid { background: rgba(26,14,8,0.96); backdrop-filter: blur(16px); }
-        .product-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .product-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(111,78,55,0.18); }
-        .cat-active { background:#6F4E37!important; color:#fff!important; border-color:#6F4E37!important; }
         .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-        ::-webkit-scrollbar { width:6px; }
-        ::-webkit-scrollbar-thumb { background:#D4A574; border-radius:3px; }
-        /* Cart drawer */
-        #cartDrawer { transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94); }
-        #cartOverlay { transition: opacity 0.3s ease; }
     </style>
 </head>
-<body class="bg-[#FAF8F5] text-gray-800 overflow-x-hidden">
+<body class="bg-cream overflow-x-hidden">
 
 <!-- ===== NAVBAR ===== -->
-<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-[#D4A574] rounded-xl flex items-center justify-center shadow-lg">
-                <svg class="w-6 h-6 text-[#2C1810]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<nav id="navbar" class="navbar navbar-expand-lg fixed-top py-2 mt-3">
+    <div class="container-xxl">
+        <a href="/" class="navbar-brand d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl shadow-lg" style="width: 40px; height: 40px;">
+                <svg class="text-dark" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
                     <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
                 </svg>
             </div>
-            <span class="text-white font-bold text-xl serif tracking-wide">SaleStore</span>
+            <span class="text-white fw-bold fs-5 serif">SaleStore</span>
         </a>
-        <div class="hidden md:flex items-center gap-8">
-            <a href="#menu"    class="text-white/80 hover:text-[#D4A574] transition-colors text-sm font-medium">Thực đơn</a>
-            <a href="#about"   class="text-white/80 hover:text-[#D4A574] transition-colors text-sm font-medium">Về chúng tôi</a>
-            <a href="#popular" class="text-white/80 hover:text-[#D4A574] transition-colors text-sm font-medium">Yêu thích</a>
-            <a href="#contact" class="text-white/80 hover:text-[#D4A574] transition-colors text-sm font-medium">Liên hệ</a>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="toggleCart()" class="relative flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border border-white/20">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19m-5-5v5m-4-5v5"/>
-                </svg>
-                <span class="hidden sm:inline">Giỏ hàng</span>
-                <span id="cartBadge" class="absolute -top-2 -right-2 w-5 h-5 bg-[#D4A574] text-[#1A0E08] text-xs font-bold rounded-full flex items-center justify-center hidden">0</span>
-            </button>
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <div class="hidden lg:flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm text-white">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#D4A574] font-bold text-[#1A0E08]">@User.Identity.Name?.Substring(0, 1).ToUpperInvariant()</span>
-                    <div class="leading-tight">
-                        <p class="font-semibold">@User.Identity.Name</p>
-                        <p class="text-xs text-white/50">Thành viên SaleStore</p>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto me-3 mb-2 mb-lg-0">
+                <li class="nav-item"><a href="#menu" class="nav-link text-white-50 small fw-medium">Thực đơn</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link text-white-50 small fw-medium">Về chúng tôi</a></li>
+                <li class="nav-item"><a href="#popular" class="nav-link text-white-50 small fw-medium">Yêu thích</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link text-white-50 small fw-medium">Liên hệ</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button onclick="toggleCart()" class="btn btn-outline-light btn-sm position-relative d-flex align-items-center gap-2 rounded-xl">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19m-5-5v5m-4-5v5"/>
+                    </svg>
+                    <span class="d-none d-sm-inline">Giỏ hàng</span>
+                    <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary text-dark d-none">0</span>
+                </button>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="d-none d-lg-flex align-items-center gap-2 rounded-3 border border-white border-opacity-25 bg-white bg-opacity-10 px-3 py-2 small text-white">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-secondary fw-bold text-dark" style="width: 32px; height: 32px;">@User.Identity.Name?.Substring(0, 1).ToUpperInvariant()</span>
+                        <div class="lh-sm">
+                            <p class="mb-0 fw-semibold">@User.Identity.Name</p>
+                            <p class="mb-0 text-white-50" style="font-size: 0.75rem;">Thành viên SaleStore</p>
+                        </div>
                     </div>
-                </div>
-                <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="hidden sm:block">
-                    <button type="submit" class="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
-                        Đăng xuất
-                    </button>
-                </form>
-            }
-            else
-            {
-                <a asp-area="" asp-controller="Auth" asp-action="Login" class="hidden sm:inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
-                    Đăng nhập
-                </a>
-                <a asp-area="" asp-controller="Auth" asp-action="Register" class="hidden sm:inline-flex items-center rounded-xl bg-[#D4A574] px-4 py-2.5 text-sm font-bold text-[#1A0E08] transition hover:bg-[#C4956A]">
-                    Đăng ký
-                </a>
-            }
-            @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
-            {
-                <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="hidden md:inline-flex items-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white">
-                    POS
-                </a>
-            }
-            @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
-            {
-                <a href="/Admin" class="hidden md:flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Admin
-                </a>
-            }
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-none d-sm-block">
+                        <button type="submit" class="btn btn-outline-light btn-sm rounded-xl">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="btn btn-outline-light btn-sm rounded-xl d-none d-sm-inline-flex">Đăng nhập</a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Register" class="btn btn-secondary btn-sm rounded-xl text-dark fw-bold d-none d-sm-inline-flex">Đăng ký</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
+                {
+                    <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="btn btn-outline-light btn-sm rounded-xl d-none d-md-inline-flex">POS</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
+                {
+                    <a href="/Admin" class="d-none d-md-flex align-items-center gap-1 text-white-50 text-decoration-none" style="font-size: 0.75rem;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Admin
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </nav>
 
 <!-- ===== HERO ===== -->
-<section class="hero-bg min-h-screen flex items-center relative overflow-hidden">
-    <div class="absolute top-20 right-0 w-[600px] h-[600px] bg-[#D4A574]/5 rounded-full pointer-events-none"></div>
-    <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-[#8B5E3C]/15 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pt-24 pb-16">
-        <div>
-            <div class="inline-flex items-center gap-2 bg-[#D4A574]/20 border border-[#D4A574]/30 text-[#D4A574] text-xs font-semibold px-4 py-2 rounded-full mb-6 fade-up">
-                <span class="w-1.5 h-1.5 bg-[#D4A574] rounded-full"></span>
-                Hạt cà phê Arabica nguyên chất từ Đà Lạt
-            </div>
-            <h1 class="text-5xl lg:text-[5rem] font-bold text-white leading-[1.05] mb-6 fade-up serif">
-                Thức uống<br/>
-                <span class="text-[#D4A574] italic">đậm vị,</span><br/>
-                <span class="text-white/90">đong đầy cảm xúc</span>
-            </h1>
-            <p class="text-white/60 text-lg mb-10 leading-relaxed max-w-lg fade-up">
-                Từng ly cà phê được pha chế tỉ mỉ bởi barista lành nghề — sử dụng hạt rang tươi, phục vụ nhanh trong 5 phút.
-            </p>
-            <div class="flex flex-wrap gap-4 fade-up">
-                <a href="#menu" class="inline-flex items-center gap-2 bg-[#D4A574] hover:bg-[#C4956A] text-[#1A0E08] px-8 py-4 rounded-2xl font-bold text-base transition-all shadow-2xl">
-                    Xem thực đơn
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
-                <button onclick="toggleCart()" class="inline-flex items-center gap-2 border border-white/20 text-white/70 hover:bg-white/10 hover:text-white px-8 py-4 rounded-2xl font-medium text-base transition-all fade-up">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19"/></svg>
-                    Giỏ hàng của tôi
-                </button>
-            </div>
-            <div class="grid grid-cols-3 gap-6 mt-14 fade-up">
-                @{ var heroStats = new[]{ new{num="500+",label="Khách/ngày"},new{num="20+",label="Loại thức uống"},new{num="5★",label="Đánh giá TB"} }; }
-                @foreach(var s in heroStats){
-                    <div class="border-l border-white/10 pl-6 first:border-l-0 first:pl-0">
-                        <p class="text-3xl font-bold text-[#D4A574] serif">@s.num</p>
-                        <p class="text-white/40 text-xs mt-1">@s.label</p>
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="hidden lg:flex justify-center items-center">
-            <div class="relative floating">
-                <div class="w-[380px] h-[380px] rounded-full bg-gradient-to-br from-[#D4A574]/20 to-[#6F4E37]/10 border border-[#D4A574]/15 backdrop-blur-sm flex items-center justify-center">
-                    <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600" alt="Caramel Macchiato" class="w-72 h-72 object-cover rounded-full shadow-[0_40px_80px_rgba(0,0,0,0.5)]"/>
+<section class="bg-gradient-hero min-vh-100 d-flex align-items-center position-relative overflow-hidden">
+    <div class="position-absolute top-0 end-0 rounded-circle bg-secondary-soft" style="width: 600px; height: 600px; pointer-events: none;"></div>
+    <div class="position-absolute bottom-0 start-0 rounded-circle blur bg-primary-soft-15" style="width: 320px; height: 320px; margin-left: -80px; margin-bottom: -80px; pointer-events: none;"></div>
+    <div class="container-xxl px-4 pt-5 pb-4" style="margin-top: 80px;">
+        <div class="row g-5 align-items-center">
+            <div class="col-12 col-lg-6">
+                <div class="d-inline-flex align-items-center gap-2 border border-opacity-25 rounded-pill px-4 py-2 mb-4 fade-up bg-secondary-soft-20 border-secondary-soft">
+                    <span class="rounded-circle bg-secondary" style="width: 6px; height: 6px;"></span>
+                    <span class="text-secondary small fw-semibold">Hạt cà phê Arabica nguyên chất từ Đà Lạt</span>
                 </div>
-                <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-white rounded-2xl px-6 py-3 shadow-2xl flex items-center gap-3 whitespace-nowrap">
-                    <div class="w-9 h-9 bg-gradient-to-br from-[#D4A574] to-[#C4956A] rounded-xl flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 font-medium">Bán chạy nhất</p>
-                        <p class="text-sm font-bold text-[#1A0E08]">Caramel Macchiato · 65.000 ₫</p>
-                    </div>
+                <h1 class="display-3 fw-bold text-white lh-sm mb-4 fade-up serif">
+                    Thức uống<br/>
+                    <span class="text-secondary fst-italic">đậm vị,</span><br/>
+                    <span class="text-white-50">đong đầy cảm xúc</span>
+                </h1>
+                <p class="text-white-50 fs-5 mb-5 fade-up" style="max-width: 500px;">
+                    Từng ly cà phê được pha chế tỉ mỉ bởi barista lành nghề — sử dụng hạt rang tươi, phục vụ nhanh trong 5 phút.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-5 fade-up">
+                    <a href="#menu" class="btn btn-secondary btn-lg rounded-3 fw-bold d-inline-flex align-items-center gap-2 shadow-lg text-dark">
+                        Xem thực đơn
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <button onclick="toggleCart()" class="btn btn-outline-light btn-lg rounded-3 fw-medium d-inline-flex align-items-center gap-2">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19"/></svg>
+                        Giỏ hàng của tôi
+                    </button>
                 </div>
-                <div class="absolute top-6 -right-6 bg-[#D4A574] rounded-2xl px-4 py-2.5 text-white shadow-xl">
-                    <p class="text-xs font-medium">Đánh giá</p>
-                    <p class="text-lg font-bold">⭐ 4.9</p>
+                <div class="row g-4 mt-4 fade-up">
+                    @{ var heroStats = new[]{ new{num="500+",label="Khách/ngày"},new{num="20+",label="Loại thức uống"},new{num="5★",label="Đánh giá TB"} }; }
+                    @foreach(var s in heroStats){
+                        <div class="col-4">
+                            <div class="border-start border-white border-opacity-10 ps-4">
+                                <p class="display-6 fw-bold text-secondary serif mb-1">@s.num</p>
+                                <p class="text-white-50 small mb-0">@s.label</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 d-none d-lg-flex justify-content-center align-items-center">
+                <div class="position-relative floating">
+                    <div class="rounded-circle border border-secondary border-opacity-25 d-flex align-items-center justify-content-center bg-gradient-floating" style="width: 380px; height: 380px; backdrop-filter: blur(8px);">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600" alt="Caramel Macchiato" class="rounded-circle object-fit-cover shadow-lg" style="width: 288px; height: 288px;"/>
+                    </div>
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x bg-white rounded-3 px-4 py-3 shadow-lg d-flex align-items-center gap-3" style="margin-bottom: -20px; white-space: nowrap;">
+                        <div class="d-flex align-items-center justify-content-center rounded-xl bg-gradient-secondary" style="width: 36px; height: 36px;">
+                            <svg width="16" height="16" class="text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0" style="font-size: 10px; font-weight: 500;">Bán chạy nhất</p>
+                            <p class="fw-bold text-dark mb-0 small">Caramel Macchiato · 65.000 ₫</p>
+                        </div>
+                    </div>
+                    <div class="position-absolute top-0 end-0 bg-secondary rounded-3 px-3 py-2 text-white shadow-lg" style="margin-top: 24px; margin-right: -24px;">
+                        <p class="mb-0" style="font-size: 0.75rem; font-weight: 500;">Đánh giá</p>
+                        <p class="mb-0 fs-5 fw-bold">⭐ 4.9</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 80" fill="none" preserveAspectRatio="none" class="w-full h-16">
-            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FAF8F5"/>
+    <div class="position-absolute bottom-0 start-0 end-0">
+        <svg viewBox="0 0 1440 80" fill="none" preserveAspectRatio="none" style="width: 100%; height: 64px;">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" class="fill-cream"/>
         </svg>
     </div>
 </section>
 
 <!-- ===== FEATURES ===== -->
-<section class="py-16 bg-[#FAF8F5]">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<section class="py-5 bg-cream">
+    <div class="container-xxl px-4">
+        <div class="row g-4">
             @{ var features=new[]{new{icon="☕",title="Nguyên liệu tươi",desc="Hạt Arabica & Robusta chọn lọc từ Đà Lạt, rang tươi mỗi ngày."},new{icon="⚡",title="Phục vụ nhanh",desc="Thức uống được pha chế và phục vụ trong vòng 5 phút."},new{icon="🌿",title="Thân thiện môi trường",desc="Ly và ống hút làm từ vật liệu sinh học phân hủy."}}; }
             @foreach(var f in features){
-                <div class="group bg-white rounded-3xl p-8 border border-[#E8DFD8] hover:border-[#D4A574] hover:shadow-xl transition-all duration-300">
-                    <div class="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300 inline-block">@f.icon</div>
-                    <h3 class="text-lg font-bold text-[#2C1810] mb-2 serif">@f.title</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">@f.desc</p>
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border rounded-4 p-4 shadow-sm">
+                        <div class="display-4 mb-4">@f.icon</div>
+                        <h3 class="fs-5 fw-bold text-dark mb-2 serif">@f.title</h3>
+                        <p class="text-muted small mb-0">@f.desc</p>
+                    </div>
                 </div>
             }
         </div>
@@ -192,47 +192,49 @@
 </section>
 
 <!-- ===== MENU ===== -->
-<section id="menu" class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-14">
-            <span class="text-[#D4A574] text-xs font-bold uppercase tracking-[0.2em]">Thực đơn</span>
-            <h2 class="text-4xl lg:text-5xl font-bold text-[#1A0E08] mt-2 serif">Khám phá thức uống</h2>
-            <p class="text-gray-400 mt-4 max-w-lg mx-auto">Từ cà phê nguyên chất đến thức uống sáng tạo — tất cả đều được pha chế bằng tình yêu.</p>
+<section id="menu" class="py-5 bg-white">
+    <div class="container-xxl px-4">
+        <div class="text-center mb-5">
+            <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Thực đơn</span>
+            <h2 class="display-4 fw-bold text-dark mt-2 serif">Khám phá thức uống</h2>
+            <p class="text-muted mt-3 mx-auto" style="max-width: 500px;">Từ cà phê nguyên chất đến thức uống sáng tạo — tất cả đều được pha chế bằng tình yêu.</p>
         </div>
-        <div class="flex flex-wrap justify-center gap-3 mb-10">
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
             @{ var cats=new[]{"Tất cả","Cà phê đặc biệt","Cà phê đá","Cà phê truyền thống","Trà & Khác"}; }
             @foreach(var c in cats){
-                <button onclick="filterCat(this,'@c')" class="cat-btn px-5 py-2.5 rounded-full border border-[#E8DFD8] text-sm font-semibold text-[#6F4E37] hover:border-[#6F4E37] hover:bg-[#6F4E37] hover:text-white transition-all @(c=="Tất cả"?"cat-active":"")">@c</button>
+                <button onclick="filterCat(this,'@c')" class="cat-btn btn btn-outline-primary rounded-pill small fw-semibold @(c=="Tất cả"?"active":"")">@c</button>
             }
         </div>
         @{ var menuProducts = _context.Products.Where(p=>p.IsActive).ToList(); }
-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div id="productGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
             @foreach(var p in menuProducts){
-                <div class="product-card bg-white rounded-3xl border border-[#E8DFD8] overflow-hidden group" data-cat="@p.Category">
-                    <div class="relative h-52 overflow-hidden bg-[#F5EBE0]">
-                        @if(!string.IsNullOrEmpty(p.ImageUrl)){
-                            <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
-                        }else{
-                            <div class="w-full h-full flex items-center justify-center text-6xl">☕</div>
-                        }
-                        <div class="absolute top-3 right-3 bg-white/95 text-[#6F4E37] text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">@p.Category</div>
-                        @if(p.Stock < 20){ <div class="absolute top-3 left-3 bg-orange-500 text-white text-[11px] font-bold px-3 py-1 rounded-full">Sắp hết</div> }
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-[#1A0E08] text-base mb-1 serif">@p.Name</h3>
-                        @if(!string.IsNullOrEmpty(p.Description)){
-                            <p class="text-gray-400 text-xs mb-4 leading-relaxed line-clamp-2">@p.Description</p>
-                        }else{ <div class="mb-4"></div> }
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-[#6F4E37] font-bold text-lg">@p.Price.ToString("N0")</span>
-                                <span class="text-[#8B7355] text-sm ml-0.5">₫</span>
+                <div class="col product-card" data-cat="@p.Category">
+                    <div class="card h-100 border rounded-4 overflow-hidden shadow-sm">
+                        <div class="position-relative bg-light-brown" style="height: 208px;">
+                            @if(!string.IsNullOrEmpty(p.ImageUrl)){
+                                <img src="@p.ImageUrl" alt="@p.Name" class="w-100 h-100 object-fit-cover"/>
+                            }else{
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center display-3">☕</div>
+                            }
+                            <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary rounded-pill small fw-bold">@p.Category</span>
+                            @if(p.Stock < 20){ <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-white rounded-pill small fw-bold">Sắp hết</span> }
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title fw-bold text-dark small mb-1 serif">@p.Name</h3>
+                            @if(!string.IsNullOrEmpty(p.Description)){
+                                <p class="card-text text-muted line-clamp-2 mb-3" style="font-size: 0.75rem;">@p.Description</p>
+                            }else{ <div class="mb-3"></div> }
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-primary fw-bold fs-5">@p.Price.ToString("N0")</span>
+                                    <span class="text-muted-custom small">₫</span>
+                                </div>
+                                <button onclick="addToCart(@p.Id,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
+                                        class="btn btn-primary btn-sm rounded-xl d-flex align-items-center gap-1 fw-semibold shadow-sm">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    Thêm
+                                </button>
                             </div>
-                            <button onclick="addToCart(@p.Id,'@p.Name.Replace("'","\\'")',@p.Price,'@(p.ImageUrl ?? "")','@p.Category')"
-                                    class="flex items-center gap-1.5 bg-[#6F4E37] hover:bg-[#5D3A1A] active:scale-95 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                Thêm
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -242,52 +244,58 @@
 </section>
 
 <!-- ===== ABOUT ===== -->
-<section id="about" class="py-24 bg-[#FAF8F5]">
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div class="relative">
-            <div class="rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
-                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800" alt="Barista pha cà phê" class="w-full h-full object-cover"/>
+<section id="about" class="py-5 bg-cream">
+    <div class="container-xxl px-4">
+        <div class="row g-5 align-items-center">
+            <div class="col-12 col-lg-6">
+                <div class="position-relative">
+                    <div class="rounded-4 overflow-hidden shadow-lg ratio ratio-4x3">
+                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800" alt="Barista pha cà phê" class="object-fit-cover"/>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 rounded-4 p-4 text-white shadow-lg bg-gradient-primary" style="margin-bottom: -24px; margin-right: -24px;">
+                        <p class="display-4 fw-bold serif mb-1">5+</p>
+                        <p class="text-white-50 small mb-0">Năm kinh nghiệm</p>
+                    </div>
+                    <div class="position-absolute top-0 start-0 bg-white rounded-3 px-4 py-3 shadow-lg border" style="margin-top: 24px; margin-left: -24px;">
+                        <p class="display-6 fw-bold text-primary serif mb-1">500+</p>
+                        <p class="text-muted mb-0" style="font-size: 0.75rem;">Khách hàng mỗi ngày</p>
+                    </div>
+                </div>
             </div>
-            <div class="absolute -bottom-6 -right-6 bg-gradient-to-br from-[#6F4E37] to-[#1A0E08] rounded-3xl p-6 text-white shadow-2xl">
-                <p class="text-5xl font-bold serif">5+</p>
-                <p class="text-white/60 text-sm mt-1">Năm kinh nghiệm</p>
-            </div>
-            <div class="absolute top-6 -left-6 bg-white rounded-2xl px-5 py-4 shadow-xl border border-[#E8DFD8]">
-                <p class="text-2xl font-bold text-[#6F4E37] serif">500+</p>
-                <p class="text-gray-400 text-xs">Khách hàng mỗi ngày</p>
-            </div>
-        </div>
-        <div>
-            <span class="text-[#D4A574] text-xs font-bold uppercase tracking-[0.2em]">Về chúng tôi</span>
-            <h2 class="text-4xl lg:text-5xl font-bold text-[#1A0E08] mt-2 mb-6 leading-tight serif">Đam mê pha chế<br/>từ những ngày đầu</h2>
-            <p class="text-gray-500 leading-relaxed mb-5">SaleStore ra đời từ tình yêu với những ly cà phê đậm đà. Chúng tôi tin rằng mỗi ly cà phê là một câu chuyện — câu chuyện về nguồn gốc hạt, về bàn tay người pha, và về khoảnh khắc bạn thưởng thức.</p>
-            <p class="text-gray-500 leading-relaxed mb-9">Hạt cà phê của chúng tôi được chọn lựa kỹ càng từ các nông trường Tây Nguyên, rang tươi mỗi tuần để giữ trọn hương vị đặc trưng.</p>
-            <div class="flex flex-wrap gap-4">
-                <a href="#menu" class="bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-8 py-3.5 rounded-xl font-semibold transition-colors shadow-lg">Xem thực đơn</a>
-                <a href="#contact" class="border-2 border-[#6F4E37] text-[#6F4E37] hover:bg-[#6F4E37] hover:text-white px-8 py-3.5 rounded-xl font-semibold transition-all">Liên hệ ngay</a>
+            <div class="col-12 col-lg-6">
+                <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Về chúng tôi</span>
+                <h2 class="display-4 fw-bold text-dark mt-2 mb-4 serif">Đam mê pha chế<br/>từ những ngày đầu</h2>
+                <p class="text-muted mb-3">SaleStore ra đời từ tình yêu với những ly cà phê đậm đà. Chúng tôi tin rằng mỗi ly cà phê là một câu chuyện — câu chuyện về nguồn gốc hạt, về bàn tay người pha, và về khoảnh khắc bạn thưởng thức.</p>
+                <p class="text-muted mb-4">Hạt cà phê của chúng tôi được chọn lựa kỹ càng từ các nông trường Tây Nguyên, rang tươi mỗi tuần để giữ trọn hương vị đặc trưng.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#menu" class="btn btn-primary rounded-xl fw-semibold shadow-lg">Xem thực đơn</a>
+                    <a href="#contact" class="btn btn-outline-primary rounded-xl fw-semibold">Liên hệ ngay</a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- ===== POPULAR ===== -->
-<section id="popular" class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-14">
-            <span class="text-[#D4A574] text-xs font-bold uppercase tracking-[0.2em]">Bán chạy nhất</span>
-            <h2 class="text-4xl lg:text-5xl font-bold text-[#1A0E08] mt-2 serif">Được yêu thích tuần này</h2>
+<section id="popular" class="py-5 bg-white">
+    <div class="container-xxl px-4">
+        <div class="text-center mb-5">
+            <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Bán chạy nhất</span>
+            <h2 class="display-4 fw-bold text-dark mt-2 serif">Được yêu thích tuần này</h2>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
             @{ var popularItems=new[]{new{name="Caramel Macchiato",price=65000,sold=342,img="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400"},new{name="Cappuccino",price=55000,sold=298,img="https://images.unsplash.com/photo-1606791405792-1004f1718d0c?w=400"},new{name="Iced Latte",price=55000,sold=276,img="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400"},new{name="Espresso",price=40000,sold=245,img="https://images.unsplash.com/photo-1579992357154-faf4bde95b3d?w=400"},new{name="Mocha",price=60000,sold=198,img="https://images.unsplash.com/photo-1607681034540-2c46cc71896d?w=400"}}; int rank=0; }
             @foreach(var item in popularItems){ rank++;
-                <div class="product-card bg-[#FAF8F5] rounded-3xl p-5 border border-[#E8DFD8] text-center group">
-                    <div class="relative mb-4">
-                        <img src="@item.img" alt="@item.name" class="w-full h-36 object-cover rounded-2xl"/>
-                        <div class="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-[#6F4E37] to-[#D4A574] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">@rank</div>
+                <div class="col">
+                    <div class="card bg-cream border rounded-4 p-3 text-center shadow-sm">
+                        <div class="position-relative mb-3">
+                            <img src="@item.img" alt="@item.name" class="w-100 rounded-3 object-fit-cover" style="height: 144px;"/>
+                            <div class="position-absolute top-0 start-0 d-flex align-items-center justify-content-center rounded-circle text-white small fw-bold shadow bg-gradient-secondary-primary" style="width: 32px; height: 32px; margin-top: -8px; margin-left: -8px;">@rank</div>
+                        </div>
+                        <h3 class="fw-bold text-dark small mb-1 serif lh-sm">@item.name</h3>
+                        <p class="text-secondary fw-bold small mb-1">@item.price.ToString("N0") ₫</p>
+                        <p class="text-muted mb-0" style="font-size: 0.75rem;">@item.sold đơn tuần này</p>
                     </div>
-                    <h3 class="font-bold text-[#1A0E08] text-sm mb-1 serif leading-tight">@item.name</h3>
-                    <p class="text-[#D4A574] font-bold text-sm mb-1">@item.price.ToString("N0") ₫</p>
-                    <p class="text-gray-400 text-xs">@item.sold đơn tuần này</p>
                 </div>
             }
         </div>
@@ -295,24 +303,26 @@
 </section>
 
 <!-- ===== TESTIMONIALS ===== -->
-<section class="py-24 bg-gradient-to-br from-[#1A0E08] to-[#6F4E37] relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 25% 50%,#D4A574 0%,transparent 60%)"></div>
-    <div class="max-w-7xl mx-auto px-6 relative">
-        <div class="text-center mb-12">
-            <span class="text-[#D4A574] text-xs font-bold uppercase tracking-[0.2em]">Khách hàng nói gì</span>
-            <h2 class="text-4xl lg:text-5xl font-bold text-white mt-2 serif">Phản hồi từ cộng đồng</h2>
+<section class="py-5 position-relative overflow-hidden bg-gradient-testimonial">
+    <div class="position-absolute top-0 start-0 end-0 bottom-0 opacity-10" style="background-image:radial-gradient(circle at 25% 50%, var(--bs-secondary) 0%,transparent 60%)"></div>
+    <div class="container-xxl px-4 position-relative">
+        <div class="text-center mb-5">
+            <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Khách hàng nói gì</span>
+            <h2 class="display-4 fw-bold text-white mt-2 serif">Phản hồi từ cộng đồng</h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="row g-4">
             @{ var reviews=new[]{new{name="Nguyễn Văn An",role="Khách hàng thân thiết",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà.",stars=5,avatar="NA"},new{name="Trần Thị Bích",role="Food Blogger",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB"},new{name="Lê Hữu Phúc",role="Sinh viên",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng.",stars=5,avatar="LP"}}; }
             @foreach(var r in reviews){
-                <div class="bg-white/10 backdrop-blur-md rounded-3xl p-7 border border-white/10 hover:bg-white/15 transition-colors">
-                    <div class="flex gap-1 mb-5">@for(int i=0;i<r.stars;i++){<span class="text-[#D4A574] text-lg">★</span>}</div>
-                    <p class="text-white/75 text-sm leading-relaxed mb-6 italic">"@r.text"</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-[#D4A574] to-[#C4956A] rounded-full flex items-center justify-center text-[#1A0E08] font-bold text-sm shadow-lg">@r.avatar</div>
-                        <div>
-                            <p class="text-white font-semibold text-sm">@r.name</p>
-                            <p class="text-white/40 text-xs">@r.role</p>
+                <div class="col-12 col-md-4">
+                    <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
+                        <div class="d-flex gap-1 mb-4">@for(int i=0;i<r.stars;i++){<span class="text-secondary fs-5">★</span>}</div>
+                        <p class="text-white-50 small mb-4 fst-italic">"@r.text"</p>
+                        <div class="d-flex align-items-center gap-3 mt-auto">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@r.avatar</div>
+                            <div>
+                                <p class="text-white fw-semibold small mb-0">@r.name</p>
+                                <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.role</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -322,66 +332,68 @@
 </section>
 
 <!-- ===== CONTACT ===== -->
-<section id="contact" class="py-24 bg-[#FAF8F5]">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-        <span class="text-[#D4A574] text-xs font-bold uppercase tracking-[0.2em]">Tìm đến chúng tôi</span>
-        <h2 class="text-4xl lg:text-5xl font-bold text-[#1A0E08] mt-2 mb-4 serif">Đến thăm SaleStore hôm nay</h2>
-        <p class="text-gray-400 mb-12 max-w-xl mx-auto">Ghé thăm cửa hàng hoặc gọi đặt hàng — chúng tôi luôn sẵn sàng phục vụ bạn.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<section id="contact" class="py-5 bg-cream">
+    <div class="container px-4 text-center" style="max-width: 800px;">
+        <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Tìm đến chúng tôi</span>
+        <h2 class="display-4 fw-bold text-dark mt-2 mb-3 serif">Đến thăm SaleStore hôm nay</h2>
+        <p class="text-muted mb-5 mx-auto" style="max-width: 600px;">Ghé thăm cửa hàng hoặc gọi đặt hàng — chúng tôi luôn sẵn sàng phục vụ bạn.</p>
+        <div class="row g-4 mb-5">
             @{ var infos=new[]{new{icon="📍",label="Địa chỉ",val="123 Đường Cà Phê, Quận 1, TP.HCM"},new{icon="🕐",label="Giờ mở cửa",val="6:00 SA – 10:00 CH · Tất cả các ngày"},new{icon="📞",label="Điện thoại",val="0901 234 567"}}; }
             @foreach(var info in infos){
-                <div class="bg-white rounded-3xl p-7 border border-[#E8DFD8] shadow-sm hover:shadow-lg hover:border-[#D4A574] transition-all">
-                    <div class="text-4xl mb-4">@info.icon</div>
-                    <p class="text-[#8B7355] text-[10px] font-bold uppercase tracking-widest mb-2">@info.label</p>
-                    <p class="text-[#1A0E08] font-semibold text-sm leading-relaxed">@info.val</p>
+                <div class="col-12 col-md-4">
+                    <div class="card border rounded-4 p-4 shadow-sm h-100">
+                        <div class="display-4 mb-3">@info.icon</div>
+                        <p class="text-muted-custom small fw-bold text-uppercase mb-2" style="font-size: 10px; letter-spacing: 0.15em;">@info.label</p>
+                        <p class="text-dark fw-semibold small mb-0">@info.val</p>
+                    </div>
                 </div>
             }
         </div>
-        <a href="#menu" class="inline-flex items-center gap-3 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-12 py-4 rounded-2xl font-bold text-base transition-all shadow-2xl">
+        <a href="#menu" class="btn btn-primary btn-lg rounded-3 fw-bold d-inline-flex align-items-center gap-3 shadow-lg">
             Đặt thức uống ngay
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
     </div>
 </section>
 
 <!-- ===== FOOTER ===== -->
-<footer class="bg-[#1A0E08] text-white/50 py-12">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
-            <a href="/" class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-[#D4A574] rounded-xl flex items-center justify-center"><span class="text-[#1A0E08] text-base">☕</span></div>
-                <span class="text-white font-bold text-xl serif">SaleStore</span>
+<footer class="py-5 text-white-50 bg-dark-brown">
+    <div class="container-xxl px-4">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 pb-4 border-bottom border-white border-opacity-10">
+            <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+                <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl" style="width: 36px; height: 36px;"><span class="text-dark">☕</span></div>
+                <span class="text-white fw-bold fs-5 serif">SaleStore</span>
             </a>
-            <div class="flex flex-wrap gap-8 text-sm">
-                <a href="#menu" class="hover:text-white transition-colors">Thực đơn</a>
-                <a href="#about" class="hover:text-white transition-colors">Về chúng tôi</a>
-                <a href="#popular" class="hover:text-white transition-colors">Yêu thích</a>
-                <a href="#contact" class="hover:text-white transition-colors">Liên hệ</a>
+            <div class="d-flex flex-wrap gap-4 small">
+                <a href="#menu" class="text-white-50 text-decoration-none">Thực đơn</a>
+                <a href="#about" class="text-white-50 text-decoration-none">Về chúng tôi</a>
+                <a href="#popular" class="text-white-50 text-decoration-none">Yêu thích</a>
+                <a href="#contact" class="text-white-50 text-decoration-none">Liên hệ</a>
             </div>
         </div>
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 text-sm">
-            <p>© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
-            <div class="flex flex-wrap items-center justify-center gap-4">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 pt-4 small">
+            <p class="mb-0">© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <span class="text-white/75">Xin chào, @User.Identity.Name</span>
-                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
-                        <button type="submit" class="hover:text-[#D4A574] transition-colors">Đăng xuất</button>
+                    <span class="text-white-50">Xin chào, @User.Identity.Name</span>
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link btn-sm text-white-50 text-decoration-none p-0">Đăng xuất</button>
                     </form>
                 }
                 else
                 {
-                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="hover:text-[#D4A574] transition-colors">Đăng nhập</a>
-                    <a asp-area="" asp-controller="Auth" asp-action="Register" class="hover:text-[#D4A574] transition-colors">Đăng ký</a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="text-white-50 text-decoration-none">Đăng nhập</a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Register" class="text-white-50 text-decoration-none">Đăng ký</a>
                 }
                 @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
                 {
-                    <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="hover:text-[#D4A574] transition-colors">POS</a>
+                    <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="text-white-50 text-decoration-none">POS</a>
                 }
                 @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
                 {
-                    <a href="/Admin" class="hover:text-[#D4A574] transition-colors flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <a href="/Admin" class="text-white-50 text-decoration-none d-flex align-items-center gap-1">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         Admin Panel
                     </a>
                 }
@@ -391,68 +403,64 @@
 </footer>
 
 <!-- ===== FLOATING CART BUTTON ===== -->
-<button onclick="toggleCart()" id="floatingCartBtn"
-        class="fixed bottom-8 right-8 z-40 w-16 h-16 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white rounded-2xl flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95">
-    <div class="relative">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<button onclick="toggleCart()" id="floatingCartBtn" aria-label="Open shopping cart"
+        class="btn btn-primary position-fixed bottom-0 end-0 rounded-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; margin-bottom: 32px; margin-right: 32px; z-index: 1040;">
+    <div class="position-relative">
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19m-5-5v5m-4-5v5"/>
         </svg>
-        <span id="floatCartBadge" class="absolute -top-3 -right-3 w-5 h-5 bg-[#D4A574] text-[#1A0E08] text-[10px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+        <span id="floatCartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary text-dark d-none" style="font-size: 10px; margin-top: -12px; margin-left: -12px;">0</span>
     </div>
 </button>
 
 <!-- ===== CART DRAWER OVERLAY ===== -->
-<div id="cartOverlay" onclick="closeCart()" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300"></div>
-
-<!-- ===== CART DRAWER ===== -->
-<div id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-2xl flex flex-col transform translate-x-full">
+<!-- ===== CART DRAWER (Bootstrap Offcanvas) ===== -->
+<div id="cartDrawer" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="cartDrawerLabel" data-bs-backdrop="true" data-bs-scroll="false" style="width: 100%; max-width: 420px;">
     <!-- Header -->
-    <div class="flex items-center justify-between px-6 py-5 border-b border-[#E8DFD8] bg-[#FAF8F5]">
+    <div class="offcanvas-header bg-cream border-bottom">
         <div>
-            <h2 class="text-lg font-bold text-[#2C1810] serif">Giỏ hàng</h2>
-            <p id="cartItemCount" class="text-xs text-[#8B7355]">0 sản phẩm</p>
+            <h2 id="cartDrawerLabel" class="offcanvas-title fs-5 fw-bold text-dark serif">Giỏ hàng</h2>
+            <p id="cartItemCount" class="mb-0 text-muted-custom small">0 sản phẩm</p>
         </div>
-        <button onclick="closeCart()" class="w-9 h-9 rounded-xl hover:bg-[#E8DFD8] flex items-center justify-center transition-colors">
-            <svg class="w-5 h-5 text-[#6F4E37]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
     <!-- Cart Items -->
-    <div id="cartItems" class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+    <div id="cartItems" class="offcanvas-body overflow-auto p-4">
         <!-- Populated by JS -->
     </div>
 
     <!-- Empty state -->
-    <div id="cartEmpty" class="flex-1 flex flex-col items-center justify-center text-center px-6 py-12">
-        <div class="text-6xl mb-4">🛒</div>
-        <p class="text-[#8B7355] font-medium mb-2">Giỏ hàng đang trống</p>
-        <p class="text-gray-400 text-sm">Hãy thêm những món đồ uống yêu thích!</p>
-        <button onclick="closeCart(); setTimeout(()=>document.getElementById('menu').scrollIntoView({behavior:'smooth'}),300)" class="mt-5 bg-[#6F4E37] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#5D3A1A] transition-colors">Xem thực đơn</button>
+    <div id="cartEmpty" class="offcanvas-body d-flex flex-column align-items-center justify-content-center text-center">
+        <div class="display-3 mb-3">🛒</div>
+        <p class="text-muted-custom fw-medium mb-2">Giỏ hàng đang trống</p>
+        <p class="text-muted small">Hãy thêm những món đồ uống yêu thích!</p>
+        <button onclick="closeCart(); setTimeout(()=>document.getElementById('menu').scrollIntoView({behavior:'smooth'}),300)" class="btn btn-primary rounded-xl small fw-semibold mt-3">Xem thực đơn</button>
     </div>
 
     <!-- Footer: Total + Checkout -->
-    <div id="cartFooter" class="border-t border-[#E8DFD8] px-6 py-5 bg-[#FAF8F5] hidden">
-        <div class="flex items-center justify-between mb-4">
-            <span class="text-sm text-[#8B7355]">Tạm tính</span>
-            <span id="cartTotal" class="text-xl font-bold text-[#6F4E37]">0 ₫</span>
+    <div id="cartFooter" class="border-top bg-cream p-4 d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="small text-muted-custom">Tạm tính</span>
+            <span id="cartTotal" class="fs-4 fw-bold text-primary">0 ₫</span>
         </div>
         <form id="checkoutForm" action="/Cart/Checkout" method="get">
             <input type="hidden" name="cartData" id="cartDataInput"/>
-            <button type="button" onclick="goCheckout()" class="w-full bg-[#6F4E37] hover:bg-[#5D3A1A] text-white py-3.5 rounded-2xl font-bold text-base transition-colors shadow-lg flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <button type="button" onclick="goCheckout()" class="btn btn-primary w-100 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg py-3">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Tiến hành thanh toán
             </button>
         </form>
-        <button onclick="clearCart()" class="w-full mt-2 text-red-400 hover:text-red-600 text-sm font-medium py-2 transition-colors">Xóa giỏ hàng</button>
+        <button onclick="clearCart()" class="btn btn-link w-100 text-danger small fw-medium mt-2">Xóa giỏ hàng</button>
     </div>
 </div>
 
 <!-- ===== TOAST ===== -->
-<div id="toast" class="fixed bottom-28 right-8 bg-[#2C1810] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-x-32 opacity-0 transition-all duration-300 z-60 border border-[#D4A574]/30">
-    <div class="w-7 h-7 bg-[#D4A574] rounded-xl flex items-center justify-center flex-shrink-0">
-        <svg class="w-4 h-4 text-[#1A0E08]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+<div id="toast" class="position-fixed bottom-0 end-0 bg-dark text-white rounded-3 shadow-lg d-flex align-items-center gap-3 border border-secondary border-opacity-25" style="margin-bottom: 112px; margin-right: 32px; padding: 14px 20px; z-index: 1060; transform: translateX(128px); opacity: 0;">
+    <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl flex-shrink-0" style="width: 28px; height: 28px;">
+        <svg width="16" height="16" class="text-dark" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
     </div>
-    <span id="toastMsg" class="text-sm font-medium">Đã thêm vào giỏ!</span>
+    <span id="toastMsg" class="small fw-medium">Đã thêm vào giỏ!</span>
 </div>
 
 <!-- ===== SCRIPTS ===== -->
@@ -464,9 +472,9 @@
 
     // ── Category filter ──
     function filterCat(btn, cat) {
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
-        btn.classList.add('cat-active');
-        document.querySelectorAll('#productGrid [data-cat]').forEach(card => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('#productGrid .product-card').forEach(card => {
             card.style.display = (cat === 'Tất cả' || card.dataset.cat === cat) ? '' : 'none';
         });
     }
@@ -528,32 +536,34 @@
         totalEl.textContent = total.toLocaleString('vi-VN') + ' ₫';
 
         if (cart.length === 0) {
-            itemsEl.classList.add('hidden');
-            emptyEl.classList.remove('hidden');
-            footerEl.classList.add('hidden');
+            itemsEl.classList.add('d-none');
+            emptyEl.classList.remove('d-none');
+            footerEl.classList.add('d-none');
         } else {
-            itemsEl.classList.remove('hidden');
-            emptyEl.classList.add('hidden');
-            footerEl.classList.remove('hidden');
+            itemsEl.classList.remove('d-none');
+            emptyEl.classList.add('d-none');
+            footerEl.classList.remove('d-none');
             itemsEl.innerHTML = cart.map(item => `
-                <div class="flex items-center gap-4 bg-[#FAF8F5] rounded-2xl p-4 border border-[#E8DFD8]">
-                    ${item.imageUrl
-                        ? `<img src="${item.imageUrl}" alt="${item.productName}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0"/>`
-                        : `<div class="w-16 h-16 rounded-xl bg-[#F5EBE0] flex items-center justify-center text-2xl flex-shrink-0">☕</div>`}
-                    <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-[#1A0E08] text-sm truncate">${item.productName}</p>
-                        <p class="text-[#D4A574] font-bold text-sm">${(item.price).toLocaleString('vi-VN')} ₫</p>
-                        <div class="flex items-center gap-3 mt-2">
-                            <button onclick="updateQty(${item.productId},-1)" class="w-7 h-7 rounded-lg bg-white border border-[#E8DFD8] flex items-center justify-center text-[#6F4E37] hover:bg-[#E8DFD8] transition-colors font-bold text-lg leading-none">−</button>
-                            <span class="text-sm font-bold text-[#6F4E37] w-5 text-center">${item.quantity}</span>
-                            <button onclick="updateQty(${item.productId},+1)" class="w-7 h-7 rounded-lg bg-white border border-[#E8DFD8] flex items-center justify-center text-[#6F4E37] hover:bg-[#E8DFD8] transition-colors font-bold text-lg leading-none">+</button>
+                <div class="card bg-cream border rounded-3 p-3 mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        ${item.imageUrl
+                            ? `<img src="${item.imageUrl}" alt="${item.productName}" class="rounded-xl object-fit-cover flex-shrink-0" style="width: 64px; height: 64px;"/>`
+                            : `<div class="rounded-xl bg-light-brown d-flex align-items-center justify-content-center flex-shrink-0 fs-2" style="width: 64px; height: 64px;">☕</div>`}
+                        <div class="flex-fill min-w-0">
+                            <p class="fw-semibold text-dark small text-truncate mb-1">${item.productName}</p>
+                            <p class="text-secondary fw-bold small mb-2">${(item.price).toLocaleString('vi-VN')} ₫</p>
+                            <div class="d-flex align-items-center gap-2">
+                                <button onclick="updateQty(${item.productId},-1)" class="btn btn-sm btn-outline-primary rounded-2 lh-1 p-1" style="width: 28px; height: 28px;">−</button>
+                                <span class="small fw-bold text-primary" style="width: 20px; text-align: center;">${item.quantity}</span>
+                                <button onclick="updateQty(${item.productId},+1)" class="btn btn-sm btn-outline-primary rounded-2 lh-1 p-1" style="width: 28px; height: 28px;">+</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex flex-col items-end gap-2 flex-shrink-0">
-                        <button onclick="removeFromCart(${item.productId})" class="text-red-300 hover:text-red-500 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
-                        <p class="text-xs text-gray-400 font-medium">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
+                        <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                            <button onclick="removeFromCart(${item.productId})" class="btn btn-link text-danger p-0">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                            <p class="text-muted small fw-medium mb-0">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -566,33 +576,48 @@
         const badge1 = document.getElementById('cartBadge');
         const badge2 = document.getElementById('floatCartBadge');
         [badge1, badge2].forEach(b => {
-            if (count > 0) { b.textContent = count > 9 ? '9+' : count; b.classList.remove('hidden'); }
-            else { b.classList.add('hidden'); }
+            if (count > 0) { b.textContent = count > 9 ? '9+' : count; b.classList.remove('d-none'); }
+            else { b.classList.add('d-none'); }
         });
     }
 
-    // ── Open/close ──
-    function toggleCart() {
+    // ── Bootstrap Offcanvas instance ──
+    let cartOffcanvasInstance = null;
+    
+    // ── Initialize Bootstrap Offcanvas ──
+    function initCartOffcanvas() {
         const drawer = document.getElementById('cartDrawer');
-        if (drawer.classList.contains('translate-x-full')) openCart();
-        else closeCart();
+        if (drawer && typeof bootstrap !== 'undefined') {
+            cartOffcanvasInstance = new bootstrap.Offcanvas(drawer);
+            
+            // Add event listeners for offcanvas events
+            drawer.addEventListener('shown.bs.offcanvas', function() {
+                console.log('Cart offcanvas shown');
+                renderCart();
+            });
+            
+            drawer.addEventListener('hidden.bs.offcanvas', function() {
+                console.log('Cart offcanvas hidden');
+            });
+        }
+    }
+    
+    // ── Open/close using Bootstrap API ──
+    function toggleCart() {
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.toggle();
+        }
     }
     function openCart() {
         renderCart();
-        const drawer  = document.getElementById('cartDrawer');
-        const overlay = document.getElementById('cartOverlay');
-        overlay.classList.remove('hidden');
-        setTimeout(() => overlay.classList.replace('opacity-0','opacity-100'), 10);
-        drawer.classList.remove('translate-x-full');
-        document.body.classList.add('overflow-hidden');
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.show();
+        }
     }
     function closeCart() {
-        const drawer  = document.getElementById('cartDrawer');
-        const overlay = document.getElementById('cartOverlay');
-        drawer.classList.add('translate-x-full');
-        overlay.classList.replace('opacity-100','opacity-0');
-        setTimeout(() => { overlay.classList.add('hidden'); }, 300);
-        document.body.classList.remove('overflow-hidden');
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.hide();
+        }
     }
 
     // ── Checkout redirect ──
@@ -607,16 +632,27 @@
     function showToast(msg) {
         document.getElementById('toastMsg').textContent = msg;
         const t = document.getElementById('toast');
-        t.classList.remove('translate-x-32','opacity-0');
-        t.classList.add('translate-x-0','opacity-100');
+        t.style.transform = 'translateX(0)';
+        t.style.opacity = '1';
         setTimeout(() => {
-            t.classList.add('translate-x-32','opacity-0');
-            t.classList.remove('translate-x-0','opacity-100');
+            t.style.transform = 'translateX(128px)';
+            t.style.opacity = '0';
         }, 3000);
     }
 
     // ── Init ──
     updateBadges();
+    
+    // Initialize Bootstrap Offcanvas when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCartOffcanvas);
+    } else {
+        initCartOffcanvas();
+    }
 </script>
+
+<!-- Bootstrap 5.3 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
 </body>
 </html>

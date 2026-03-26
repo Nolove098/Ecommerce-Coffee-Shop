@@ -4,57 +4,57 @@
     var categories = ViewBag.Categories as List<string> ?? new List<string>();
 }
 
-<div class="flex items-center justify-between mb-6">
+<div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <p class="text-sm text-[#8B7355]">Tổng cộng <strong>@Model.Count</strong> sản phẩm</p>
+        <p class="small text-muted-custom">Tổng cộng <strong>@Model.Count</strong> sản phẩm</p>
     </div>
     <a asp-area="Admin" asp-controller="Product" asp-action="Create"
-       class="flex items-center gap-2 bg-[#6F4E37] hover:bg-[#5D3A1A] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+       class="btn btn-primary d-flex align-items-center gap-2">
+        <svg class="me-1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
         Thêm sản phẩm
     </a>
 </div>
 
 <!-- Search / Filter -->
-<form method="get" class="flex gap-3 mb-6">
-    <div class="relative flex-1 max-w-xs">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+<form method="get" class="d-flex gap-3 mb-4">
+    <div class="position-relative flex-grow-1" style="max-width: 20rem;">
+        <svg class="position-absolute top-50 translate-middle-y ms-3" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="left: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <input name="search" value="@ViewBag.Search" type="text" placeholder="Tìm tên sản phẩm..."
-               class="pl-9 pr-4 py-2 w-full border border-[#E8DFD8] rounded-xl text-sm bg-white text-[#6F4E37] focus:ring-2 focus:ring-[#D4A574] focus:border-[#D4A574] outline-none" />
+               class="form-control ps-5" style="padding-left: 2.5rem;" />
     </div>
-    <select name="category" class="border border-[#E8DFD8] rounded-xl px-4 py-2 text-sm text-[#6F4E37] bg-white focus:ring-2 focus:ring-[#D4A574] outline-none">
+    <select name="category" class="form-select" style="width: auto;">
         <option value="">Tất cả danh mục</option>
         @foreach (var cat in categories)
         {
             <option value="@cat" selected="@(ViewBag.Category as string == cat ? "selected" : null)">@cat</option>
         }
     </select>
-    <button type="submit" class="bg-[#6F4E37] text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-[#5D3A1A] transition-colors">Lọc</button>
+    <button type="submit" class="btn btn-primary">Lọc</button>
     @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string) || !string.IsNullOrWhiteSpace(ViewBag.Category as string))
     {
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="bg-[#FAF8F5] border border-[#E8DFD8] text-[#6F4E37] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#F5EBE0] transition-colors">Xóa lọc</a>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">Xóa lọc</a>
     }
 </form>
 
 <!-- Table -->
-<div class="bg-white rounded-3xl border border-[#E8DFD8] shadow-sm overflow-hidden">
-    <table class="w-full admin-table text-sm">
-        <thead class="bg-[#FAF8F5] text-[#8B7355]">
+<div class="table-responsive bg-white rounded-2xl border shadow-soft overflow-hidden mb-5">
+    <table class="table table-striped table-hover align-middle mb-0">
+        <thead class="table-light">
             <tr>
-                <th class="text-left px-6 py-4 font-semibold">Sản phẩm</th>
-                <th class="text-left px-6 py-4 font-semibold">Danh mục</th>
-                <th class="text-right px-6 py-4 font-semibold">Giá</th>
-                <th class="text-right px-6 py-4 font-semibold">Tồn kho</th>
-                <th class="text-center px-6 py-4 font-semibold">Trạng thái</th>
-                <th class="px-6 py-4"></th>
+                <th class="px-4 py-3">Sản phẩm</th>
+                <th class="px-4 py-3">Danh mục</th>
+                <th class="px-4 py-3">Giá</th>
+                <th class="px-4 py-3">Tồn kho</th>
+                <th class="text-center px-4 py-3">Trạng thái</th>
+                <th class="px-4 py-3"></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-[#F5EBE0]">
+        <tbody>
             @if (!Model.Any())
             {
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-[#8B7355]">
-                        <svg class="w-10 h-10 mx-auto mb-3 text-[#D4A574]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4m0-10l8 4m-8-4v10M4 12v10l8 4 8-4V12"/></svg>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <svg class="mx-auto mb-3 text-secondary" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4m0-10l8 4m-8-4v10M4 12v10l8 4 8-4V12"/></svg>
                         Không tìm thấy sản phẩm nào.
                     </td>
                 </tr>
@@ -62,51 +62,51 @@
             @foreach (var p in Model)
             {
                 <tr>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
                             @if (!string.IsNullOrEmpty(p.ImageUrl))
                             {
-                                <img src="@p.ImageUrl" alt="@p.Name" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+                                <img src="@p.ImageUrl" alt="@p.Name" class="rounded-xl flex-shrink-0" style="width: 48px; height: 48px; object-fit: cover;" />
                             }
                             else
                             {
-                                <div class="w-12 h-12 rounded-xl bg-[#F5EBE0] flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-6 h-6 text-[#D4A574]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
+                                <div class="rounded-xl bg-light-brown d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <svg width="24" height="24" class="text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
                                 </div>
                             }
                             <div>
-                                <p class="font-semibold text-[#6F4E37]">@p.Name</p>
+                                <p class="fw-semibold text-coffee mb-0">@p.Name</p>
                                 @if (!string.IsNullOrEmpty(p.Description))
                                 {
-                                    <p class="text-xs text-[#8B7355] truncate max-w-xs">@p.Description</p>
+                                    <p class="small text-muted mb-0 text-truncate" style="max-width: 20rem;">@p.Description</p>
                                 }
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <span class="text-xs bg-[#F5EBE0] text-[#6F4E37] px-3 py-1 rounded-full font-medium">@p.Category</span>
+                    <td class="px-4 py-3">
+                        <span class="badge bg-light-brown text-coffee">@p.Category</span>
                     </td>
-                    <td class="px-6 py-4 text-right text-[#6F4E37] font-semibold">@p.Price.ToString("N0") ₫</td>
-                    <td class="px-6 py-4 text-right @(p.Stock < 20 ? "text-red-600 font-bold" : "text-[#6F4E37]")">@p.Stock</td>
-                    <td class="px-6 py-4 text-center">
+                    <td class="px-4 py-3 text-end text-coffee fw-semibold">@p.Price.ToString("N0") ₫</td>
+                    <td class="px-4 py-3 text-end @(p.Stock < 20 ? "text-danger fw-bold" : "text-coffee")">@p.Stock</td>
+                    <td class="px-4 py-3 text-center">
                         @if (p.IsActive)
                         {
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Đang bán</span>
+                            <span class="badge bg-success">Đang bán</span>
                         }
                         else
                         {
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">Tạm ẩn</span>
+                            <span class="badge bg-secondary">Tạm ẩn</span>
                         }
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-2 justify-end">
+                    <td class="px-4 py-3">
+                        <div class="btn-group btn-group-sm" role="group">
                             <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@p.Id"
-                               class="p-2 rounded-lg hover:bg-[#F5EBE0] text-[#6F4E37] transition-colors" title="Sửa">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                               class="btn btn-outline-primary" title="Sửa">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
                             <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@p.Id"
-                               class="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors" title="Xóa">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                               class="btn btn-outline-danger" title="Xóa">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </a>
                         </div>
                     </td>

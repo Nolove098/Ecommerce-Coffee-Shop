@@ -3,49 +3,49 @@
     ViewData["Title"] = "Xóa sản phẩm";
 }
 
-<div class="max-w-lg mx-auto">
-    <div class="bg-white rounded-3xl border border-red-100 shadow-sm overflow-hidden">
-        <div class="px-8 py-6 border-b border-red-100 bg-red-50/50 flex items-center gap-3">
-            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+<div class="container" style="max-width: 600px;">
+    <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger bg-opacity-10 border-danger d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0 bg-danger bg-opacity-25 rounded-3" style="width: 2.5rem; height: 2.5rem;">
+                <svg class="text-danger" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-red-700">Xác nhận xóa sản phẩm</h3>
-                <p class="text-sm text-red-500 mt-0.5">Hành động này không thể hoàn tác</p>
+                <h3 class="h5 fw-bold text-danger mb-1">Xác nhận xóa sản phẩm</h3>
+                <p class="small text-danger mb-0">Hành động này không thể hoàn tác</p>
             </div>
         </div>
 
-        <div class="px-8 py-6">
+        <div class="card-body p-4">
             <!-- Product preview -->
-            <div class="flex items-center gap-4 bg-[#FAF8F5] border border-[#E8DFD8] rounded-2xl p-4 mb-6">
+            <div class="d-flex align-items-center gap-3 bg-cream border rounded-3 p-3 mb-4">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@(Model.ImageUrl ?? "")" class="w-16 h-16 rounded-xl object-cover" alt="@Model.Name" />
+                    <img src="@(Model.ImageUrl ?? "")" class="rounded-3 object-fit-cover" style="width: 4rem; height: 4rem;" alt="@Model.Name" />
                 }
                 else
                 {
-                    <div class="w-16 h-16 bg-[#F5EBE0] rounded-xl flex items-center justify-center">
-                        <svg class="w-8 h-8 text-[#D4A574]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
+                    <div class="d-flex align-items-center justify-content-center bg-light-brown rounded-3" style="width: 4rem; height: 4rem;">
+                        <svg class="text-caramel" style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
                     </div>
                 }
                 <div>
-                    <p class="font-bold text-[#6F4E37] text-base">@Model.Name</p>
-                    <p class="text-sm text-[#8B7355]">@Model.Category · @Model.Price.ToString("N0") ₫</p>
-                    <p class="text-xs text-[#8B7355] mt-1">Tồn kho: @Model.Stock</p>
+                    <p class="fw-bold text-coffee mb-1">@Model.Name</p>
+                    <p class="small text-muted-custom mb-1">@Model.Category · @Model.Price.ToString("N0") ₫</p>
+                    <p class="small text-muted-custom mb-0">Tồn kho: @Model.Stock</p>
                 </div>
             </div>
 
-            <p class="text-sm text-gray-600 mb-6">
-                Bạn có chắc muốn xóa vĩnh viễn sản phẩm <strong class="text-[#6F4E37]">"@Model.Name"</strong> không?
+            <p class="small text-muted mb-4">
+                Bạn có chắc muốn xóa vĩnh viễn sản phẩm <strong class="text-coffee">"@Model.Name"</strong> không?
             </p>
 
-            <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="flex gap-3">
+            <form asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-3">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <button type="submit" class="btn btn-danger d-flex align-items-center gap-2 shadow-sm" aria-label="Xóa sản phẩm">
+                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Xóa sản phẩm
                 </button>
-                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="bg-[#FAF8F5] border border-[#E8DFD8] text-[#6F4E37] px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#F5EBE0] transition-colors">Hủy</a>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary">Hủy</a>
             </form>
         </div>
     </div>

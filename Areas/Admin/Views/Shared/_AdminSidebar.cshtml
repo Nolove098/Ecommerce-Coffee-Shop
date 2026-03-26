@@ -1,88 +1,135 @@
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    string NavClass(string ctrl) => currentController == ctrl ? "nav-active" : "text-white/70 hover:bg-white/10 hover:text-white";
+    bool IsActive(string ctrl) => currentController == ctrl;
 }
 
-<aside class="w-64 bg-gradient-to-b from-[#5D3A1A] to-[#6F4E37] text-white flex flex-col flex-shrink-0 shadow-xl">
+<!-- Mobile Toggle Button (visible on small screens) -->
+<button class="btn btn-primary d-lg-none position-fixed top-0 start-0 m-3 shadow-lg" 
+        type="button" 
+        data-bs-toggle="offcanvas" 
+        data-bs-target="#adminSidebar" 
+        aria-controls="adminSidebar"
+        style="z-index: 1050;">
+    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+    </svg>
+</button>
+
+<!-- Sidebar (offcanvas on mobile, static on desktop) -->
+<aside class="offcanvas-lg offcanvas-start admin-sidebar text-white d-flex flex-column flex-shrink-0 shadow-lg" 
+       id="adminSidebar" 
+       tabindex="-1" 
+       aria-labelledby="adminSidebarLabel"
+       style="width: 16rem;">
+
+    <!-- Offcanvas Header (mobile only) -->
+    <div class="offcanvas-header d-lg-none border-bottom" style="border-color: rgba(255, 255, 255, 0.1);">
+        <h5 class="offcanvas-title" id="adminSidebarLabel">Menu</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
 
     <!-- Logo -->
-    <div class="px-6 py-5 border-b border-white/10">
-        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-[#D4A574] rounded-xl flex items-center justify-center shadow-md">
-                <svg class="w-6 h-6 text-[#5D3A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <div class="px-4 py-4 border-bottom" style="border-color: rgba(255, 255, 255, 0.1);">
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="d-flex align-items-center gap-3 text-decoration-none">
+            <div class="d-flex align-items-center justify-content-center bg-secondary rounded-3 shadow" style="width: 2.5rem; height: 2.5rem;">
+                <svg width="24" height="24" fill="none" stroke="#5D3A1A" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
                     <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
                 </svg>
             </div>
-            <div>
-                <h1 class="text-base font-bold leading-tight">SaleStore</h1>
-                <p class="text-xs text-white/60">Admin Panel</p>
+            <div class="text-white">
+                <h1 class="fs-6 fw-bold mb-0 lh-sm">SaleStore</h1>
+                <p class="small mb-0" style="font-size: 0.75rem; opacity: 0.6;">Admin Panel</p>
             </div>
         </a>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-4 py-5 space-y-1">
+    <nav class="flex-fill px-3 py-4 overflow-auto">
+        <ul class="nav nav-pills flex-column">
+            
+            <li class="nav-item mb-1">
+                <p class="text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.625rem; letter-spacing: 0.1em; opacity: 0.4;">Tổng quan</p>
+            </li>
 
-        <p class="text-[10px] uppercase tracking-widest text-white/40 px-3 mb-2 font-semibold">Tổng quan</p>
+            <li class="nav-item">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                   class="nav-link d-flex align-items-center gap-3 @(IsActive("Dashboard") ? "active" : "")">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline stroke-linecap="round" stroke-linejoin="round" points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <span class="small">Dashboard</span>
+                </a>
+            </li>
 
-        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl @NavClass("Dashboard")">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                <polyline stroke-linecap="round" stroke-linejoin="round" points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            <span class="text-sm">Dashboard</span>
-        </a>
+            <li class="nav-item mt-4 mb-1">
+                <p class="text-uppercase fw-semibold px-3 mb-2" style="font-size: 0.625rem; letter-spacing: 0.1em; opacity: 0.4;">Quản lý</p>
+            </li>
 
-        <p class="text-[10px] uppercase tracking-widest text-white/40 px-3 mt-5 mb-2 font-semibold">Quản lý</p>
+            <li class="nav-item">
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index"
+                   class="nav-link d-flex align-items-center gap-3 @(IsActive("Product") ? "active" : "")">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                        <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                    </svg>
+                    <span class="small">Sản phẩm</span>
+                </a>
+            </li>
 
-        <a asp-area="Admin" asp-controller="Product" asp-action="Index"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl @NavClass("Product")">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-            </svg>
-            <span class="text-sm">Sản phẩm</span>
-        </a>
+            <li class="nav-item">
+                <a asp-area="Admin" asp-controller="Order" asp-action="Index"
+                   class="nav-link d-flex align-items-center gap-3 @(IsActive("Order") ? "active" : "")">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <span class="small">Đơn hàng</span>
+                </a>
+            </li>
 
-        <a asp-area="Admin" asp-controller="Order" asp-action="Index"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl @NavClass("Order")">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            <span class="text-sm">Đơn hàng</span>
-        </a>
+            <li class="nav-item">
+                <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index"
+                   class="nav-link d-flex align-items-center gap-3 @(IsActive("UserManagement") ? "active" : "")">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-10a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span class="small">Tài khoản</span>
+                </a>
+            </li>
 
-        <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl @NavClass("UserManagement")">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H11a4 4 0 00-4 4v2m10 0H7m10-10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            <span class="text-sm">Tài khoản</span>
-        </a>
+            <li class="nav-item">
+                <a asp-area="Staff" asp-controller="POS" asp-action="Index"
+                   class="nav-link d-flex align-items-center gap-3">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5 10h5a2 2 0 002-2V8a2 2 0 00-2-2h-5m0 12H7a2 2 0 01-2-2V8a2 2 0 012-2h3" />
+                    </svg>
+                    <span class="small">POS tại quầy</span>
+                </a>
+            </li>
 
-        <a asp-area="Staff" asp-controller="POS" asp-action="Index"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-white/70 hover:bg-white/10 hover:text-white">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5 10h5a2 2 0 002-2V8a2 2 0 00-2-2h-5m0 12H7a2 2 0 01-2-2V8a2 2 0 012-2h3" /></svg>
-            <span class="text-sm">POS tại quầy</span>
-        </a>
+            <li class="nav-item">
+                <hr class="border-top my-3" style="border-color: rgba(255, 255, 255, 0.1);">
+            </li>
 
-        <div class="border-t border-white/10 my-4"></div>
-
-        <a href="/" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white/90">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            <span class="text-sm">Về trang chủ</span>
-        </a>
+            <li class="nav-item">
+                <a href="/" class="nav-link d-flex align-items-center gap-3" style="opacity: 0.7;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="small">Về trang chủ</span>
+                </a>
+            </li>
+        </ul>
     </nav>
 
     <!-- Footer -->
-    <div class="px-4 py-4 border-t border-white/10">
-        <div class="flex items-center gap-3 bg-white/10 rounded-xl px-3 py-2">
-            <div class="w-8 h-8 bg-[#D4A574] rounded-full flex items-center justify-center text-[#5D3A1A] text-xs font-bold">AD</div>
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium truncate">@(User.Identity?.Name ?? "Admin")</p>
-                <p class="text-xs text-white/50">@((User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "Quản trị viên" : "Người dùng nội bộ"))</p>
+    <div class="px-3 py-3 border-top" style="border-color: rgba(255, 255, 255, 0.1);">
+        <div class="d-flex align-items-center gap-3 rounded-3 px-3 py-2" style="background-color: rgba(255, 255, 255, 0.1);">
+            <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary fw-bold" style="width: 2rem; height: 2rem; color: #5D3A1A; font-size: 0.75rem;">AD</div>
+            <div class="flex-fill text-truncate">
+                <p class="small fw-semibold mb-0 text-truncate">@(User.Identity?.Name ?? "Admin")</p>
+                <p class="mb-0" style="font-size: 0.75rem; opacity: 0.5;">@((User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "Quản trị viên" : "Người dùng nội bộ"))</p>
             </div>
         </div>
     </div>
