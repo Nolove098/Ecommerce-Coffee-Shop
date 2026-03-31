@@ -67,9 +67,7 @@
             - gap-3: Spacing between flex items
         -->
         <header class="border-bottom bg-white px-4 py-3 d-flex align-items-center justify-content-between gap-3 flex-shrink-0 border-light-brown" style="backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.85);">
-            <!-- Left section: POS branding and title -->
             <div class="d-flex align-items-center gap-3">
-                <!-- Coffee cup icon with gradient background -->
                 <div class="d-flex align-items-center justify-content-center rounded-2xl shadow-medium bg-primary" style="width: 2.75rem; height: 2.75rem;">
                     <svg class="text-white" style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
@@ -80,28 +78,21 @@
                     <p class="text-uppercase small fw-bold text-muted-custom mb-0" style="letter-spacing: 0.22em;">Point of Sale</p>
                     <h1 class="h4 fw-bold serif text-coffee mb-0">@(ViewData["Title"] ?? "POS")</h1>
                 </div>
+                <span class="badge rounded-pill ms-2 @(User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "bg-danger" : "bg-success") text-white small">
+                    @(User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "Admin" : "Staff")
+                </span>
             </div>
 
-            <!-- 
-                Right section: Navigation links and logout
-                Conditional rendering based on user role (Admin sees additional link)
-                
-                Bootstrap Button Classes:
-                - btn-outline-primary: Outlined button with primary color border
-                - btn-primary: Solid button with primary background
-                - btn-sm: Small button size
-                - rounded-2xl: Custom rounded corners (defined in custom.css)
-                - d-inline-flex: Inline flexbox for icon + text alignment
-                - align-items-center: Vertical centering of icon and text
-                - gap-2: Spacing between icon and text
-            -->
             <div class="d-flex align-items-center gap-2">
-                <!-- Admin Dashboard link (only visible to Admin role) -->
                 @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
                 {
                     <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-2xl d-inline-flex align-items-center gap-2">
                         <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
                         Admin Dashboard
+                    </a>
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-2xl d-inline-flex align-items-center gap-2">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Quản lý đơn
                     </a>
                 }
                 <!-- Website link (returns to public-facing site) -->

@@ -85,7 +85,13 @@
                 <tr>
                     <td class="px-4 py-3 font-monospace fw-semibold text-coffee">#@order.Id.ToString("D4")</td>
                     <td class="px-4 py-3">
-                        <div class="fw-semibold text-coffee">@(order.CustomerName ?? order.Customer?.FullName)</div>
+                        <div class="fw-semibold text-coffee">
+                            @(order.CustomerName ?? order.Customer?.FullName)
+                            @if (!string.IsNullOrWhiteSpace(order.TableNumber))
+                            {
+                                <span class="badge bg-primary rounded-pill ms-1" style="font-size:.65rem;">Bàn @order.TableNumber</span>
+                            }
+                        </div>
                         <small class="text-muted-custom">@order.Customer?.Phone</small>
                     </td>
                     <td class="px-4 py-3 text-muted-custom small">

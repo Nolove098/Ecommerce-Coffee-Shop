@@ -62,9 +62,21 @@
                 </div>
 
                 <div class="px-4 py-3 border-bottom flex-shrink-0">
-                    <div class="mb-3">
-                        <label for="posCustomerName" class="form-label small fw-semibold text-coffee">Tên khách (tùy chọn)</label>
-                        <input id="posCustomerName" type="text" placeholder="Khách tại quầy" class="form-control rounded-xl" style="background-color: #FDFAF8;" />
+                    <div class="row g-3 mb-3">
+                        <div class="col-8">
+                            <label for="posCustomerName" class="form-label small fw-semibold text-coffee">Tên khách (tùy chọn)</label>
+                            <input id="posCustomerName" type="text" placeholder="Khách tại quầy" class="form-control rounded-xl" style="background-color: #FDFAF8;" />
+                        </div>
+                        <div class="col-4">
+                            <label for="posTableNumber" class="form-label small fw-semibold text-coffee">Số bàn</label>
+                            <select id="posTableNumber" class="form-select rounded-xl" style="background-color: #FDFAF8;">
+                                <option value="">— Không —</option>
+                                @for (int i = 1; i <= 20; i++)
+                                {
+                                    <option value="@i">Bàn @i</option>
+                                }
+                            </select>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="posCustomerPhone" class="form-label small fw-semibold text-coffee">Số điện thoại (tùy chọn)</label>
@@ -97,6 +109,9 @@
                     </div>
 
                     <div id="posCheckoutMessage" class="d-none rounded-2xl px-3 py-2 small mb-3"></div>
+                    <a id="posInvoiceLink" href="#" target="_blank" class="btn btn-outline-primary w-100 rounded-2xl py-2 fw-semibold mb-2 d-none">
+                        🧾 Xuất hóa đơn
+                    </a>
 
                     <form id="posAntiForgeryForm">@Html.AntiForgeryToken()</form>
 
@@ -305,6 +320,7 @@
                 body: JSON.stringify({
                     customerName: document.getElementById('posCustomerName').value,
                     customerPhone: document.getElementById('posCustomerPhone').value,
+                    tableNumber: document.getElementById('posTableNumber').value,
                     note: document.getElementById('posOrderNote').value,
                     items: posState.cart.map(item => ({ productId: item.id, quantity: item.quantity, price: item.price }))
                 })
@@ -316,13 +332,18 @@
             }
 
             setMessage('success', payload.message || `Đã tạo đơn #${payload.orderId} • ${payload.statusText} • ${payload.createdAt}`);
+            const invoiceLink = document.getElementById('posInvoiceLink');
+            invoiceLink.href = '@Url.Action("Invoice", "POS", new { area = "Staff" })' + '?id=' + payload.orderId;
+            invoiceLink.classList.remove('d-none');
             posState.cart = [];
             document.getElementById('posCustomerName').value = '';
             document.getElementById('posCustomerPhone').value = '';
             document.getElementById('posOrderNote').value = '';
+            document.getElementById('posTableNumber').value = '';
             renderCart();
         } catch (error) {
             setMessage('error', error.message || 'Không thể tạo đơn hàng POS.');
+            document.getElementById('posInvoiceLink').classList.add('d-none');
         } finally {
             posState.processing = false;
             renderCart();
@@ -363,6 +384,7 @@
     clearCartButtonEl.addEventListener('click', () => {
         posState.cart = [];
         setMessage('', '');
+        document.getElementById('posInvoiceLink').classList.add('d-none');
         renderCart();
     });
 

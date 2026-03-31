@@ -30,6 +30,7 @@ public class PosCheckoutRequest
 {
     public string? CustomerName { get; set; }
     public string? CustomerPhone { get; set; }
+    public string? TableNumber { get; set; }
     public string? Note { get; set; }
     public List<PosCartItemInputModel> Items { get; set; } = new();
 }

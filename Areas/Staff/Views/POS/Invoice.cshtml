@@ -1,0 +1,184 @@
+@model SaleStore.Models.Order
+@using SaleStore.Models
+@{
+    Layout = null;
+    var customerName = Model.CustomerName ?? Model.Customer?.FullName ?? "Khách tại quầy";
+    var customerPhone = Model.Customer?.Phone;
+    var operatorName = Model.CreatedByUser?.FullName ?? "Nhân viên";
+    var subtotal = Model.OrderItems.Sum(i => i.UnitPrice * i.Quantity);
+    var taxRate = 0.08m;
+    var tax = Math.Round(subtotal * taxRate);
+    var total = subtotal + tax;
+    var createdAtVn = Model.CreatedAt.AddHours(7);
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hóa đơn #@Model.Id.ToString("D4") – SaleStore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f2ed;
+            color: #3D2010;
+        }
+        .invoice-container {
+            max-width: 420px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,.08);
+            overflow: hidden;
+        }
+        .invoice-header {
+            background: linear-gradient(135deg, #3D2010, #6B3A1F);
+            color: #fff;
+            padding: 1.5rem 1.5rem 1.25rem;
+            text-align: center;
+        }
+        .invoice-header h1 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: .25rem; }
+        .invoice-header p { font-size: .8rem; opacity: .75; }
+        .invoice-body { padding: 1.25rem 1.5rem; }
+        .info-row { display: flex; justify-content: space-between; font-size: .82rem; margin-bottom: .4rem; }
+        .info-row .label { color: #8B7355; }
+        .info-row .value { font-weight: 600; }
+        .divider { border: none; border-top: 1px dashed #D4C5B2; margin: .75rem 0; }
+        .items-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        .items-table th { text-align: left; padding: .4rem 0; color: #8B7355; font-weight: 600; border-bottom: 1px solid #E8DDD0; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+        .items-table td { padding: .5rem 0; border-bottom: 1px solid #F3EDE6; }
+        .items-table td:last-child, .items-table th:last-child { text-align: right; }
+        .items-table .qty { color: #8B7355; font-size: .75rem; }
+        .summary-row { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: .35rem; }
+        .summary-row.total { font-size: 1.1rem; font-weight: 700; color: #3D2010; margin-top: .5rem; padding-top: .5rem; border-top: 2px solid #3D2010; }
+        .invoice-footer { text-align: center; padding: 1rem 1.5rem 1.5rem; font-size: .75rem; color: #8B7355; }
+        .invoice-footer .thanks { font-family: 'Playfair Display', serif; font-size: .95rem; color: #3D2010; font-weight: 600; margin-bottom: .25rem; }
+
+        .actions { text-align: center; margin: 1.5rem auto; max-width: 420px; display: flex; gap: .5rem; justify-content: center; }
+        .actions button, .actions a {
+            padding: .5rem 1.25rem; border-radius: .5rem; font-size: .85rem; font-weight: 600;
+            cursor: pointer; text-decoration: none; border: none; display: inline-flex; align-items: center; gap: .4rem;
+        }
+        .btn-print { background: #3D2010; color: #fff; }
+        .btn-print:hover { background: #6B3A1F; }
+        .btn-back { background: #E8DDD0; color: #3D2010; }
+        .btn-back:hover { background: #D4C5B2; }
+
+        @@media print {
+            body { background: #fff; }
+            .actions { display: none !important; }
+            .invoice-container { box-shadow: none; margin: 0 auto; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="actions">
+        <button class="btn-print" onclick="window.print()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            In hóa đơn
+        </button>
+        <a class="btn-back" href="@Url.Action("Index", "POS", new { area = "Staff" })">← Quay lại POS</a>
+    </div>
+
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div style="font-size:1.5rem; margin-bottom:.25rem;">☕</div>
+            <h1>SaleStore Coffee</h1>
+            <p>Hóa đơn bán hàng</p>
+        </div>
+
+        <div class="invoice-body">
+            <div class="info-row">
+                <span class="label">Mã đơn</span>
+                <span class="value">#@Model.Id.ToString("D4")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Ngày</span>
+                <span class="value">@createdAtVn.ToString("dd/MM/yyyy")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Giờ</span>
+                <span class="value">@createdAtVn.ToString("HH:mm")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Thu ngân</span>
+                <span class="value">@operatorName</span>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="info-row">
+                <span class="label">Khách hàng</span>
+                <span class="value">@customerName</span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(customerPhone) && !customerPhone.StartsWith("POS-"))
+            {
+                <div class="info-row">
+                    <span class="label">Điện thoại</span>
+                    <span class="value">@customerPhone</span>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.TableNumber))
+            {
+                <div class="info-row">
+                    <span class="label">Số bàn</span>
+                    <span class="value">Bàn @Model.TableNumber</span>
+                </div>
+            }
+
+            <hr class="divider" />
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Món</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <tr>
+                        <td>
+                            @item.ProductName
+                            <span class="qty">× @item.Quantity</span>
+                        </td>
+                        <td>@((item.UnitPrice * item.Quantity).ToString("N0")) ₫</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+
+            <hr class="divider" />
+
+            <div class="summary-row">
+                <span>Tạm tính</span>
+                <span>@subtotal.ToString("N0") ₫</span>
+            </div>
+            <div class="summary-row">
+                <span>Thuế (8%)</span>
+                <span>@tax.ToString("N0") ₫</span>
+            </div>
+            <div class="summary-row total">
+                <span>Tổng cộng</span>
+                <span>@total.ToString("N0") ₫</span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Note) && Model.Note != "Đơn POS tại quầy")
+            {
+                <hr class="divider" />
+                <div style="font-size:.8rem; color:#8B7355;">
+                    <strong>Ghi chú:</strong> @Model.Note
+                </div>
+            }
+        </div>
+
+        <div class="invoice-footer">
+            <p class="thanks">Cảm ơn quý khách! ♥</p>
+            <p>Hẹn gặp lại tại SaleStore Coffee</p>
+        </div>
+    </div>
+</body>
+</html>

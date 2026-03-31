@@ -11,6 +11,7 @@ namespace SaleStore.Models
         public long? CreatedByUserId { get; set; }
         public string? ShippingAddress { get; set; }
         public string? Note { get; set; }
+        public string? TableNumber { get; set; }
         public OrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }

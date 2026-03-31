@@ -115,6 +115,7 @@ namespace SaleStore.Areas.Staff.Controllers
                 CustomerName = orderCustomerName,
                 CreatedByUserId = createdByUserId,
                 ShippingAddress = "Mua tại quầy",
+                TableNumber = string.IsNullOrWhiteSpace(request.TableNumber) ? null : request.TableNumber.Trim(),
                 Note = string.IsNullOrWhiteSpace(request.Note) ? "Đơn POS tại quầy" : request.Note.Trim(),
                 Status = OrderStatus.Pending,
                 TotalAmount = items.Sum(x => x.UnitPrice * x.Quantity),
@@ -136,6 +137,21 @@ namespace SaleStore.Areas.Staff.Controllers
                 createdAt = order.CreatedAt.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
                 operatorName = User.FindFirstValue(ClaimTypes.Name) ?? User.Identity?.Name ?? "Nhân viên"
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Invoice(long id)
+        {
+            var order = await _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.OrderItems)
+                .Include(o => o.CreatedByUser)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+                return NotFound();
+
+            return View(order);
         }
 
         private async Task<Customer> ResolveCustomerAsync(string? customerName, string? customerPhone)

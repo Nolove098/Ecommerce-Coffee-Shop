@@ -59,6 +59,7 @@ namespace SaleStore.Data
             {
                 entity.ToTable("orders");
                 entity.Property(x => x.CustomerName).HasMaxLength(120);
+                entity.Property(x => x.TableNumber).HasMaxLength(20);
                 entity.HasOne(x => x.CreatedByUser)
                       .WithMany()
                       .HasForeignKey(x => x.CreatedByUserId)
