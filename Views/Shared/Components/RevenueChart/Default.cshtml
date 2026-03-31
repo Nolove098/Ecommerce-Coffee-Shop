@@ -1,0 +1,28 @@
+@{
+    var labels = (string[])ViewBag.Labels;
+    var values = (decimal[])ViewBag.Values;
+    var totalToday = (decimal)ViewBag.TotalToday;
+}
+
+<div class="card rounded-3 shadow-sm">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="mb-1 fw-bold text-primary">Biểu đồ doanh thu hôm nay</h3>
+                <p class="mb-0 small text-muted-custom">Theo từng khung giờ (dữ liệu thực)</p>
+            </div>
+            <div class="text-end">
+                <p class="fs-4 fw-bold text-primary mb-0">@totalToday.ToString("N0") ₫</p>
+                <p class="small text-muted-custom fw-medium mb-0 mt-1">Tổng doanh thu hôm nay</p>
+            </div>
+        </div>
+        <canvas id="adminSalesChart" height="100"></canvas>
+    </div>
+</div>
+
+<script>
+    window.__revenueChartData = {
+        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels)),
+        values: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(values))
+    };
+</script>

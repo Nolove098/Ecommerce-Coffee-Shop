@@ -1,4 +1,5 @@
 using SaleStore.Data; // Đảm bảo gọi đúng namespace chứa ApplicationDbContext
+using SaleStore.Hubs;
 using SaleStore.Middleware;
 using SaleStore.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -102,5 +103,6 @@ app.MapControllerRoute(
 app.MapDefaultControllerRoute();
 app.MapRazorPages();
 app.MapBlazorHub();
+app.MapHub<OrderHub>("/hubs/order");
 
 app.Run();

@@ -225,24 +225,31 @@
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+                            @if (TempData["ReviewSuccess"] != null)
+                            {
+                                <div class="alert alert-success small mb-3">@TempData["ReviewSuccess"]</div>
+                            }
                             <div class="bg-light rounded-3 p-3 mb-4">
-                                <form action="/Review/Create" method="post" id="reviewForm">
+                                <form method="post" asp-page="/ProductDetail" asp-route-id="@Model.Product.Id" id="reviewForm">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="productId" value="@Model.Product.Id" />
                                     <div class="mb-2">
-                                        <label class="form-label fw-semibold small">Đánh giá của bạn</label>
+                                        <label class="form-label fw-semibold small">
+                                            @(Model.UserReview != null ? "Cập nhật đánh giá của bạn" : "Đánh giá của bạn")
+                                        </label>
                                         <div id="starPicker" class="d-flex gap-1 mb-2" style="cursor:pointer; font-size:1.5rem;">
                                             @for (int i = 1; i <= 5; i++)
                                             {
                                                 <button type="button" class="star-pick btn btn-link p-0 text-decoration-none" style="color:#adb5bd; font-size:1.5rem;" data-value="@i" aria-label="@($"{i} sao")">★</button>
                                             }
                                         </div>
-                                        <input type="hidden" name="rating" id="ratingInput" value="5" />
+                                        <input type="hidden" name="Rating" id="ratingInput" value="@Model.Rating" />
                                     </div>
                                     <div class="mb-2">
-                                        <textarea name="comment" class="form-control" rows="2" maxlength="1000" placeholder="Viết nhận xét của bạn (không bắt buộc)..."></textarea>
+                                        <textarea name="Comment" class="form-control" rows="2" maxlength="1000" placeholder="Viết nhận xét của bạn (không bắt buộc)...">@Model.Comment</textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Gửi đánh giá</button>
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                                        @(Model.UserReview != null ? "Cập nhật đánh giá" : "Gửi đánh giá")
+                                    </button>
                                 </form>
                             </div>
                         }

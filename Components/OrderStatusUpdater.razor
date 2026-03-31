@@ -1,4 +1,5 @@
 @inject IServiceScopeFactory ScopeFactory
+@inject Microsoft.AspNetCore.SignalR.IHubContext<SaleStore.Hubs.OrderHub> HubContext
 
 <div class="card shadow-soft h-100">
     <div class="card-body p-4">
@@ -124,6 +125,10 @@
             currentStatus = newStatus;
             selectedStatusValue = newStatus.ToString();
             message = $"Đã cập nhật thành \"{newStatus.ToVietnamese()}\" thành công!";
+
+            // Broadcast real-time update via SignalR
+            await HubContext.Clients.Group($"order-{OrderId}").SendAsync("OrderStatusChanged", OrderId, newStatus.ToString(), newStatus.ToVietnamese());
+            await HubContext.Clients.Group("admin-dashboard").SendAsync("OrderUpdated", OrderId, newStatus.ToString(), newStatus.ToVietnamese());
         }
         catch
         {

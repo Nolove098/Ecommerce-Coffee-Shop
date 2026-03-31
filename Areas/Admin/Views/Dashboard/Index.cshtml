@@ -1,23 +1,6 @@
 @using SaleStore.Models
 @{
     ViewData["Title"] = "Dashboard";
-    var salesData = new[] {
-        new { time = "6 AM",  sales = 120 },
-        new { time = "8 AM",  sales = 450 },
-        new { time = "10 AM", sales = 680 },
-        new { time = "12 PM", sales = 890 },
-        new { time = "2 PM",  sales = 720 },
-        new { time = "4 PM",  sales = 850 },
-        new { time = "6 PM",  sales = 650 },
-        new { time = "8 PM",  sales = 320 },
-    };
-    var bestSellers = new[] {
-        new { name = "Caramel Macchiato", sales = 342, revenue = 22230000, trend = "+15%" },
-        new { name = "Cappuccino",        sales = 298, revenue = 16390000, trend = "+12%" },
-        new { name = "Iced Latte",        sales = 276, revenue = 15180000, trend = "+8%" },
-        new { name = "Espresso",          sales = 245, revenue =  9800000, trend = "+5%" },
-        new { name = "Mocha",             sales = 198, revenue = 11880000, trend = "+10%" },
-    };
 }
 
 <!-- Stat Cards -->
@@ -104,69 +87,32 @@
 <!-- ===== Sales Chart + Best Sellers ===== -->
 <div class="row g-4 mt-4">
 
-    <!-- Sales Chart -->
+    <!-- Sales Chart (View Component) -->
     <div class="col-12 col-xl-8">
-        <div class="card rounded-3 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                        <h3 class="mb-1 fw-bold text-primary">Biểu đồ doanh thu hôm nay</h3>
-                        <p class="mb-0 small text-muted-custom">Theo từng khung giờ</p>
-                    </div>
-                    <div class="text-end">
-                        <p class="fs-4 fw-bold text-primary mb-0">@(salesData.Sum(x => x.sales).ToString("N0")) ₫</p>
-                        <p class="small text-success fw-medium mb-0 mt-1">▲ +12.5% so với hôm qua</p>
-                    </div>
-                </div>
-                <canvas id="adminSalesChart" height="100"></canvas>
-            </div>
-        </div>
+        @await Component.InvokeAsync("RevenueChart")
     </div>
 
-    <!-- Best Sellers -->
+    <!-- Best Sellers (View Component) -->
     <div class="col-12 col-xl-4">
-        <div class="card rounded-3 shadow-sm overflow-hidden">
-            <div class="card-header bg-white d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
-                <h3 class="mb-0 fw-bold text-primary">🏆 Bán chạy nhất</h3>
-                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-decoration-none text-muted-custom fw-medium small">Quản lý →</a>
-            </div>
-            <div class="card-body p-0">
-                @{int bsRank = 0;}
-                @foreach (var item in bestSellers)
-                {
-                    bsRank++;
-                    <div class="d-flex align-items-center gap-3 px-4 py-3 border-bottom">
-                        <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold flex-shrink-0 bg-gradient-secondary-primary" style="width: 1.75rem; height: 1.75rem; font-size: 0.75rem;">
-                            @bsRank
-                        </div>
-                        <div class="flex-grow-1 min-w-0">
-                            <p class="fw-semibold text-primary small mb-0 text-truncate">@item.name</p>
-                            <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">@item.sales đơn</p>
-                        </div>
-                        <div class="text-end flex-shrink-0">
-                            <p class="fw-bold text-primary mb-0" style="font-size: 0.75rem;">@((item.revenue / 1000000m).ToString("N1"))M ₫</p>
-                            <p class="text-success fw-semibold mb-0" style="font-size: 0.75rem;">@item.trend</p>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
+        @await Component.InvokeAsync("TopProducts", new { count = 5 })
     </div>
 </div>
 
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
 
 @section Scripts {
 <script>
+    const chartData = window.__revenueChartData || { labels: [], values: [] };
     const ctx = document.getElementById('adminSalesChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.time))),
+            labels: chartData.labels,
             datasets: [{
                 label: 'Doanh thu (₫)',
-                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(salesData.Select(x => x.sales))),
+                data: chartData.values,
                 borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bs-primary').trim(),
                 backgroundColor: 'rgba(212,165,116,0.1)',
                 borderWidth: 3,
@@ -208,5 +154,23 @@
             }
         }
     });
+
+    // SignalR real-time order updates
+    const orderConnection = new signalR.HubConnectionBuilder()
+        .withUrl('/hubs/order')
+        .withAutomaticReconnect()
+        .build();
+
+    orderConnection.on('OrderUpdated', (orderId, status, statusText) => {
+        // Show a toast notification
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 m-4 p-3 bg-primary text-white rounded-3 shadow-lg';
+        toast.style.cssText = 'z-index:9999; animation: fadeIn .3s ease;';
+        toast.innerHTML = `<strong>Đơn #${String(orderId).padStart(4, '0')}</strong> → ${statusText}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    });
+
+    orderConnection.start().then(() => orderConnection.invoke('JoinAdminDashboard'));
 </script>
 }

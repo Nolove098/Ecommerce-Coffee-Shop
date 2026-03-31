@@ -1,0 +1,215 @@
+@page
+@model SaleStore.Pages.Admin.ReportsModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Báo cáo doanh thu";
+}
+
+<!-- Date Range Filter -->
+<div class="card shadow-sm rounded-3 mb-4">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold small text-muted-custom">Từ ngày</label>
+                <input type="date" class="form-control" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold small text-muted-custom">Đến ngày</label>
+                <input type="date" class="form-control" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-12 col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    Lọc báo cáo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card shadow-sm rounded-3 border-0">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted-custom small mb-2">Tổng doanh thu</p>
+                <p class="fs-4 fw-bold text-primary mb-0">@Model.TotalRevenue.ToString("N0") ₫</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card shadow-sm rounded-3 border-0">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted-custom small mb-2">Số đơn hàng</p>
+                <p class="fs-4 fw-bold text-primary mb-0">@Model.TotalOrders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card shadow-sm rounded-3 border-0">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted-custom small mb-2">Sản phẩm bán ra</p>
+                <p class="fs-4 fw-bold text-primary mb-0">@Model.TotalItemsSold</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card shadow-sm rounded-3 border-0">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted-custom small mb-2">Giá trị TB / đơn</p>
+                <p class="fs-4 fw-bold text-primary mb-0">@Model.AverageOrderValue.ToString("N0") ₫</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Daily Revenue Chart -->
+    <div class="col-12 col-xl-8">
+        <div class="card shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-primary mb-3">Doanh thu theo ngày</h3>
+                @if (Model.DailyRevenue.Any())
+                {
+                    <canvas id="dailyRevenueChart" height="120"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-5">Không có dữ liệu trong khoảng thời gian này.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Revenue Chart -->
+    <div class="col-12 col-xl-4">
+        <div class="card shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-primary mb-3">Doanh thu theo danh mục</h3>
+                @if (Model.CategoryRevenue.Any())
+                {
+                    <canvas id="categoryRevenueChart" height="200"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-5">Không có dữ liệu.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Detail Table -->
+<div class="card shadow-sm rounded-3">
+    <div class="card-header bg-white px-4 py-3 border-bottom">
+        <h3 class="fw-bold text-primary mb-0">Chi tiết theo ngày</h3>
+    </div>
+    @if (Model.DailyRevenue.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead class="bg-light-brown text-muted-custom">
+                    <tr>
+                        <th class="px-4 py-3 fw-semibold">Ngày</th>
+                        <th class="px-4 py-3 fw-semibold text-end">Số đơn</th>
+                        <th class="px-4 py-3 fw-semibold text-end">Doanh thu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var day in Model.DailyRevenue)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 fw-medium">@day.Date.ToString("dd/MM/yyyy")</td>
+                            <td class="px-4 py-3 text-end">@day.OrderCount</td>
+                            <td class="px-4 py-3 text-end fw-semibold text-primary">@day.Revenue.ToString("N0") ₫</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="bg-light-brown">
+                    <tr>
+                        <td class="px-4 py-3 fw-bold">Tổng cộng</td>
+                        <td class="px-4 py-3 text-end fw-bold">@Model.TotalOrders</td>
+                        <td class="px-4 py-3 text-end fw-bold text-primary">@Model.TotalRevenue.ToString("N0") ₫</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-center py-5">
+            <p class="text-muted mb-0">Không có dữ liệu trong khoảng thời gian được chọn.</p>
+        </div>
+    }
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+@section Scripts {
+<script>
+    @if (Model.DailyRevenue.Any())
+    {
+        <text>
+        new Chart(document.getElementById('dailyRevenueChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyRevenue.Select(d => d.Date.ToString("dd/MM")))),
+                datasets: [{
+                    label: 'Doanh thu (₫)',
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DailyRevenue.Select(d => d.Revenue))),
+                    backgroundColor: 'rgba(212,165,116,0.6)',
+                    borderColor: 'rgba(212,165,116,1)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' ₫' }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => (v/1000).toLocaleString() + 'K' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+        </text>
+    }
+
+    @if (Model.CategoryRevenue.Any())
+    {
+        <text>
+        const catColors = ['#D4A574','#8B6914','#5D3A1A','#A0522D','#CD853F','#DEB887','#F5DEB3','#FAEBD7'];
+        new Chart(document.getElementById('categoryRevenueChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryRevenue.Select(c => c.Category))),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryRevenue.Select(c => c.Revenue))),
+                    backgroundColor: catColors.slice(0, @Model.CategoryRevenue.Count),
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 16, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed.toLocaleString() + ' ₫' }
+                    }
+                }
+            }
+        });
+        </text>
+    }
+</script>
+}

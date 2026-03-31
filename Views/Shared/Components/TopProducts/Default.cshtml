@@ -1,0 +1,46 @@
+@model IReadOnlyList<SaleStore.ViewComponents.TopProductViewModel>
+
+<div class="card rounded-3 shadow-sm overflow-hidden">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+        <h3 class="mb-0 fw-bold text-primary">🏆 Bán chạy nhất</h3>
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-decoration-none text-muted-custom fw-medium small">Quản lý →</a>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="card-body text-center py-5">
+            <p class="text-muted mb-0">Chưa có dữ liệu bán hàng.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card-body p-0">
+            @{ int rank = 0; }
+            @foreach (var item in Model)
+            {
+                rank++;
+                <div class="d-flex align-items-center gap-3 px-4 py-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold flex-shrink-0 bg-gradient-secondary-primary"
+                         style="width: 1.75rem; height: 1.75rem; font-size: 0.75rem;">
+                        @rank
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                        <p class="fw-semibold text-primary small mb-0 text-truncate">@item.Name</p>
+                        <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">@item.TotalQuantity đơn</p>
+                    </div>
+                    <div class="text-end flex-shrink-0">
+                        <p class="fw-bold text-primary mb-0" style="font-size: 0.75rem;">
+                            @if (item.TotalRevenue >= 1_000_000)
+                            {
+                                @((item.TotalRevenue / 1_000_000m).ToString("N1"))@:M ₫
+                            }
+                            else
+                            {
+                                @(item.TotalRevenue.ToString("N0"))@: ₫
+                            }
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
