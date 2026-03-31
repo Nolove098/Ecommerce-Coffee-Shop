@@ -65,7 +65,7 @@
     public string InitialStatus { get; set; } = nameof(OrderStatus.Pending);
 
     private OrderStatus currentStatus;
-    private OrderStatus[] allStatuses = Enum.GetValues<OrderStatus>();
+    private OrderStatus[] allStatuses = new[] { OrderStatus.Pending, OrderStatus.Ready, OrderStatus.Delivered, OrderStatus.Cancelled };
     private string message = "";
     private bool isError;
     private bool isUpdating;

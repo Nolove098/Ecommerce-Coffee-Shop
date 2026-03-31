@@ -1,0 +1,146 @@
+@model List<SaleStore.Models.Product>
+@{
+    Layout = null;
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+    var currentCat = ViewBag.CurrentCategory as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Thực đơn – SaleStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="~/css/custom.css" rel="stylesheet"/>
+    <style>
+        .menu-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.12) !important; }
+        .menu-card { transition: transform .2s, box-shadow .2s; }
+        .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    </style>
+</head>
+<body class="bg-cream">
+
+<!-- Header -->
+<nav class="navbar bg-dark-brown">
+    <div class="container-xxl">
+        <a href="/" class="navbar-brand d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl" style="width: 36px; height: 36px;">
+                <svg class="text-dark" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+                    <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                </svg>
+            </div>
+            <span class="text-white fw-bold fs-5 serif">SaleStore</span>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="/" class="btn btn-outline-light btn-sm rounded-xl">← Trang chủ</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-xxl px-4 py-5">
+    <!-- Title -->
+    <div class="text-center mb-5">
+        <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Thực đơn</span>
+        <h1 class="display-4 fw-bold text-dark mt-2 serif">Khám phá thức uống</h1>
+        <p class="text-muted mt-3 mx-auto" style="max-width: 500px;">Xem toàn bộ thực đơn của chúng tôi — từ cà phê nguyên chất đến các thức uống sáng tạo.</p>
+    </div>
+
+    <!-- Category filters -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+        <a href="/Menu" class="btn @(string.IsNullOrEmpty(currentCat) ? "btn-primary" : "btn-outline-primary") rounded-pill small fw-semibold">
+            Tất cả <span class="badge rounded-pill bg-white bg-opacity-25 ms-1">@Model.Count</span>
+        </a>
+        @foreach (var cat in categories)
+        {
+            var catCount = Model.Count(p => p.Category == cat);
+            <a href="/Menu?category=@Uri.EscapeDataString(cat)"
+               class="btn @(currentCat == cat ? "btn-primary" : "btn-outline-primary") rounded-pill small fw-semibold">
+                @cat <span class="badge rounded-pill bg-white bg-opacity-25 ms-1">@catCount</span>
+            </a>
+        }
+    </div>
+
+    <!-- Search -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <input type="text" id="menuSearch" class="form-control rounded-xl border" placeholder="Tìm kiếm thức uống..." oninput="filterMenu(this.value)">
+        </div>
+    </div>
+
+    <!-- Products grid -->
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="display-3 mb-3">☕</div>
+            <p class="text-muted fw-medium">Chưa có sản phẩm nào trong danh mục này.</p>
+        </div>
+    }
+    else
+    {
+        <div id="menuGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var p in Model)
+            {
+                <div class="col menu-item" data-name="@p.Name.ToLower()">
+                    <a href="/san-pham/@p.Id" class="text-decoration-none">
+                        <div class="card h-100 border rounded-4 overflow-hidden shadow-sm menu-card">
+                            <div class="position-relative bg-light" style="height: 200px;">
+                                @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                {
+                                    <img src="@p.ImageUrl" alt="@p.Name" class="w-100 h-100 object-fit-cover"/>
+                                }
+                                else
+                                {
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center display-3 bg-cream">☕</div>
+                                }
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary rounded-pill small fw-bold shadow-sm">@p.Category</span>
+                                @if (p.Stock < 20)
+                                {
+                                    <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-white rounded-pill small fw-bold">Sắp hết</span>
+                                }
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title fw-bold small mb-1 serif text-dark">@p.Name</h3>
+                                @if (!string.IsNullOrEmpty(p.Description))
+                                {
+                                    <p class="card-text text-muted line-clamp-2 mb-3" style="font-size: 0.75rem;">@p.Description</p>
+                                }
+                                else
+                                {
+                                    <div class="mb-3"></div>
+                                }
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-primary fw-bold fs-5">@p.Price.ToString("N0")</span>
+                                        <span class="text-muted small">₫</span>
+                                    </div>
+                                    <span class="badge bg-cream text-primary rounded-pill small">
+                                        Xem chi tiết →
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Footer -->
+<footer class="py-4 text-center bg-dark-brown text-white-50 small">
+    <p class="mb-0">© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
+</footer>
+
+<script>
+    function filterMenu(query) {
+        const q = query.toLowerCase().trim();
+        document.querySelectorAll('#menuGrid .menu-item').forEach(card => {
+            card.style.display = (!q || card.dataset.name.includes(q)) ? '' : 'none';
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>

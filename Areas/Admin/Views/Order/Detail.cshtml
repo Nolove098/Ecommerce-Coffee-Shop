@@ -2,11 +2,11 @@
 @using SaleStore.Models
 @{
     ViewData["Title"] = "Đơn hàng #" + (Model?.Id.ToString("D4") ?? "");
-    var customerInitial = string.IsNullOrEmpty(Model?.Customer?.FullName) ? "?" : Model.Customer?.FullName[0].ToString();
+    var customerName = Model?.CustomerName ?? Model?.Customer?.FullName;
+    var customerInitial = string.IsNullOrEmpty(customerName) ? "?" : customerName[0].ToString();
     // Determine the next logical status
     var nextStatus = Model!.Status switch {
-        OrderStatus.Pending   => OrderStatus.Brewing,
-        OrderStatus.Brewing   => OrderStatus.Ready,
+        OrderStatus.Pending   => OrderStatus.Ready,
         OrderStatus.Ready     => OrderStatus.Delivered,
         _ => (OrderStatus?)null
     };
@@ -23,20 +23,8 @@
                         <h3 class="h5 fw-bold text-coffee mb-0">Đơn #@Model.Id.ToString("D4")</h3>
                         <span class="badge @Model.Status.ToBadgeClass()">@Model.Status.ToVietnamese()</span>
                     </div>
-                    <p class="small text-muted-custom mb-0">Đặt lúc: @Model.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</p>
+                    <p class="small text-muted-custom mb-0">Đặt lúc: @Model.CreatedAt.AddHours(7).ToString("HH:mm - dd/MM/yyyy")</p>
                 </div>
-                @if (nextStatus.HasValue)
-                {
-                    <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id" />
-                        <input type="hidden" name="status" value="@nextStatus.Value" />
-                        <button type="submit" class="btn btn-primary d-flex align-items-center gap-2 text-nowrap">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-                            Chuyển sang: @nextStatus.Value.ToVietnamese()
-                        </button>
-                    </form>
-                }
             </div>
         </div>
     </div>
@@ -53,7 +41,7 @@
                                 @customerInitial
                             </div>
                             <div>
-                                <p class="fw-semibold text-coffee mb-0">@Model.Customer?.FullName</p>
+                                <p class="fw-semibold text-coffee mb-0">@customerName</p>
                                 <p class="small text-muted-custom mb-0">@Model.Customer?.Phone</p>
                             </div>
                         </div>

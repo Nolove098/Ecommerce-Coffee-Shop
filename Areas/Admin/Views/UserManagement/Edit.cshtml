@@ -1,0 +1,86 @@
+@model SaleStore.Models.ViewModels.EditUserViewModel
+@using SaleStore.Models
+@{
+    ViewData["Title"] = "Chỉnh sửa tài khoản";
+}
+
+<div class="container" style="max-width: 48rem;">
+    <div class="card border shadow-sm">
+        <div class="card-header bg-cream border-bottom px-4 py-3">
+            <p class="text-uppercase text-muted-custom fw-bold mb-2" style="font-size: 0.75rem; letter-spacing: 0.22em;">User Management</p>
+            <h1 class="h3 fw-bold text-coffee mb-2">Chỉnh sửa tài khoản</h1>
+            <p class="small text-muted-custom mb-0">
+                Tài khoản: <strong>@Model.Username</strong>
+            </p>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-area="Admin" asp-controller="UserManagement" asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Username" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-xl"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Role" class="form-label"></label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="@AppRoles.Admin">Admin</option>
+                            <option value="@AppRoles.Staff">Staff</option>
+                            <option value="@AppRoles.User">User</option>
+                        </select>
+                        <span asp-validation-for="Role" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="IsActive" class="form-label d-block">&nbsp;</label>
+                        <div class="form-check p-3 rounded-xl bg-cream">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">
+                                Tài khoản đang kích hoạt
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <hr class="my-2" />
+                        <p class="small text-muted-custom mb-2">Đặt lại mật khẩu (để trống nếu không muốn đổi)</p>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="NewPassword" class="form-label"></label>
+                        <input asp-for="NewPassword" class="form-control" type="password" autocomplete="new-password" placeholder="Nhập mật khẩu mới..." />
+                        <span asp-validation-for="NewPassword" class="invalid-feedback d-block"></span>
+                        <p class="form-text text-muted small mt-1">Tối thiểu 8 ký tự. Để trống sẽ giữ nguyên mật khẩu hiện tại.</p>
+                    </div>
+
+                    <div class="col-12 pt-2">
+                        <button type="submit" class="btn btn-primary me-2">Lưu thay đổi</button>
+                        <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

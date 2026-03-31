@@ -51,6 +51,9 @@ public class CartController : Controller
         if (!ModelState.IsValid)
             return View("Checkout", model);
 
+        var inputCustomerName = model.CustomerName.Trim();
+        var inputCustomerPhone = model.CustomerPhone.Trim();
+
         // Parse cart from JSON
         List<CartItem> cartItems;
         try
@@ -71,23 +74,24 @@ public class CartController : Controller
         }
 
         // 2. Xử lý thông tin Khách hàng (Tìm theo SĐT, nếu không có thì tạo mới)
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == model.CustomerPhone);
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == inputCustomerPhone);
         if (customer == null)
         {
             customer = new Customer
             {
-                FullName = model.CustomerName,
-                Phone = model.CustomerPhone,
-                CreatedAt = DateTime.UtcNow // Dùng giờ UTC cho chuẩn quốc tế của Postgres
+                FullName = inputCustomerName,
+                Phone = inputCustomerPhone,
+                CreatedAt = DateTime.UtcNow
             };
             _context.Customers.Add(customer);
-            await _context.SaveChangesAsync(); // Lưu để lấy được Customer.Id
+            await _context.SaveChangesAsync();
         }
 
         // 3. Xây dựng Đơn hàng (Lưu vào bảng orders)
         var order = new Order
         {
             CustomerId = customer.Id, // Gắn ID khách hàng vào đơn
+            CustomerName = inputCustomerName,
             ShippingAddress = model.Address,
             Note = model.Note,
             Status = OrderStatus.Pending,

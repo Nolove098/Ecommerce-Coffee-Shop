@@ -17,6 +17,9 @@ public class ProductDetailModel : PageModel
 
     public Product Product { get; set; } = null!;
     public List<Product> RelatedProducts { get; set; } = new();
+    public List<Review> Reviews { get; set; } = new();
+    public double AverageRating { get; set; }
+    public int ReviewCount { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -26,12 +29,21 @@ public class ProductDetailModel : PageModel
 
         Product = product;
 
-        // Lấy sản phẩm cùng danh mục
         RelatedProducts = await _context.Products
             .Where(p => p.IsActive && p.Category == product.Category && p.Id != product.Id)
             .OrderByDescending(p => p.Stock)
             .Take(4)
             .ToListAsync();
+
+        Reviews = await _context.Reviews
+            .Include(r => r.User)
+            .Where(r => r.ProductId == id)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(20)
+            .ToListAsync();
+
+        ReviewCount = Reviews.Count;
+        AverageRating = ReviewCount > 0 ? Reviews.Average(r => r.Rating) : 0;
 
         return Page();
     }

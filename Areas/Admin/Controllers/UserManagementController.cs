@@ -78,5 +78,115 @@ namespace SaleStore.Areas.Admin.Controllers
             TempData["Success"] = $"Đã tạo tài khoản nhân viên '{normalizedUsername}'.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(long id)
+        {
+            var user = await _context.AppUsers.FindAsync(id);
+            if (user == null) return NotFound();
+
+            var vm = new EditUserViewModel
+            {
+                Id = user.Id,
+                Username = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _context.AppUsers.FindAsync(model.Id);
+            if (user == null) return NotFound();
+
+            // Prevent admin from demoting themselves
+            var currentUsername = User.Identity?.Name?.ToLowerInvariant();
+            if (user.Username == currentUsername && model.Role != AppRoles.Admin)
+            {
+                ModelState.AddModelError(nameof(model.Role), "Bạn không thể thay đổi vai trò của chính mình.");
+                model.Username = user.Username;
+                return View(model);
+            }
+
+            var normalizedEmail = model.Email.Trim().ToLowerInvariant();
+            if (await _context.AppUsers.AnyAsync(x => x.Email == normalizedEmail && x.Id != model.Id))
+            {
+                ModelState.AddModelError(nameof(model.Email), "Email đã tồn tại.");
+                model.Username = user.Username;
+                return View(model);
+            }
+
+            user.FullName = model.FullName.Trim();
+            user.Email = normalizedEmail;
+            user.Phone = string.IsNullOrWhiteSpace(model.Phone) ? null : model.Phone.Trim();
+            user.Role = model.Role;
+            user.IsActive = model.IsActive;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            if (!string.IsNullOrWhiteSpace(model.NewPassword))
+            {
+                var (hash, salt) = _passwordHasher.CreateHash(model.NewPassword);
+                user.PasswordHash = hash;
+                user.PasswordSalt = salt;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = $"Đã cập nhật tài khoản '{user.Username}'.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleActive(long id)
+        {
+            var user = await _context.AppUsers.FindAsync(id);
+            if (user == null) return NotFound();
+
+            var currentUsername = User.Identity?.Name?.ToLowerInvariant();
+            if (user.Username == currentUsername)
+            {
+                TempData["Error"] = "Bạn không thể khóa tài khoản của chính mình.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            user.IsActive = !user.IsActive;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = user.IsActive
+                ? $"Đã mở khóa tài khoản '{user.Username}'."
+                : $"Đã khóa tài khoản '{user.Username}'.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var user = await _context.AppUsers.FindAsync(id);
+            if (user == null) return NotFound();
+
+            var currentUsername = User.Identity?.Name?.ToLowerInvariant();
+            if (user.Username == currentUsername)
+            {
+                TempData["Error"] = "Bạn không thể xóa tài khoản của chính mình.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.AppUsers.Remove(user);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Đã xóa tài khoản '{user.Username}'.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

@@ -31,12 +31,12 @@
                     {
                         <tr>
                             <td class="px-4 py-3 text-primary fw-medium font-monospace">#@order.Id.ToString("D4")</td>
-                            <td class="px-4 py-3 text-primary fw-medium">@(order.Customer?.FullName ?? "Khách lẻ")</td>
+                            <td class="px-4 py-3 text-primary fw-medium">@(order.CustomerName ?? order.Customer?.FullName ?? "Khách lẻ")</td>
                             <td class="px-4 py-3 text-primary fw-semibold">@order.TotalAmount.ToString("N0") ₫</td>
                             <td class="px-4 py-3">
                                 <span class="badge rounded-pill @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
                             </td>
-                            <td class="px-4 py-3 text-muted-custom">@order.CreatedAt.ToString("HH:mm dd/MM")</td>
+                            <td class="px-4 py-3 text-muted-custom">@order.CreatedAt.AddHours(7).ToString("HH:mm dd/MM")</td>
                             <td class="px-4 py-3 text-end">
                                 <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
                                    class="text-decoration-none text-primary fw-medium small">Chi tiết</a>

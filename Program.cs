@@ -1,7 +1,10 @@
 using SaleStore.Data; // Đảm bảo gọi đúng namespace chứa ApplicationDbContext
+using SaleStore.Middleware;
 using SaleStore.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,35 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "salestore.auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var userIdClaim = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!long.TryParse(userIdClaim, out var userId))
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return;
+                }
+
+                var db = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var user = await db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
+                if (user == null || !user.IsActive)
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return;
+                }
+
+                var roleClaim = context.Principal?.FindFirstValue(ClaimTypes.Role);
+                if (!string.Equals(roleClaim, user.Role, StringComparison.Ordinal))
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                }
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -44,6 +76,7 @@ using (var scope = app.Services.CreateScope())
     await AuthDbInitializer.EnsureCreatedAsync(dbContext, passwordHasher);
 }
 
+app.UseRequestLogging();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

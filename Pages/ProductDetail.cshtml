@@ -22,6 +22,8 @@
         "Cà phê truyền thống" => new[] {"Cà phê Robusta Tây Nguyên rang mộc", "Sữa đặc có đường", "Nước sôi 95–98°C", "Phin nhôm/inox truyền thống"},
         _                     => new[] {"Nguyên liệu tươi chọn lọc", "Không chất bảo quản", "Đường mía tự nhiên", "Nước tinh khiết"}
     };
+    var ratingDisplay = Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "Chưa có";
+    var ratingStarText = Model.ReviewCount > 0 ? string.Concat(Enumerable.Repeat("★", (int)Math.Round(Model.AverageRating))) + string.Concat(Enumerable.Repeat("☆", 5 - (int)Math.Round(Model.AverageRating))) : "★★★★★";
     var stockClass = Model.Product.Stock > 20 ? "badge-stock-ok" : (Model.Product.Stock > 0 ? "badge-stock-low" : "badge-stock-none");
     var stockText  = Model.Product.Stock > 20 ? "Còn hàng" : (Model.Product.Stock > 0 ? "Sắp hết (" + Model.Product.Stock + ")" : "Hết hàng");
 }
@@ -83,7 +85,7 @@
             <div class="col-lg-5">
                 <div class="position-relative rounded-4 overflow-hidden shadow-lg" style="aspect-ratio:1; max-width:440px; margin:auto;">
                     <span class="position-absolute top-0 start-0 m-3 px-3 py-1 rounded-pill small fw-semibold @stockClass" style="z-index:2;">@stockText</span>
-                    <span class="position-absolute top-0 end-0 m-3 px-3 py-1 rounded-pill small fw-bold bg-warning text-dark" style="z-index:2;">⭐ 4.8</span>
+                    <span class="position-absolute top-0 end-0 m-3 px-3 py-1 rounded-pill small fw-bold bg-warning text-dark" style="z-index:2;">⭐ @ratingDisplay</span>
                     @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
                     {
                         <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" class="w-100 h-100 object-fit-cover img-zoom"/>
@@ -99,8 +101,8 @@
                 <span class="badge rounded-pill mb-3 px-3 py-2 small" style="background:rgba(255,255,255,.15); color:#fff;">@Model.Product.Category</span>
                 <h1 class="display-5 fw-bold text-white mb-3" style="font-family:'Playfair Display',serif; line-height:1.15;">@Model.Product.Name</h1>
                 <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="star fs-5">★★★★★</span>
-                    <span class="small" style="color:rgba(255,255,255,.6);">4.8 / 5.0 · 128 đánh giá</span>
+                    <span class="star fs-5">@ratingStarText</span>
+                    <span class="small" style="color:rgba(255,255,255,.6);">@ratingDisplay / 5.0 · @Model.ReviewCount đánh giá</span>
                 </div>
                 @if (!string.IsNullOrEmpty(Model.Product.Description))
                 {
@@ -204,11 +206,11 @@
                             </li>
                             <li class="d-flex justify-content-between small border-bottom pb-2">
                                 <span class="text-muted">Đánh giá</span>
-                                <span class="fw-semibold text-dark star">★ 4.8 / 5</span>
+                                <span class="fw-semibold text-dark star">★ @ratingDisplay / 5</span>
                             </li>
                             <li class="d-flex justify-content-between small">
-                                <span class="text-muted">Lượt bán</span>
-                                <span class="fw-semibold text-dark">128+</span>
+                                <span class="text-muted">Lượt đánh giá</span>
+                                <span class="fw-semibold text-dark">@Model.ReviewCount</span>
                             </li>
                         </ul>
                     </div>
@@ -219,45 +221,68 @@
             <div class="col-12">
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-4">
-                        <h3 class="h5 fw-bold mb-4" style="font-family:'Playfair Display',serif;">💬 Đánh giá từ khách hàng</h3>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="bg-light rounded-3 p-3 h-100">
-                                    <div class="d-flex align-items-center gap-3 mb-2">
-                                        <div class="review-avatar bg-primary text-white">A</div>
-                                        <div>
-                                            <div class="fw-semibold small">Nguyễn Văn An</div>
-                                            <div class="star small">★★★★★</div>
+                        <h3 class="h5 fw-bold mb-4" style="font-family:'Playfair Display',serif;">💬 Đánh giá từ khách hàng (@Model.ReviewCount)</h3>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="bg-light rounded-3 p-3 mb-4">
+                                <form action="/Review/Create" method="post" id="reviewForm">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@Model.Product.Id" />
+                                    <div class="mb-2">
+                                        <label class="form-label fw-semibold small">Đánh giá của bạn</label>
+                                        <div id="starPicker" class="d-flex gap-1 mb-2" style="cursor:pointer; font-size:1.5rem;">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <button type="button" class="star-pick btn btn-link p-0 text-decoration-none" style="color:#adb5bd; font-size:1.5rem;" data-value="@i" aria-label="@($"{i} sao")">★</button>
+                                            }
+                                        </div>
+                                        <input type="hidden" name="rating" id="ratingInput" value="5" />
+                                    </div>
+                                    <div class="mb-2">
+                                        <textarea name="comment" class="form-control" rows="2" maxlength="1000" placeholder="Viết nhận xét của bạn (không bắt buộc)..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Gửi đánh giá</button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light border small mb-4">
+                                <a href="/Auth/Login" class="fw-semibold text-primary">Đăng nhập</a> để viết đánh giá cho sản phẩm này.
+                            </div>
+                        }
+
+                        @if (Model.Reviews.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var r in Model.Reviews)
+                                {
+                                    var initial = r.User?.FullName?.Substring(0, 1).ToUpper() ?? "?";
+                                    var starHtml = string.Concat(Enumerable.Repeat("★", r.Rating)) + string.Concat(Enumerable.Repeat("☆", 5 - r.Rating));
+                                    <div class="col-md-4">
+                                        <div class="bg-light rounded-3 p-3 h-100">
+                                            <div class="d-flex align-items-center gap-3 mb-2">
+                                                <div class="review-avatar bg-primary text-white">@initial</div>
+                                                <div>
+                                                    <div class="fw-semibold small">@(r.User?.FullName ?? "Khách hàng")</div>
+                                                    <div class="star small">@starHtml</div>
+                                                </div>
+                                            </div>
+                                            @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                            {
+                                                <p class="text-muted small mb-1">"@r.Comment"</p>
+                                            }
+                                            <p class="text-muted mb-0" style="font-size:0.7rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
                                         </div>
                                     </div>
-                                    <p class="text-muted small mb-0">"Hương thơm tuyệt vời, vị cà phê đậm đà mà không quá đắng. Sẽ quay lại nhiều lần!"</p>
-                                </div>
+                                }
                             </div>
-                            <div class="col-md-4">
-                                <div class="bg-light rounded-3 p-3 h-100">
-                                    <div class="d-flex align-items-center gap-3 mb-2">
-                                        <div class="review-avatar bg-success text-white">B</div>
-                                        <div>
-                                            <div class="fw-semibold small">Trần Thị Bích</div>
-                                            <div class="star small">★★★★★</div>
-                                        </div>
-                                    </div>
-                                    <p class="text-muted small mb-0">"@Model.Product.Name là lựa chọn yêu thích của tôi. Không gian ấm cúng, đồ uống xuất sắc!"</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="bg-light rounded-3 p-3 h-100">
-                                    <div class="d-flex align-items-center gap-3 mb-2">
-                                        <div class="review-avatar bg-warning text-dark">P</div>
-                                        <div>
-                                            <div class="fw-semibold small">Lê Hữu Phúc</div>
-                                            <div class="star small">★★★★☆</div>
-                                        </div>
-                                    </div>
-                                    <p class="text-muted small mb-0">"Giá cả hợp lý, chất lượng ổn định. Nhân viên nhiệt tình và thân thiện."</p>
-                                </div>
-                            </div>
-                        </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                        }
                     </div>
                 </div>
             </div>
@@ -372,6 +397,24 @@
         setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
         showToast(name);
     }
+    // Star picker for review form
+    function pickStar(val) {
+        const ratingInput = document.getElementById('ratingInput');
+        if (!ratingInput) return;
+        ratingInput.value = val;
+        document.querySelectorAll('.star-pick').forEach(s => {
+            const c = parseInt(s.dataset.value) <= val ? '#F59E0B' : '#adb5bd';
+            s.style.setProperty('color', c, 'important');
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const ratingInput = document.getElementById('ratingInput');
+        if (!ratingInput) return;
+        document.querySelectorAll('.star-pick').forEach(s => {
+            s.addEventListener('click', () => pickStar(parseInt(s.dataset.value)));
+        });
+        pickStar(parseInt(ratingInput.value) || 5);
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>

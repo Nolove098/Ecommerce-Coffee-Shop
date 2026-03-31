@@ -7,6 +7,7 @@ namespace SaleStore.Models
     {
         public long Id { get; set; }
         public long CustomerId { get; set; }
+        public string? CustomerName { get; set; }
         public long? CreatedByUserId { get; set; }
         public string? ShippingAddress { get; set; }
         public string? Note { get; set; }

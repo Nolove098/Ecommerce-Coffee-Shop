@@ -16,6 +16,7 @@ namespace SaleStore.Data
         public DbSet<OrderItem> OrderItems { get; set; } = null!;
         public DbSet<AppUser> AppUsers { get; set; } = null!;
         public DbSet<AuthActivity> AuthActivities { get; set; } = null!;
+        public DbSet<Review> Reviews { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,10 +58,25 @@ namespace SaleStore.Data
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.ToTable("orders");
+                entity.Property(x => x.CustomerName).HasMaxLength(120);
                 entity.HasOne(x => x.CreatedByUser)
                       .WithMany()
                       .HasForeignKey(x => x.CreatedByUserId)
                       .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.ToTable("reviews");
+                entity.Property(x => x.Comment).HasMaxLength(1000);
+                entity.HasOne(x => x.Product)
+                      .WithMany()
+                      .HasForeignKey(x => x.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(x => x.User)
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

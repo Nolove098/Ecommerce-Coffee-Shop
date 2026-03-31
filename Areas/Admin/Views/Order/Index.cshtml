@@ -85,7 +85,7 @@
                 <tr>
                     <td class="px-4 py-3 font-monospace fw-semibold text-coffee">#@order.Id.ToString("D4")</td>
                     <td class="px-4 py-3">
-                        <div class="fw-semibold text-coffee">@order.Customer?.FullName</div>
+                        <div class="fw-semibold text-coffee">@(order.CustomerName ?? order.Customer?.FullName)</div>
                         <small class="text-muted-custom">@order.Customer?.Phone</small>
                     </td>
                     <td class="px-4 py-3 text-muted-custom small">
@@ -95,7 +95,7 @@
                     <td class="px-4 py-3 text-center">
                         <span class="badge @order.Status.ToBadgeClass()">@order.Status.ToVietnamese()</span>
                     </td>
-                    <td class="px-4 py-3 text-muted-custom small">@order.CreatedAt.ToString("HH:mm - dd/MM/yyyy")</td>
+                    <td class="px-4 py-3 text-muted-custom small">@order.CreatedAt.AddHours(7).ToString("HH:mm - dd/MM/yyyy")</td>
                     <td class="px-4 py-3 text-end">
                         <a asp-area="Admin" asp-controller="Order" asp-action="Detail" asp-route-id="@order.Id"
                            class="btn btn-sm btn-outline-primary rounded-xl">

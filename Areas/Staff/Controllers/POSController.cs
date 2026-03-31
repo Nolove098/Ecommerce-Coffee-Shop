@@ -105,14 +105,18 @@ namespace SaleStore.Areas.Staff.Controllers
             }
 
             var customer = await ResolveCustomerAsync(request.CustomerName, request.CustomerPhone);
+            var orderCustomerName = string.IsNullOrWhiteSpace(request.CustomerName)
+                ? customer.FullName
+                : request.CustomerName.Trim();
 
             var order = new Order
             {
                 CustomerId = customer.Id,
+                CustomerName = orderCustomerName,
                 CreatedByUserId = createdByUserId,
                 ShippingAddress = "Mua tại quầy",
                 Note = string.IsNullOrWhiteSpace(request.Note) ? "Đơn POS tại quầy" : request.Note.Trim(),
-                Status = OrderStatus.Brewing,
+                Status = OrderStatus.Pending,
                 TotalAmount = items.Sum(x => x.UnitPrice * x.Quantity),
                 CreatedAt = DateTime.UtcNow,
                 OrderItems = items

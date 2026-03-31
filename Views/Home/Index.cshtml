@@ -1,4 +1,5 @@
 @inject SaleStore.Data.ApplicationDbContext _context
+@using Microsoft.EntityFrameworkCore
 @{
     Layout = null;
 }
@@ -57,9 +58,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto me-3 mb-2 mb-lg-0">
                 <li class="nav-item"><a href="#menu" class="nav-link text-white-50 small fw-medium">Thực đơn</a></li>
+                <li class="nav-item"><a href="/Menu" class="nav-link text-white-50 small fw-medium">Xem thực đơn</a></li>
                 <li class="nav-item"><a href="#about" class="nav-link text-white-50 small fw-medium">Về chúng tôi</a></li>
                 <li class="nav-item"><a href="#popular" class="nav-link text-white-50 small fw-medium">Yêu thích</a></li>
                 <li class="nav-item"><a href="#contact" class="nav-link text-white-50 small fw-medium">Liên hệ</a></li>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li class="nav-item"><a href="/Order/History" class="nav-link text-white-50 small fw-medium">Đơn hàng</a></li>
+                }
             </ul>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <button onclick="toggleCart()" class="btn btn-outline-light btn-sm position-relative d-flex align-items-center gap-2 rounded-xl">
@@ -200,12 +206,14 @@
             <p class="text-muted mt-3 mx-auto" style="max-width: 500px;">Từ cà phê nguyên chất đến thức uống sáng tạo — tất cả đều được pha chế bằng tình yêu.</p>
         </div>
         <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-            @{ var cats=new[]{"Tất cả","Cà phê đặc biệt","Cà phê đá","Cà phê truyền thống","Trà & Khác"}; }
+            @{ 
+                var menuProducts = _context.Products.Where(p=>p.IsActive).ToList();
+                var cats = new[] { "Tất cả" }.Concat(menuProducts.Select(p => p.Category).Distinct().OrderBy(c => c)).ToArray(); 
+            }
             @foreach(var c in cats){
                 <button onclick="filterCat(this,'@c')" class="cat-btn btn btn-outline-primary rounded-pill small fw-semibold @(c=="Tất cả"?"active":"")">@c</button>
             }
         </div>
-        @{ var menuProducts = _context.Products.Where(p=>p.IsActive).ToList(); }
         <div id="productGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
             @foreach(var p in menuProducts){
                 <div class="col product-card" data-cat="@p.Category">
@@ -313,21 +321,60 @@
             <h2 class="display-4 fw-bold text-white mt-2 serif">Phản hồi từ cộng đồng</h2>
         </div>
         <div class="row g-4">
-            @{ var reviews=new[]{new{name="Nguyễn Văn An",role="Khách hàng thân thiết",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà.",stars=5,avatar="NA"},new{name="Trần Thị Bích",role="Food Blogger",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB"},new{name="Lê Hữu Phúc",role="Sinh viên",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng.",stars=5,avatar="LP"}}; }
-            @foreach(var r in reviews){
-                <div class="col-12 col-md-4">
-                    <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
-                        <div class="d-flex gap-1 mb-4">@for(int i=0;i<r.stars;i++){<span class="text-secondary fs-5">★</span>}</div>
-                        <p class="text-white-50 small mb-4 fst-italic">"@r.text"</p>
-                        <div class="d-flex align-items-center gap-3 mt-auto">
-                            <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@r.avatar</div>
-                            <div>
-                                <p class="text-white fw-semibold small mb-0">@r.name</p>
-                                <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.role</p>
+            @{
+                var dbReviews = _context.Reviews
+                    .Include(r => r.User)
+                    .Include(r => r.Product)
+                    .OrderByDescending(r => r.Rating)
+                    .ThenByDescending(r => r.CreatedAt)
+                    .Take(6)
+                    .ToList();
+            }
+            @if (dbReviews.Any())
+            {
+                @foreach (var r in dbReviews)
+                {
+                    var initials = r.User?.FullName?.Length >= 2
+                        ? r.User.FullName.Substring(0, 1).ToUpper() + r.User.FullName.Split(' ').Last().Substring(0, 1).ToUpper()
+                        : "??";
+                    <div class="col-12 col-md-4">
+                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
+                            <div class="d-flex gap-1 mb-3">@for(int i=0;i<r.Rating;i++){<span class="text-secondary fs-5">★</span>}@for(int i=r.Rating;i<5;i++){<span class="text-white-50 fs-5">★</span>}</div>
+                            @if (!string.IsNullOrWhiteSpace(r.Comment))
+                            {
+                                <p class="text-white-50 small mb-3 fst-italic">"@r.Comment"</p>
+                            }
+                            <p class="text-secondary small mb-3 fw-semibold">@(r.Product?.Name ?? "Sản phẩm")</p>
+                            <div class="d-flex align-items-center gap-3 mt-auto">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@initials</div>
+                                <div>
+                                    <p class="text-white fw-semibold small mb-0">@(r.User?.FullName ?? "Khách hàng")</p>
+                                    <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+            }
+            else
+            {
+                var defaultReviews = new[]{new{name="Nguyễn Văn An",role="Khách hàng thân thiết",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà.",stars=5,avatar="NA"},new{name="Trần Thị Bích",role="Food Blogger",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB"},new{name="Lê Hữu Phúc",role="Sinh viên",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng.",stars=5,avatar="LP"}};
+                @foreach (var r in defaultReviews)
+                {
+                    <div class="col-12 col-md-4">
+                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
+                            <div class="d-flex gap-1 mb-4">@for(int i=0;i<r.stars;i++){<span class="text-secondary fs-5">★</span>}</div>
+                            <p class="text-white-50 small mb-4 fst-italic">"@r.text"</p>
+                            <div class="d-flex align-items-center gap-3 mt-auto">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@r.avatar</div>
+                                <div>
+                                    <p class="text-white fw-semibold small mb-0">@r.name</p>
+                                    <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.role</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>

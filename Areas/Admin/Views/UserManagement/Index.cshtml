@@ -2,8 +2,16 @@
 @using SaleStore.Models
 @{
     ViewData["Title"] = "Tài khoản";
-    // Ensure model is never null
     var users = Model ?? new List<AppUser>();
+    var currentUsername = User.Identity?.Name?.ToLowerInvariant();
+}
+
+@if (TempData["Error"] is string errorMsg)
+{
+    <div class="alert alert-danger alert-dismissible fade show rounded-2xl" role="alert">
+        @errorMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -54,13 +62,14 @@
                     <th class="px-4 py-3 fw-semibold">Vai trò</th>
                     <th class="px-4 py-3 fw-semibold">Trạng thái</th>
                     <th class="px-4 py-3 fw-semibold">Đăng nhập gần nhất</th>
+                    <th class="px-4 py-3 fw-semibold text-end">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @if (users.Count == 0)
                 {
                     <tr>
-                        <td colspan="5" class="text-center py-5">
+                        <td colspan="6" class="text-center py-5">
                             <p class="text-muted-custom mb-0">Chưa có tài khoản nào trong hệ thống.</p>
                         </td>
                     </tr>
@@ -75,6 +84,7 @@
                             AppRoles.Staff => "bg-info bg-opacity-10 text-info border border-info border-opacity-25",
                             _ => "bg-light-brown text-coffee border border-light"
                         };
+                        var isSelf = user.Username == currentUsername;
 
                         <tr>
                             <td class="px-4 py-3">
@@ -106,7 +116,60 @@
                                     </span>
                                 }
                             </td>
-                            <td class="px-4 py-3 text-muted-custom">@(user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy") : "Chưa đăng nhập")</td>
+                            <td class="px-4 py-3 text-muted-custom">@(user.LastLoginAt.HasValue ? user.LastLoginAt.Value.AddHours(7).ToString("HH:mm dd/MM/yyyy") : "Chưa đăng nhập")</td>
+                            <td class="px-4 py-3 text-end">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary rounded-xl dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        <li>
+                                            <a asp-area="Admin" asp-controller="UserManagement" asp-action="Edit" asp-route-id="@user.Id"
+                                               class="dropdown-item d-flex align-items-center gap-2 small">
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                Chỉnh sửa
+                                            </a>
+                                        </li>
+                                        @if (!isSelf)
+                                        {
+                                            <li>
+                                                <form asp-area="Admin" asp-controller="UserManagement" asp-action="ToggleActive" asp-route-id="@user.Id" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2 small">
+                                                        @if (user.IsActive)
+                                                        {
+                                                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                                            <span>Khóa tài khoản</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                            <span>Mở khóa</span>
+                                                        }
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-area="Admin" asp-controller="UserManagement" asp-action="Delete" asp-route-id="@user.Id" method="post"
+                                                      onsubmit="return confirm('Bạn có chắc muốn xóa tài khoản \'@user.Username\'? Hành động này không thể hoàn tác.');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="dropdown-item d-flex align-items-center gap-2 small text-danger">
+                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        Xóa tài khoản
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
+                                        @if (isSelf)
+                                        {
+                                            <li>
+                                                <span class="dropdown-item text-muted small disabled">Không thể thao tác trên tài khoản của bạn</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
                         </tr>
                     }
                 }
