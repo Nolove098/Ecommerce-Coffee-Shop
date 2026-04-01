@@ -1,0 +1,195 @@
+@page
+@model SaleStore.Pages.PopularModel
+@{
+    ViewData["Title"] = "Bán chạy nhất – SaleStore";
+}
+
+<!-- ===== HERO BANNER ===== -->
+<section class="position-relative overflow-hidden" style="min-height: 60vh; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);">
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600') center/cover;"></div>
+    <div class="container-xxl px-4 h-100 d-flex align-items-center position-relative" style="min-height: 60vh;">
+        <div class="row w-100 align-items-center">
+            <div class="col-12 col-lg-6 text-white">
+                <div class="badge bg-white text-primary rounded-pill px-4 py-2 mb-4 shadow-lg">
+                    <span class="fw-bold">🔥 TOP BÁN CHẠY TUẦN NÀY</span>
+                </div>
+                <h1 class="display-2 fw-bold mb-4 serif" style="line-height: 1.2;">ĐƯỢC YÊU THÍCH NHẤT</h1>
+                <p class="fs-5 mb-4 text-white-75" style="max-width: 550px; line-height: 1.8;">
+                    Khám phá những món được khách hàng lựa chọn nhiều nhất trong tuần qua. 
+                    Hương vị được đảm bảo bởi hàng trăm đánh giá 5 sao từ cộng đồng yêu cà phê.
+                </p>
+                <div class="d-flex gap-4 flex-wrap">
+                    <div class="text-center">
+                        <h3 class="display-5 fw-bold mb-1">500+</h3>
+                        <p class="small mb-0 text-white-75">Đơn hàng/tuần</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="display-5 fw-bold mb-1">4.9★</h3>
+                        <p class="small mb-0 text-white-75">Đánh giá trung bình</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="display-5 fw-bold mb-1">98%</h3>
+                        <p class="small mb-0 text-white-75">Khách hài lòng</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===== TOP 5 PRODUCTS ===== -->
+<section class="py-5 bg-white">
+    <div class="container-xxl px-4 py-5">
+        <div class="text-center mb-5">
+            <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Top 5 tuần này</span>
+            <h2 class="display-4 fw-bold text-dark mt-2 mb-3 serif">Món được yêu thích nhất</h2>
+            <p class="text-muted mx-auto" style="max-width: 700px;">Dựa trên số lượng đơn hàng và đánh giá từ khách hàng trong 7 ngày qua</p>
+        </div>
+        <div class="row g-4">
+            @{ 
+                var badges = new[] { "🏆 #1", "🥈 #2", "🥉 #3", "#4", "#5" };
+                var index = 0;
+            }
+            @foreach(var product in Model.PopularProducts)
+            {
+                var badge = index < badges.Length ? badges[index] : $"#{index + 1}";
+                var rating = 4.7 + (0.2 * (5 - index)); // Giả lập rating từ 4.9 xuống 4.7
+                var sold = 342 - (index * 50); // Giả lập số đơn bán
+                index++;
+                
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border rounded-4 overflow-hidden shadow-sm position-relative" style="transition: transform 0.3s;" onmouseenter="this.style.transform='translateY(-8px)'" onmouseleave="this.style.transform=''">
+                        <a href="/san-pham/@product.Id" class="text-decoration-none">
+                            <div class="position-relative" style="height: 240px;">
+                                @if(!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" alt="@product.Name" class="w-100 h-100 object-fit-cover"/>
+                                }
+                                else
+                                {
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light display-3">☕</div>
+                                }
+                                <div class="position-absolute top-0 start-0 m-3">
+                                    <span class="badge bg-white text-primary fw-bold px-3 py-2 shadow-lg">@badge</span>
+                                </div>
+                                <div class="position-absolute bottom-0 end-0 m-3">
+                                    <span class="badge bg-dark text-white fw-bold px-3 py-2">@rating.ToString("0.0") ★</span>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card-body p-4">
+                            <a href="/san-pham/@product.Id" class="text-decoration-none">
+                                <h3 class="fw-bold text-dark mb-2 serif">@product.Name</h3>
+                            </a>
+                            <p class="text-muted small mb-3" style="line-height: 1.6;">@(product.Description ?? "Sản phẩm chất lượng cao được yêu thích")</p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span class="text-primary fw-bold fs-4">@product.Price.ToString("N0")</span>
+                                    <span class="text-muted small">₫</span>
+                                </div>
+                                <div class="text-end">
+                                    <p class="text-muted small mb-0">🔥 @sold đơn</p>
+                                    <p class="text-muted small mb-0">tuần này</p>
+                                </div>
+                            </div>
+                            <button onclick="event.stopPropagation();event.preventDefault();addToCart(@product.Id,'@product.Name.Replace("'","\\'")',@product.Price,'@(product.ImageUrl ?? "")','@product.Category')" class="btn btn-primary w-100 rounded-xl fw-semibold shadow-sm">
+                                <svg width="16" height="16" class="me-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY POPULAR ===== -->
+<section class="py-5 bg-cream">
+    <div class="container-xxl px-4 py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-dark serif">Tại sao được yêu thích?</h2>
+            <p class="text-muted mt-3">Những lý do khiến khách hàng quay lại nhiều lần</p>
+        </div>
+        <div class="row g-4">
+            @{ var reasons=new[]{
+                new{icon="🌟",title="Chất lượng đỉnh cao",desc="Hạt cà phê Arabica & Robusta chọn lọc từ Tây Nguyên, rang tươi mỗi ngày để giữ trọn hương vị"},
+                new{icon="👨‍🍳",title="Barista chuyên nghiệp",desc="Đội ngũ barista được đào tạo bài bản với chứng chỉ quốc tế, đảm bảo mỗi ly đều hoàn hảo"},
+                new{icon="⚡",title="Phục vụ nhanh chóng",desc="Cam kết pha chế và phục vụ trong vòng 5 phút, không để bạn phải chờ đợi lâu"},
+                new{icon="💰",title="Giá cả hợp lý",desc="Chất lượng cao nhưng giá cả phải chăng, phù hợp với mọi đối tượng khách hàng"}
+            }; }
+            @foreach(var r in reasons){
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border-0 bg-white rounded-4 p-4 h-100 shadow-sm text-center">
+                        <div class="display-3 mb-3">@r.icon</div>
+                        <h4 class="fw-bold text-dark mb-3 serif">@r.title</h4>
+                        <p class="text-muted small mb-0" style="line-height: 1.6;">@r.desc</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== CUSTOMER REVIEWS ===== -->
+<section class="py-5 bg-white">
+    <div class="container-xxl px-4 py-5">
+        <div class="text-center mb-5">
+            <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Khách hàng nói gì</span>
+            <h2 class="display-5 fw-bold text-dark mt-2 mb-3 serif">Đánh giá từ cộng đồng</h2>
+            <p class="text-muted">Hơn 500 khách hàng đã tin tưởng và yêu thích SaleStore</p>
+        </div>
+        <div class="row g-4">
+            @{ var reviews=new[]{
+                new{name="Nguyễn Văn An",role="Khách hàng thân thiết",product="Caramel Macchiato",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà. Mình đã order hơn 20 lần rồi!",stars=5,avatar="NA",date="2 ngày trước"},
+                new{name="Trần Thị Bích",role="Food Blogger",product="Cappuccino",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Cappuccino ở đây có lớp foam mịn màng, uống vào rất êm. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB",date="5 ngày trước"},
+                new{name="Lê Hữu Phúc",role="Sinh viên",product="Espresso",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng. Giá cả sinh viên cũng chấp nhận được.",stars=5,avatar="LP",date="1 tuần trước"},
+                new{name="Phạm Minh Châu",role="Nhân viên văn phòng",product="Iced Latte",text="Iced Latte mát lạnh, vị cà phê đậm đà nhưng không đắng. Rất thích uống vào buổi trưa nóng nực. Nhân viên phục vụ nhiệt tình, giao hàng nhanh.",stars=5,avatar="PC",date="3 ngày trước"},
+                new{name="Hoàng Thị Mai",role="Giáo viên",product="Mocha",text="Mocha ở đây là sự kết hợp hoàn hảo giữa cà phê và chocolate. Không quá ngọt, vừa miệng. Mình thường order về uống khi làm việc ở nhà.",stars=5,avatar="HM",date="4 ngày trước"},
+                new{name="Đỗ Quang Huy",role="Freelancer",product="Cappuccino",text="Chất lượng ổn định, mỗi lần order đều giống nhau về hương vị. Đây là điều mình đánh giá cao nhất. Không gian quán cũng yên tĩnh, phù hợp làm việc.",stars=5,avatar="DH",date="1 tuần trước"}
+            }; }
+            @foreach(var r in reviews){
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card border rounded-4 p-4 h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex gap-1">
+                                @for(int i=0;i<r.stars;i++){<span class="text-warning fs-5">★</span>}
+                            </div>
+                            <span class="badge bg-primary-soft text-primary small">@r.product</span>
+                        </div>
+                        <p class="text-muted small mb-4 fst-italic" style="line-height: 1.7;">"@r.text"</p>
+                        <div class="mt-auto">
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold bg-gradient-primary shadow" style="width: 48px; height: 48px;">@r.avatar</div>
+                                <div>
+                                    <p class="text-dark fw-bold small mb-0">@r.name</p>
+                                    <p class="text-muted mb-0" style="font-size: 0.75rem;">@r.role</p>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-0 ms-5 ps-3">@r.date</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA SECTION ===== -->
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container-xxl px-4 py-5 text-center">
+        <h2 class="display-5 fw-bold mb-4 serif">Thử ngay hôm nay!</h2>
+        <p class="fs-5 mb-4 text-white-75" style="max-width: 600px; margin: 0 auto;">
+            Đặt hàng ngay để trải nghiệm những món được yêu thích nhất
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="/Menu" class="btn btn-light btn-lg rounded-pill px-5 fw-semibold shadow-lg">
+                Xem thực đơn đầy đủ
+            </a>
+            <a href="/Contact" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-semibold">
+                Tìm cửa hàng gần nhất
+            </a>
+        </div>
+    </div>
+</section>

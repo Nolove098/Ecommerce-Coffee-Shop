@@ -1,0 +1,76 @@
+@model SaleStore.Models.ViewModels.AdminCreateStaffViewModel
+@{
+    ViewData["Title"] = "Tạo Staff";
+}
+
+<div class="container" style="max-width: 48rem;">
+    <div class="card border shadow-sm">
+        <div class="card-header bg-cream border-bottom px-4 py-3">
+            <p class="text-uppercase text-muted-custom fw-bold mb-2" style="font-size: 0.75rem; letter-spacing: 0.22em;">Internal Account</p>
+            <h1 class="h3 fw-bold text-coffee mb-2">Tạo tài khoản nhân viên</h1>
+            <p class="small text-muted-custom mb-0">Tài khoản Staff sau khi đăng nhập sẽ được đưa thẳng vào màn hình POS bán hàng tại quầy.</p>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-area="Admin" asp-controller="UserManagement" asp-action="CreateStaff" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-xl"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <div asp-validation-for="FullName" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Username" class="form-control" />
+                        <div asp-validation-for="Username" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <div asp-validation-for="Email" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <div asp-validation-for="Phone" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <div asp-validation-for="Password" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <div asp-validation-for="ConfirmPassword" class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check p-3 rounded-xl bg-cream">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">
+                                Kích hoạt tài khoản ngay sau khi tạo
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 pt-2">
+                        <button type="submit" class="btn btn-primary me-2">Tạo tài khoản Staff</button>
+                        <a asp-area="Admin" asp-controller="UserManagement" asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

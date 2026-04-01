@@ -1,0 +1,154 @@
+<!--
+    Admin Layout - SaleStore Admin Area
+    
+    Bootstrap Version: 5.3.8
+    
+    This layout provides the main structure for the admin area using Bootstrap 5.3.8.
+    It implements a sidebar navigation layout with a fixed sidebar and scrollable main content area.
+    
+    Key Bootstrap Components Used:
+    - Grid System: d-flex, flex-column for layout structure
+    - Utilities: vh-100, overflow-hidden for full-height layout
+    - Spacing: p-4, px-4, py-3, gap-3 for consistent spacing
+    - Colors: bg-cream, bg-white, text-coffee (custom theme colors)
+    
+    Layout Structure:
+    - Sidebar: Fixed width navigation (see _AdminSidebar.cshtml)
+    - Main Area: Flexible width content area with header and scrollable content
+    - Header: Contains page title, date, notifications, and user info
+    - Content: Scrollable main content area for page-specific content
+-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>@ViewData["Title"] – SaleStore Admin</title>
+    
+    <!-- Google Fonts Preconnect: Improves font loading performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts: Inter for body text, Playfair Display for headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3.8 CSS: Core framework styles loaded from CDN with integrity hash for security -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <!-- Custom CSS: Loaded after Bootstrap to override default styles with coffee-themed brand colors -->
+    <link href="~/css/custom.css" rel="stylesheet" />
+</head>
+<body class="bg-cream">
+
+<!-- 
+    Main Layout Container
+    Uses Bootstrap flexbox utilities (d-flex) to create a horizontal layout with sidebar and main content.
+    vh-100: Full viewport height
+    overflow-hidden: Prevents scrolling on the container itself (scrolling happens in child elements)
+-->
+<div class="d-flex vh-100 overflow-hidden">
+
+    <!-- 
+        Sidebar Navigation
+        Partial view containing admin navigation menu.
+        Fixed width, full height, with custom gradient background (see _AdminSidebar.cshtml)
+    -->
+    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_AdminSidebar.cshtml")
+
+    <!-- 
+        Main Content Area
+        flex-fill: Takes remaining horizontal space after sidebar
+        d-flex flex-column: Vertical flexbox layout for header and content
+        overflow-hidden: Prevents scrolling on this container (content area handles scrolling)
+    -->
+    <div class="flex-fill d-flex flex-column overflow-hidden">
+
+        <!-- 
+            Top Header Bar
+            Contains page title, current date, notifications, and user profile info.
+            flex-shrink-0: Prevents header from shrinking when content overflows
+            Uses Bootstrap spacing utilities (px-4, py-3) and flexbox alignment
+        -->
+        <header class="bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between flex-shrink-0" style="border-color: var(--color-border);">
+            <!-- Left side: Page title and date -->
+            <div>
+                <h2 class="fs-4 fw-bold text-coffee mb-1">@(ViewData["Title"] ?? "Admin")</h2>
+                <p class="small text-muted-custom mb-0">@DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN"))</p>
+            </div>
+            
+            <!-- Right side: Notifications and user profile -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- 
+                    Success Alert Notification
+                    Bootstrap alert component with auto-dismiss functionality.
+                    Uses TempData to display success messages after form submissions.
+                    alert-dismissible: Adds close button
+                    fade show: Bootstrap transition classes for smooth appearance
+                -->
+                @if (TempData["Success"] != null)
+                {
+                    <div id="successAlert" class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-0 py-2 px-3" role="alert">
+                        <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <span>@TempData["Success"]</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <!-- Auto-dismiss alert after 4 seconds using Bootstrap Alert API -->
+                    <script>setTimeout(()=>{ const alert = bootstrap.Alert.getOrCreateInstance(document.getElementById('successAlert')); if(alert) alert.close(); }, 4000);</script>
+                }
+                
+                <!-- 
+                    User Profile Display
+                    Shows admin avatar (gradient circle with initials) and user info.
+                    Uses custom gradient background and Bootstrap spacing utilities.
+                -->
+                <div class="d-flex align-items-center gap-2 bg-cream border rounded-3 px-3 py-2" style="border-color: var(--color-border);">
+                    <!-- Avatar with gradient background -->
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-secondary) 100%); font-size: 0.75rem;">AD</div>
+                    <div class="lh-sm">
+                        <p class="small fw-semibold text-coffee mb-0">@(User.Identity?.Name ?? "Admin")</p>
+                        <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">@((User.IsInRole(SaleStore.Models.AppRoles.Admin) ? "Quản trị viên" : "Người dùng nội bộ"))</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 
+            Main Content Area
+            flex-fill: Takes remaining vertical space after header
+            overflow-auto: Enables scrolling when content exceeds viewport height
+            p-4: Bootstrap padding utility (1.5rem on all sides)
+            pb-5: Extra bottom padding to prevent content from being cut off
+            This is where page-specific content is displayed
+        -->
+        <main class="flex-fill overflow-auto p-4" style="padding-bottom: 5rem !important;">
+            @RenderBody()
+        </main>
+
+    </div>
+</div>
+
+<!-- 
+    Bootstrap 5.3.8 JavaScript Bundle
+    Includes Bootstrap core JS and Popper.js for interactive components (modals, dropdowns, tooltips).
+    Loaded at end of body for optimal page load performance.
+    Integrity hash ensures CDN file hasn't been tampered with.
+-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<!-- Blazor Server JS: Required for interactive Blazor components embedded in MVC views -->
+<script src="/_framework/blazor.server.js"></script>
+
+<!-- 
+    Bootstrap Component Initialization
+    Custom script that initializes Bootstrap components (tooltips, modals, etc.) after DOM load.
+    Handles component event listeners and provides jQuery compatibility checks.
+-->
+<script src="~/js/bootstrap-init.js"></script>
+
+<!-- Optional page-specific scripts -->
+@RenderSection("Scripts", required: false)
+</body>
+</html>

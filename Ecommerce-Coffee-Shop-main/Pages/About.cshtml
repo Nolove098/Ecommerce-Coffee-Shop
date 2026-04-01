@@ -1,0 +1,136 @@
+@page
+@model SaleStore.Pages.AboutModel
+@{
+    ViewData["Title"] = "Về chúng tôi – SaleStore";
+}
+
+<!-- ===== HERO SECTION - HIGHLANDS STYLE ===== -->
+<section class="position-relative overflow-hidden" style="min-height: 70vh; background: linear-gradient(rgba(26,14,8,0.4), rgba(26,14,8,0.6)), url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1600') center/cover no-repeat;">
+    <div class="container-xxl px-4 h-100 d-flex align-items-center" style="min-height: 70vh;">
+        <div class="row w-100">
+            <div class="col-12 col-lg-7 text-white">
+                <h1 class="display-2 fw-bold mb-4 serif" style="line-height: 1.2;">NGUỒN GỐC</h1>
+                <p class="fs-4 mb-4" style="max-width: 600px; line-height: 1.6;">
+                    <strong>CÂU CHUYỆN NÀY LÀ CỦA CHÚNG MÌNH</strong>
+                </p>
+                <p class="fs-6 mb-4 text-white-75" style="max-width: 650px; line-height: 1.8;">
+                    SaleStore được thành lập vào năm 1999, bắt nguồn từ tình yêu dành cho đất Việt cùng với cà phê và cộng đồng nơi đây. Ngay từ những ngày đầu tiên, 
+                    mục tiêu của chúng mình là có thể phục vụ và góp phần phát triển cộng đồng 
+                    bằng cách siết chặt thêm sự kết nối và sự gắn bó giữa người với người.
+                </p>
+                <a href="#story" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-semibold">XEM CHI TIẾT</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STORY SECTION ===== -->
+<section id="story" class="py-5 bg-white">
+    <div class="container-xxl px-4 py-5">
+        <div class="row g-5 align-items-center">
+            <div class="col-12 col-lg-6">
+                <div class="ratio ratio-4x3 rounded-4 overflow-hidden shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800" alt="Cà phê Việt Nam" class="object-fit-cover"/>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <h2 class="display-5 fw-bold text-dark mb-4 serif">DỊCH VỤ NÀY LÀ CỦA CHÚNG MÌNH</h2>
+                <p class="text-muted mb-4" style="line-height: 1.8;">
+                    Ngay từ những ngày đầu tiên, mục tiêu của chúng mình là có thể phục vụ và góp phần phát triển cộng đồng bằng cách siết chặt thêm sự kết nối và sự gắn bó giữa người với người.
+                </p>
+                <p class="text-muted mb-4" style="line-height: 1.8;">
+                    Ngày hôm nay, với hàng trăm cửa hàng trên khắp Việt Nam và đội ngũ nhân viên tận tâm, chúng mình vẫn luôn kiên định với mục tiêu ban đầu: phục vụ cộng đồng bằng những sản phẩm chất lượng cao và dịch vụ tận tình.
+                </p>
+                <div class="d-flex gap-4 mt-4">
+                    <div>
+                        <h3 class="display-4 fw-bold text-primary serif mb-0">25+</h3>
+                        <p class="text-muted small mb-0">Năm kinh nghiệm</p>
+                    </div>
+                    <div>
+                        <h3 class="display-4 fw-bold text-primary serif mb-0">100+</h3>
+                        <p class="text-muted small mb-0">Cửa hàng</p>
+                    </div>
+                    <div>
+                        <h3 class="display-4 fw-bold text-primary serif mb-0">1000+</h3>
+                        <p class="text-muted small mb-0">Nhân viên</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== VALUES SECTION ===== -->
+<section class="py-5 bg-cream">
+    <div class="container-xxl px-4 py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-dark serif">GIÁ TRỊ CỐT LÕI</h2>
+            <p class="text-muted fs-6 mt-3">Những giá trị định hướng mọi hành động của chúng tôi</p>
+        </div>
+        <div class="row g-4">
+            @{ var values=new[]{
+                new{icon="☕",title="CHẤT LƯỢNG",desc="Cam kết mang đến sản phẩm chất lượng cao nhất từ nguồn nguyên liệu tươi ngon, được chọn lọc kỹ càng."},
+                new{icon="🤝",title="CỘNG ĐỒNG",desc="Xây dựng không gian kết nối, nơi mọi người có thể gặp gỡ, trò chuyện và chia sẻ những khoảnh khắc đáng nhớ."},
+                new{icon="💚",title="TRÁCH NHIỆM",desc="Cam kết bảo vệ môi trường và phát triển bền vững, từ nguồn gốc nguyên liệu đến quy trình sản xuất."},
+                new{icon="🌟",title="ĐỔI MỚI",desc="Không ngừng sáng tạo và cải tiến để mang đến trải nghiệm tốt nhất cho khách hàng."}
+            }; }
+            @foreach(var v in values){
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-white rounded-4 p-4 shadow-sm text-center">
+                        <div class="display-3 mb-3">@v.icon</div>
+                        <h4 class="fw-bold text-dark mb-3 serif">@v.title</h4>
+                        <p class="text-muted small mb-0" style="line-height: 1.6;">@v.desc</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== COMMITMENT SECTION ===== -->
+<section class="py-5 bg-white">
+    <div class="container-xxl px-4 py-5">
+        <div class="row g-5 align-items-center">
+            <div class="col-12 col-lg-6 order-lg-2">
+                <div class="ratio ratio-4x3 rounded-4 overflow-hidden shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800" alt="Barista pha chế" class="object-fit-cover"/>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 order-lg-1">
+                <h2 class="display-5 fw-bold text-dark mb-4 serif">CAM KẾT CỦA CHÚNG TÔI</h2>
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark mb-2">🌱 Nguồn gốc bền vững</h4>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        Hạt cà phê của chúng tôi được thu mua trực tiếp từ các nông trại tại Tây Nguyên, đảm bảo chất lượng và thu nhập công bằng cho người nông dân.
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark mb-2">👨‍🍳 Đào tạo chuyên nghiệp</h4>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        Đội ngũ barista được đào tạo bài bản với chứng chỉ quốc tế, đảm bảo mỗi ly cà phê đều đạt tiêu chuẩn cao nhất.
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="fw-bold text-dark mb-2">♻️ Thân thiện môi trường</h4>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        Sử dụng bao bì tái chế, giảm thiểu rác thải nhựa và cam kết bảo vệ môi trường trong mọi hoạt động kinh doanh.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA SECTION ===== -->
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container-xxl px-4 py-5 text-center">
+        <h2 class="display-5 fw-bold mb-4 serif">TRẢI NGHIỆM NGAY HÔM NAY</h2>
+        <p class="fs-5 mb-4 text-white-75" style="max-width: 700px; margin: 0 auto;">
+            Ghé thăm cửa hàng gần nhất hoặc đặt hàng online để thưởng thức những ly cà phê đậm đà từ SaleStore
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="/Menu" class="btn btn-light btn-lg rounded-pill px-5 fw-semibold">Xem thực đơn</a>
+            <a href="/Contact" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-semibold">Tìm cửa hàng</a>
+        </div>
+    </div>
+</section>

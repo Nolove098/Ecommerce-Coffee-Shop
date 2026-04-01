@@ -1,0 +1,48 @@
+<!-- ===== FLOATING CART BUTTON ===== -->
+<button onclick="toggleCart()" id="floatingCartBtn" aria-label="Open shopping cart"
+        class="btn btn-primary position-fixed bottom-0 end-0 rounded-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; margin-bottom: 32px; margin-right: 32px; z-index: 1040;">
+    <div class="position-relative">
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19m-5-5v5m-4-5v5"/>
+        </svg>
+        <span id="floatCartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary text-dark d-none" style="font-size: 10px; margin-top: -12px; margin-left: -12px;">0</span>
+    </div>
+</button>
+
+<!-- ===== CART DRAWER (Bootstrap Offcanvas) ===== -->
+<div id="cartDrawer" class="offcanvas offcanvas-end" tabindex="-1" aria-labelledby="cartDrawerLabel" data-bs-backdrop="true" data-bs-scroll="false" style="width: 100%; max-width: 420px;">
+    <!-- Header -->
+    <div class="offcanvas-header bg-cream border-bottom">
+        <div>
+            <h2 id="cartDrawerLabel" class="offcanvas-title fs-5 fw-bold text-dark serif">Giỏ hàng</h2>
+            <p id="cartItemCount" class="mb-0 text-muted-custom small">0 sản phẩm</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+
+    <!-- Cart Items -->
+    <div id="cartItems" class="offcanvas-body overflow-auto p-4">
+        <!-- Populated by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="cartEmpty" class="offcanvas-body d-flex flex-column align-items-center justify-content-center text-center">
+        <div class="display-3 mb-3">🛒</div>
+        <p class="text-muted-custom fw-medium mb-2">Giỏ hàng đang trống</p>
+        <p class="text-muted small">Hãy thêm những món đồ uống yêu thích!</p>
+        <a href="/Menu" class="btn btn-primary rounded-xl small fw-semibold mt-3">Xem thực đơn</a>
+    </div>
+
+    <!-- Footer: Total + Checkout -->
+    <div id="cartFooter" class="border-top bg-cream p-4 d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="small text-muted-custom">Tạm tính</span>
+            <span id="cartTotal" class="fs-4 fw-bold text-primary">0 ₫</span>
+        </div>
+        <button type="button" onclick="goCheckout()" class="btn btn-primary w-100 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg py-3">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Tiến hành thanh toán
+        </button>
+        <button onclick="clearCart()" class="btn btn-link w-100 text-danger small fw-medium mt-2">Xóa giỏ hàng</button>
+    </div>
+</div>

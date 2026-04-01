@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bootstrap Components Test</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+          rel="stylesheet" 
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" 
+          crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
+    <link href="/css/custom.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="mb-4">Bootstrap Components Test</h1>
+        
+        <!-- Test Offcanvas -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Offcanvas Test</h2>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#testOffcanvas">
+                    Open Offcanvas
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test Modal -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Modal Test</h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#testModal">
+                    Open Modal
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test Dropdown -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Dropdown Test</h2>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Dropdown button
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Alert -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5">Alert Test (Auto-dismiss in 5 seconds)</h2>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> This alert will auto-dismiss in 5 seconds.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Console Output -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h5">Console Output</h2>
+                <p class="text-muted">Open browser console (F12) to see Bootstrap event logs</p>
+                <div id="consoleOutput" class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;">
+                    Waiting for events...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Test Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="testOffcanvas" aria-labelledby="testOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="testOffcanvasLabel">Test Offcanvas</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <p>This is a test offcanvas component.</p>
+            <p>Bootstrap offcanvas is working correctly!</p>
+        </div>
+    </div>
+    
+    <!-- Test Modal -->
+    <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="testModalLabel">Test Modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a test modal component.</p>
+                    <p>Bootstrap modal is working correctly!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
+            crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap Initialization -->
+    <script src="/js/bootstrap-init.js"></script>
+    
+    <!-- Capture console logs -->
+    <script>
+        const consoleOutput = document.getElementById('consoleOutput');
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToOutput(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : '#51cf66';
+            consoleOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToOutput(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToOutput(args.join(' '), 'error');
+        };
+        
+        // Test that Bootstrap is loaded
+        if (typeof bootstrap !== 'undefined') {
+            console.log('✓ Bootstrap JavaScript loaded successfully');
+        } else {
+            console.error('✗ Bootstrap JavaScript not loaded');
+        }
+    </script>
+</body>
+</html>

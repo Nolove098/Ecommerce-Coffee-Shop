@@ -1,0 +1,140 @@
+@page
+@model SaleStore.Pages.ContactModel
+@{
+    ViewData["Title"] = "Liên hệ – SaleStore";
+}
+
+<!-- ===== HERO BANNER ===== -->
+<section class="position-relative overflow-hidden" style="min-height: 50vh; background: linear-gradient(rgba(26,14,8,0.7), rgba(26,14,8,0.8)), url('https://images.unsplash.com/photo-1511920170033-f8396924c348?w=1600') center/cover;">
+    <div class="container-xxl px-4 h-100 d-flex align-items-center" style="min-height: 50vh;">
+        <div class="text-center w-100 text-white">
+            <span class="badge bg-white text-primary rounded-pill px-4 py-2 mb-4 shadow-lg fw-bold">📍 LIÊN HỆ VỚI CHÚNG TÔI</span>
+            <h1 class="display-2 fw-bold mb-4 serif">CHÚNG TÔI Ở ĐÂY</h1>
+            <p class="fs-5 text-white-75 mx-auto" style="max-width: 700px; line-height: 1.8;">
+                Ghé thăm cửa hàng, gọi điện hoặc gửi tin nhắn — chúng tôi luôn sẵn sàng lắng nghe và phục vụ bạn
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT INFO CARDS ===== -->
+<section class="py-5 bg-white">
+    <div class="container-xxl px-4 py-5">
+        <div class="row g-4">
+            @{ var contactInfo=new[]{
+                new{icon="📍",title="ĐỊA CHỈ CỬA HÀNG",info="123 Đường Cà Phê, Quận 1",city="TP. Hồ Chí Minh, Việt Nam",action="Xem bản đồ",link="#map"},
+                new{icon="🕐",title="GIỜ MỞ CỬA",info="Thứ 2 - Chủ nhật",city="6:00 SA – 10:00 CH",action="",link=""},
+                new{icon="📞",title="HOTLINE",info="0901 234 567",city="Hỗ trợ 24/7",action="Gọi ngay",link="tel:0901234567"},
+                new{icon="✉️",title="EMAIL",info="hello@salestore.vn",city="Phản hồi trong 24h",action="Gửi email",link="mailto:hello@salestore.vn"}
+            }; }
+            @foreach(var info in contactInfo){
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border rounded-4 p-4 h-100 shadow-sm text-center" style="transition: transform 0.3s;" onmouseenter="this.style.transform='translateY(-8px)'" onmouseleave="this.style.transform=''">
+                        <div class="display-3 mb-3">@info.icon</div>
+                        <h4 class="fw-bold text-dark small mb-3 text-uppercase" style="letter-spacing: 0.1em;">@info.title</h4>
+                        <p class="text-dark fw-semibold mb-1">@info.info</p>
+                        <p class="text-muted small mb-3">@info.city</p>
+                        @if(!string.IsNullOrEmpty(info.action)){
+                            <a href="@info.link" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">@info.action</a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT FORM & MAP ===== -->
+<section class="py-5 bg-cream">
+    <div class="container-xxl px-4 py-5">
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 rounded-4 p-5 shadow-sm bg-white">
+                    <h2 class="display-6 fw-bold text-dark mb-3 serif">Gửi tin nhắn</h2>
+                    <p class="text-muted mb-4">Có câu hỏi hoặc góp ý? Điền form bên dưới, chúng tôi sẽ phản hồi trong vòng 24 giờ.</p>
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg rounded-xl border-2" placeholder="Nguyễn Văn A" required/>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold text-dark">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-lg rounded-xl border-2" placeholder="email@example.com" required/>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold text-dark">Số điện thoại</label>
+                                <input type="tel" class="form-control form-control-lg rounded-xl border-2" placeholder="0901 234 567"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Chủ đề</label>
+                            <select class="form-select form-select-lg rounded-xl border-2">
+                                <option>Câu hỏi chung</option>
+                                <option>Đặt hàng & Giao hàng</option>
+                                <option>Góp ý & Phản hồi</option>
+                                <option>Hợp tác kinh doanh</option>
+                                <option>Khác</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-dark">Tin nhắn <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-lg rounded-xl border-2" rows="5" placeholder="Nội dung tin nhắn của bạn..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-xl fw-semibold shadow-lg">
+                            <svg width="20" height="20" class="me-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Gửi tin nhắn
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Map & Social -->
+            <div class="col-12 col-lg-6">
+                <!-- Map -->
+                <div class="card border-0 rounded-4 overflow-hidden shadow-sm mb-4" id="map">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.3193500654!2d106.69746931533417!3d10.787932192313831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4b3330bcc9%3A0x5a8b2d3c4e5f6a7b!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1234567890123!5m2!1svi!2s" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+                    <h3 class="fw-bold text-dark mb-4 serif">Kết nối với chúng tôi</h3>
+                    <div class="d-flex flex-column gap-3">
+                        <a href="https://facebook.com/salestore" target="_blank" class="btn btn-outline-primary btn-lg rounded-xl d-flex align-items-center gap-3 text-start">
+                            <div class="d-flex align-items-center justify-content-center bg-primary text-white rounded-3" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-bold text-dark">Facebook</p>
+                                <p class="mb-0 small text-muted">@@SaleStoreVN · 10K followers</p>
+                            </div>
+                        </a>
+                        <a href="https://instagram.com/salestore" target="_blank" class="btn btn-outline-primary btn-lg rounded-xl d-flex align-items-center gap-3 text-start">
+                            <div class="d-flex align-items-center justify-content-center bg-primary text-white rounded-3" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-bold text-dark">Instagram</p>
+                                <p class="mb-0 small text-muted">@@salestore.vn · 8K followers</p>
+                            </div>
+                        </a>
+                        <a href="https://zalo.me/salestore" target="_blank" class="btn btn-outline-primary btn-lg rounded-xl d-flex align-items-center gap-3 text-start">
+                            <div class="d-flex align-items-center justify-content-center bg-primary text-white rounded-3" style="width: 56px; height: 56px; flex-shrink: 0;">
+                                <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.974 12-11.111C24 4.975 18.627 0 12 0zm.699 14.97l-3.11-3.315-6.068 3.315 6.676-7.087 3.187 3.315 6.008-3.315-6.693 7.087z"/></svg>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-bold text-dark">Zalo</p>
+                                <p class="mb-0 small text-muted">Chat trực tiếp với chúng tôi</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

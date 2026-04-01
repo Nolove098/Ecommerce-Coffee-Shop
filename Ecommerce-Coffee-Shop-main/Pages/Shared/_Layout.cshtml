@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@(ViewData["Title"] ?? "SaleStore")</title>
+    <meta name="description" content="SaleStore – Cà phê & Thức uống chọn lọc"/>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom CSS -->
+    <link href="~/css/custom.css" rel="stylesheet"/>
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        body { padding-top: 72px; } /* Add padding for fixed navbar */
+        @@keyframes fadeUp {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .fade-up { animation: fadeUp 0.6s ease both; }
+        .nav-solid { background: rgba(26,14,8,0.96); backdrop-filter: blur(16px); }
+        .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    </style>
+</head>
+<body class="bg-cream overflow-x-hidden">
+
+@await Component.InvokeAsync("Navbar")
+
+@RenderBody()
+
+<!-- ===== FOOTER ===== -->
+<footer class="py-5 text-white-50 bg-dark-brown">
+    <div class="container-xxl px-4">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 pb-4 border-bottom border-white border-opacity-10">
+            <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+                <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl" style="width: 36px; height: 36px;"><span class="text-dark">☕</span></div>
+                <span class="text-white fw-bold fs-5 serif">SaleStore</span>
+            </a>
+            <div class="d-flex flex-wrap gap-4 small">
+                <a href="/Menu" class="text-white-50 text-decoration-none">Thực đơn</a>
+                <a href="/About" class="text-white-50 text-decoration-none">Về chúng tôi</a>
+                <a href="/Popular" class="text-white-50 text-decoration-none">Yêu thích</a>
+                <a href="/Contact" class="text-white-50 text-decoration-none">Liên hệ</a>
+            </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 pt-4 small">
+            <p class="mb-0">© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="text-white-50">Xin chào, @User.Identity.Name</span>
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link btn-sm text-white-50 text-decoration-none p-0">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="" asp-controller="Auth" asp-action="Login" class="text-white-50 text-decoration-none">Đăng nhập</a>
+                    <a asp-area="" asp-controller="Auth" asp-action="Register" class="text-white-50 text-decoration-none">Đăng ký</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin) || User.IsInRole(SaleStore.Models.AppRoles.Staff))
+                {
+                    <a asp-area="Staff" asp-controller="POS" asp-action="Index" class="text-white-50 text-decoration-none">POS</a>
+                }
+                @if (User.IsInRole(SaleStore.Models.AppRoles.Admin))
+                {
+                    <a href="/Admin" class="text-white-50 text-decoration-none d-flex align-items-center gap-1">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Admin Panel
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</footer>
+
+@await Component.InvokeAsync("CartDrawer")
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="position-fixed bottom-0 end-0 bg-dark text-white rounded-3 shadow-lg d-flex align-items-center gap-3 border border-secondary border-opacity-25" style="margin-bottom: 112px; margin-right: 32px; padding: 14px 20px; z-index: 1060; transform: translateX(128px); opacity: 0;">
+    <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl flex-shrink-0" style="width: 28px; height: 28px;">
+        <svg width="16" height="16" class="text-dark" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <span id="toastMsg" class="small fw-medium">Đã thêm vào giỏ!</span>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+    // ── Navbar scroll - Keep solid background on Razor Pages ──
+    // Note: Razor Pages always have solid navbar, unlike Home page with transparent hero
+    // No scroll event needed here
+
+    // ── Cart state ──
+    const CART_KEY = 'ss_cart_v1';
+    function getCart() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+        catch { return []; }
+    }
+    function saveCart(cart) {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        renderCart();
+        updateBadges();
+    }
+
+    // ── Add to cart ──
+    function addToCart(id, name, price, img, category) {
+        console.log('Adding to cart:', { id, name, price, img, category });
+        const cart = getCart();
+        const existing = cart.find(i => i.productId === id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({ productId: id, productName: name, price: price, imageUrl: img, category: category, quantity: 1 });
+        }
+        saveCart(cart);
+        showToast(`Đã thêm "${name}" vào giỏ!`);
+        console.log('Cart after adding:', cart);
+    }
+
+    // ── Remove/update ──
+    function removeFromCart(id) {
+        saveCart(getCart().filter(i => i.productId !== id));
+    }
+    function updateQty(id, delta) {
+        const cart = getCart();
+        const item = cart.find(i => i.productId === id);
+        if (!item) return;
+        item.quantity = Math.max(1, item.quantity + delta);
+        saveCart(cart);
+    }
+    function clearCart() {
+        if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
+        localStorage.removeItem(CART_KEY);
+        renderCart(); updateBadges();
+    }
+
+    // ── Render cart drawer ──
+    function renderCart() {
+        const cart = getCart();
+        const itemsEl  = document.getElementById('cartItems');
+        const emptyEl  = document.getElementById('cartEmpty');
+        const footerEl = document.getElementById('cartFooter');
+        const countEl  = document.getElementById('cartItemCount');
+        const totalEl  = document.getElementById('cartTotal');
+
+        // Check if elements exist (they may not be on all pages)
+        if (!itemsEl || !emptyEl || !footerEl || !countEl || !totalEl) return;
+
+        const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        const count = cart.reduce((s, i) => s + i.quantity, 0);
+        countEl.textContent = count + ' sản phẩm';
+        totalEl.textContent = total.toLocaleString('vi-VN') + ' ₫';
+
+        if (cart.length === 0) {
+            itemsEl.classList.add('d-none');
+            emptyEl.classList.remove('d-none');
+            footerEl.classList.add('d-none');
+        } else {
+            itemsEl.classList.remove('d-none');
+            emptyEl.classList.add('d-none');
+            footerEl.classList.remove('d-none');
+            itemsEl.innerHTML = cart.map(item => `
+                <div class="card bg-cream border rounded-3 p-3 mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        ${item.imageUrl && item.imageUrl.trim() !== ''
+                            ? `<img src="${item.imageUrl}" alt="${item.productName}" class="rounded-xl object-fit-cover flex-shrink-0" style="width: 64px; height: 64px;"/>`
+                            : `<div class="rounded-xl bg-light-brown d-flex align-items-center justify-content-center flex-shrink-0 fs-2" style="width: 64px; height: 64px;">☕</div>`}
+                        <div class="flex-fill min-w-0">
+                            <p class="fw-semibold text-dark small text-truncate mb-1">${item.productName}</p>
+                            <p class="text-secondary fw-bold small mb-2">${(item.price).toLocaleString('vi-VN')} ₫</p>
+                            <div class="d-flex align-items-center gap-2">
+                                <button onclick="updateQty(${item.productId},-1)" class="btn btn-sm btn-outline-primary rounded-2 lh-1 p-1" style="width: 28px; height: 28px;">−</button>
+                                <span class="small fw-bold text-primary" style="width: 20px; text-align: center;">${item.quantity}</span>
+                                <button onclick="updateQty(${item.productId},+1)" class="btn btn-sm btn-outline-primary rounded-2 lh-1 p-1" style="width: 28px; height: 28px;">+</button>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                            <button onclick="removeFromCart(${item.productId})" class="btn btn-link text-danger p-0">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                            <p class="text-muted small fw-medium mb-0">${(item.price * item.quantity).toLocaleString('vi-VN')} ₫</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // ── Update badges ──
+    function updateBadges() {
+        const count = getCart().reduce((s, i) => s + i.quantity, 0);
+        const badge1 = document.getElementById('cartBadge');
+        const badge2 = document.getElementById('floatCartBadge');
+        [badge1, badge2].forEach(b => {
+            if (b) {
+                if (count > 0) { b.textContent = count > 9 ? '9+' : count; b.classList.remove('d-none'); }
+                else { b.classList.add('d-none'); }
+            }
+        });
+    }
+
+    // ── Bootstrap Offcanvas instance ──
+    let cartOffcanvasInstance = null;
+    
+    // ── Initialize Bootstrap Offcanvas ──
+    function initCartOffcanvas() {
+        const drawer = document.getElementById('cartDrawer');
+        if (drawer && typeof bootstrap !== 'undefined') {
+            cartOffcanvasInstance = new bootstrap.Offcanvas(drawer);
+        }
+    }
+    
+    // ── Open/close using Bootstrap API ──
+    function toggleCart() {
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.toggle();
+        }
+    }
+    function openCart() {
+        renderCart();
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.show();
+        }
+    }
+    function closeCart() {
+        if (cartOffcanvasInstance) {
+            cartOffcanvasInstance.hide();
+        }
+    }
+
+    // ── Checkout redirect ──
+    function goCheckout() {
+        const cart = getCart();
+        if (cart.length === 0) { 
+            showToast('Giỏ hàng đang trống!'); 
+            return; 
+        }
+        // Simply redirect to checkout page - cart data is read from localStorage there
+        window.location.href = '/Cart/Checkout';
+    }
+
+    // ── Toast ──
+    function showToast(msg) {
+        document.getElementById('toastMsg').textContent = msg;
+        const t = document.getElementById('toast');
+        t.style.transform = 'translateX(0)';
+        t.style.opacity = '1';
+        setTimeout(() => {
+            t.style.transform = 'translateX(128px)';
+            t.style.opacity = '0';
+        }, 3000);
+    }
+
+    // ── Init ──
+    updateBadges();
+    
+    // Initialize Bootstrap Offcanvas when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCartOffcanvas);
+    } else {
+        initCartOffcanvas();
+    }
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<!-- Bootstrap 5.3 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+@model SaleStore.Models.Product
+@inject SaleStore.Data.ApplicationDbContext _context
+@{
+    Layout = null;
+    var relatedProducts = _context.Products
+        .Where(p => p.IsActive && p.Category == Model.Category && p.Id != Model.Id)
+        .Take(4)
+        .ToList();
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@Model.Name - SaleStore</title>
+    <meta name="description" content="@Model.Description"/>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom CSS -->
+    <link href="~/css/custom.css" rel="stylesheet"/>
+</head>
+<body class="bg-cream">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+    <div class="container-xxl">
+        <a href="/" class="navbar-brand d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl shadow-sm" style="width: 40px; height: 40px;">
+                <svg class="text-dark" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+                    <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                </svg>
+            </div>
+            <span class="text-primary fw-bold fs-5 serif">SaleStore</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a href="/" class="nav-link">Trang chủ</a></li>
+                <li class="nav-item"><a href="/#menu" class="nav-link">Thực đơn</a></li>
+                <li class="nav-item"><a href="/#about" class="nav-link">Về chúng tôi</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== BREADCRUMB ===== -->
+<section class="py-3 bg-white border-bottom">
+    <div class="container-xxl">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-primary">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/#menu" class="text-decoration-none text-primary">Thực đơn</a></li>
+                <li class="breadcrumb-item"><a href="/Product/Category?category=@Model.Category" class="text-decoration-none text-primary">@Model.Category</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- ===== PRODUCT DETAIL ===== -->
+<section class="py-5">
+    <div class="container-xxl">
+        <div class="row g-5">
+            <!-- Product Images -->
+            <div class="col-12 col-lg-6">
+                <div class="position-sticky" style="top: 100px;">
+                    <div class="rounded-4 overflow-hidden shadow-lg bg-light-brown mb-3" style="height: 500px;">
+                        @if(!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid w-100 h-100 object-fit-cover"/>
+                        }
+                        else
+                        {
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                <span class="display-1">☕</span>
+                            </div>
+                        }
+                    </div>
+                    <!-- Thumbnail Gallery (placeholder for future enhancement) -->
+                    <div class="row g-2">
+                        @for(int i = 0; i < 4; i++)
+                        {
+                            <div class="col-3">
+                                <div class="rounded-3 overflow-hidden border @(i == 0 ? "border-primary border-2" : "")" style="height: 100px; cursor: pointer;">
+                                    @if(!string.IsNullOrEmpty(Model.ImageUrl))
+                                    {
+                                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid w-100 h-100 object-fit-cover"/>
+                                    }
+                                    else
+                                    {
+                                        <div class="w-100 h-100 bg-light-brown d-flex align-items-center justify-content-center">
+                                            <span class="fs-3">☕</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-12 col-lg-6">
+                <div class="mb-3">
+                    <span class="badge bg-secondary text-dark rounded-pill px-3 py-2">@Model.Category</span>
+                    @if(Model.Stock < 20)
+                    {
+                        <span class="badge bg-warning text-white rounded-pill px-3 py-2 ms-2">Sắp hết hàng</span>
+                    }
+                </div>
+                
+                <h1 class="display-4 fw-bold text-dark mb-3 serif">@Model.Name</h1>
+                
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="d-flex gap-1">
+                        @for(int i = 0; i < 5; i++)
+                        {
+                            <span class="text-secondary fs-5">★</span>
+                        }
+                    </div>
+                    <span class="text-muted small">(4.9 đánh giá)</span>
+                </div>
+
+                <div class="mb-4">
+                    <span class="display-5 fw-bold text-primary">@Model.Price.ToString("N0")</span>
+                    <span class="text-muted fs-5">₫</span>
+                </div>
+
+                @if(!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="mb-4">
+                        <h3 class="fs-5 fw-bold text-dark mb-3 serif">Mô tả sản phẩm</h3>
+                        <p class="text-muted">@Model.Description</p>
+                    </div>
+                }
+
+                <div class="mb-4">
+                    <h3 class="fs-5 fw-bold text-dark mb-3 serif">Thông tin chi tiết</h3>
+                    <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Danh mục:</span>
+                            <span class="fw-semibold">@Model.Category</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Tình trạng:</span>
+                            <span class="fw-semibold text-success">@(Model.Stock > 0 ? "Còn hàng" : "Hết hàng")</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <span class="text-muted">Số lượng còn:</span>
+                            <span class="fw-semibold">@Model.Stock</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Add to Cart Section -->
+                <div class="card border rounded-4 p-4 shadow-sm mb-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold small mb-2">Số lượng</label>
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+                                    </svg>
+                                </button>
+                                <input type="number" id="quantity" class="form-control text-center" value="1" min="1" max="@Model.Stock"/>
+                                <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <label class="form-label fw-semibold small mb-2 d-none d-md-block">&nbsp;</label>
+                            <button class="btn btn-primary btn-lg w-100 rounded-xl fw-bold d-flex align-items-center justify-content-center gap-2" onclick="addToCart()">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19"/>
+                                </svg>
+                                Thêm vào giỏ hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Features -->
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <div class="text-center p-3 bg-white rounded-3 border">
+                            <div class="mb-2">🚚</div>
+                            <p class="small mb-0 fw-semibold">Giao hàng nhanh</p>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="text-center p-3 bg-white rounded-3 border">
+                            <div class="mb-2">✅</div>
+                            <p class="small mb-0 fw-semibold">Chất lượng đảm bảo</p>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="text-center p-3 bg-white rounded-3 border">
+                            <div class="mb-2">🔄</div>
+                            <p class="small mb-0 fw-semibold">Đổi trả dễ dàng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== RELATED PRODUCTS ===== -->
+@if(relatedProducts.Any())
+{
+    <section class="py-5 bg-white">
+        <div class="container-xxl">
+            <div class="mb-4">
+                <h2 class="display-6 fw-bold text-dark serif">Sản phẩm liên quan</h2>
+                <p class="text-muted">Các sản phẩm khác trong danh mục @Model.Category</p>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                @foreach(var product in relatedProducts)
+                {
+                    <div class="col">
+                        <div class="card h-100 border rounded-4 overflow-hidden shadow-sm">
+                            <div class="position-relative bg-light-brown" style="height: 200px;">
+                                @if(!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid w-100 h-100 object-fit-cover"/>
+                                }
+                                else
+                                {
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center display-4">☕</div>
+                                }
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary rounded-pill small fw-bold">@product.Category</span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title fw-bold text-dark small mb-2 serif">@product.Name</h3>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="text-primary fw-bold fs-5">@product.Price.ToString("N0")</span>
+                                        <span class="text-muted small">₫</span>
+                                    </div>
+                                    <a href="/Product/Detail/@product.Id" class="btn btn-outline-primary btn-sm rounded-xl">
+                                        Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ===== FOOTER ===== -->
+<footer class="py-5 bg-dark text-white-50">
+    <div class="container-xxl">
+        <div class="text-center">
+            <p class="mb-0">© 2026 SaleStore. Được làm với ☕ và tình yêu.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap 5.3 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+<!-- Custom JavaScript -->
+<script src="~/js/bootstrap-init.js"></script>
+
+<script>
+    function increaseQty() {
+        const input = document.getElementById('quantity');
+        const max = parseInt(input.max);
+        const current = parseInt(input.value);
+        if (current < max) {
+            input.value = current + 1;
+        }
+    }
+
+    function decreaseQty() {
+        const input = document.getElementById('quantity');
+        const min = parseInt(input.min);
+        const current = parseInt(input.value);
+        if (current > min) {
+            input.value = current - 1;
+        }
+    }
+
+    const CART_KEY = 'ss_cart_v1';
+    function getCart() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+        catch { return []; }
+    }
+    function saveCart(cart) {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function addToCart() {
+        const qtyInput = document.getElementById('quantity');
+        const quantity = parseInt(qtyInput.value) || 1;
+        
+        const productId = @Model.Id;
+        const productName = '@Model.Name.Replace("'", "\\'")';
+        const price = @Model.Price;
+        const imageUrl = '@(Model.ImageUrl ?? "")';
+        const category = '@Model.Category';
+
+        const cart = getCart();
+        const existing = cart.find(i => i.productId === productId);
+        
+        if (existing) {
+            existing.quantity += quantity;
+        } else {
+            cart.push({ 
+                productId: productId, 
+                productName: productName, 
+                price: price, 
+                imageUrl: imageUrl, 
+                category: category, 
+                quantity: quantity 
+            });
+        }
+        
+        saveCart(cart);
+        alert(`Đã thêm ${quantity} "${productName}" vào giỏ hàng!`);
+    }
+</script>
+
+</body>
+</html>
