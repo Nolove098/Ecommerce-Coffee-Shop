@@ -21,4 +21,7 @@ public class CheckoutViewModel
 
     // Cart items passed as JSON from localStorage
     public string CartJson { get; set; } = "[]";
+
+    [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]
+    public string PaymentMethod { get; set; } = "COD";
 }

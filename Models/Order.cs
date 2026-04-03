@@ -20,5 +20,10 @@ namespace SaleStore.Models
         public Customer? Customer { get; set; }
         public AppUser? CreatedByUser { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new();
+
+        // New Payment Fields
+        public string? PaymentMethod { get; set; } // "COD", "VNPAY", "MoMo"
+        public bool IsPaid { get; set; } = false;
+        public string? TransactionId { get; set; } // Store transaction ID from provider
     }
 }

@@ -79,6 +79,18 @@ namespace SaleStore.Data
             const string addOrderTableNumberColumn = @"
                 ALTER TABLE orders
                 ADD COLUMN IF NOT EXISTS table_number VARCHAR(20) NULL;";
+            
+            const string addOrderPaymentMethodColumn = @"
+                ALTER TABLE orders
+                ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50) NULL;";
+
+            const string addOrderIsPaidColumn = @"
+                ALTER TABLE orders
+                ADD COLUMN IF NOT EXISTS is_paid BOOLEAN NOT NULL DEFAULT FALSE;";
+
+            const string addOrderTransactionIdColumn = @"
+                ALTER TABLE orders
+                ADD COLUMN IF NOT EXISTS transaction_id VARCHAR(100) NULL;";
 
             const string createReviewsTable = @"
                 CREATE TABLE IF NOT EXISTS reviews (
@@ -98,22 +110,14 @@ namespace SaleStore.Data
                 CREATE UNIQUE INDEX IF NOT EXISTS ix_reviews_product_user
                 ON reviews (product_id, user_id);";
 
-            await context.Database.ExecuteSqlRawAsync(createUsersTable);
-            await context.Database.ExecuteSqlRawAsync(addUsernameColumn);
-            await context.Database.ExecuteSqlRawAsync(addRoleColumn);
+            var allTablesSql = createUsersTable + addUsernameColumn + addRoleColumn + createUsersEmailIndex + createUsersUsernameIndex +
+                               createActivitiesTable + createActivitiesIndex + addCreatedByUserIdColumn + createOrdersCreatedByIndex +
+                               addOrderCustomerNameColumn + addOrderTableNumberColumn + addOrderPaymentMethodColumn + addOrderIsPaidColumn +
+                               addOrderTransactionIdColumn + createReviewsTable + createReviewsIndex + createReviewsUniqueIndex;
+
+            await context.Database.ExecuteSqlRawAsync(allTablesSql);
             await context.Database.ExecuteSqlRawAsync(fillMissingUsernames);
             await context.Database.ExecuteSqlRawAsync(fillMissingRoles);
-            await context.Database.ExecuteSqlRawAsync(createUsersEmailIndex);
-            await context.Database.ExecuteSqlRawAsync(createUsersUsernameIndex);
-            await context.Database.ExecuteSqlRawAsync(createActivitiesTable);
-            await context.Database.ExecuteSqlRawAsync(createActivitiesIndex);
-            await context.Database.ExecuteSqlRawAsync(addCreatedByUserIdColumn);
-            await context.Database.ExecuteSqlRawAsync(createOrdersCreatedByIndex);
-            await context.Database.ExecuteSqlRawAsync(addOrderCustomerNameColumn);
-            await context.Database.ExecuteSqlRawAsync(addOrderTableNumberColumn);
-            await context.Database.ExecuteSqlRawAsync(createReviewsTable);
-            await context.Database.ExecuteSqlRawAsync(createReviewsIndex);
-            await context.Database.ExecuteSqlRawAsync(createReviewsUniqueIndex);
 
             var adminExists = await context.AppUsers.AnyAsync(x => x.Username == "admin");
             if (!adminExists)

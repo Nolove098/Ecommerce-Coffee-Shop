@@ -1,4 +1,4 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
 
@@ -12,7 +12,7 @@
   },
 
   "profiles": {
-    "SportsStore": {
+    "SaleStore": {
       "commandName": "Project",
 
       "dotnetRunMessages": true,

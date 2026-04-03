@@ -10,8 +10,11 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. THÊM MỚI: Cấu hình kết nối DbContext với Supabase (PostgreSQL)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? "Host=15.164.188.235;Port=5432;Database=postgres;Username=postgres.uxlkglkfpmtpvruqndqx;Password=Baospaki1234@;SSL Mode=Require;Trust Server Certificate=true;";
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(connectionString)
            .UseSnakeCaseNamingConvention());
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -58,6 +61,9 @@ builder.Services.AddSingleton<PasswordHasher>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+// Payment Services
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // 2. Session để hỗ trợ giỏ hàng (Giữ nguyên của bạn)
 builder.Services.AddDistributedMemoryCache();

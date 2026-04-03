@@ -113,7 +113,7 @@
                     </div>
                 </div>
 
-                <!-- Payment method (display only) -->
+                <!-- Payment methods -->
                 <div class="card border rounded-2xl shadow-sm">
                     <div class="card-body p-4">
                         <h2 class="card-title h6 fw-bold text-coffee text-uppercase mb-3 d-flex align-items-center gap-2">
@@ -122,19 +122,33 @@
                             </svg>
                             Phương thức thanh toán
                         </h2>
-                        <div class="d-flex align-items-center gap-3 bg-cream border border-secondary rounded-2xl p-3">
-                            <div class="d-flex align-items-center justify-content-center rounded-xl bg-secondary-soft-20" style="width: 40px; height: 40px;">
-                                <svg class="text-caramel" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="fw-semibold text-coffee small mb-0">Thanh toán khi nhận hàng (COD)</p>
-                                <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">Thanh toán bằng tiền mặt khi nhận đơn</p>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-center border border-2 border-secondary rounded-circle" style="width: 20px; height: 20px;">
-                                <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
-                            </div>
+                        
+                        <div class="d-flex flex-column gap-3">
+                            <!-- COD -->
+                            <label class="d-flex align-items-center gap-3 bg-cream border border-secondary rounded-2xl p-3 cursor-pointer">
+                                <input type="radio" asp-for="PaymentMethod" value="COD" checked class="form-check-input mt-0"/>
+                                <div class="d-flex align-items-center justify-content-center rounded-xl bg-secondary-soft-20" style="width: 40px; height: 40px;">
+                                    <svg class="text-caramel" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="fw-semibold text-coffee small mb-0">Thanh toán khi nhận hàng (COD)</p>
+                                    <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">Thanh toán bằng tiền mặt khi nhận đơn</p>
+                                </div>
+                            </label>
+
+                            <!-- VNPAY -->
+                            <label class="d-flex align-items-center gap-3 bg-white border rounded-2xl p-3 cursor-pointer hover-border-secondary">
+                                <input type="radio" asp-for="PaymentMethod" value="VNPAY" class="form-check-input mt-0"/>
+                                <div class="d-flex align-items-center justify-content-center rounded-xl bg-primary-soft-10" style="width: 40px; height: 40px;">
+                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPAY" style="width: 32px;"/>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="fw-semibold text-dark small mb-0">Ví điện tử VNPAY</p>
+                                    <p class="text-muted-custom mb-0" style="font-size: 0.75rem;">Thanh toán qua ứng dụng ngân hàng hoặc ví VNPAY</p>
+                                </div>
+                            </label>
                         </div>
                     </div>
                 </div>

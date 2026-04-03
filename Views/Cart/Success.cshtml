@@ -73,16 +73,32 @@
 
     <div class="card border shadow-sm overflow-hidden fade-up delay-2 rounded-2xl border-light-brown">
         <div class="card-header text-white px-4 py-4 bg-gradient-primary-card">
-            <p class="text-uppercase small fw-semibold mb-1 text-white-50" style="letter-spacing: 0.1em;">Trạng thái thanh toán</p>
-            <p class="display-6 fw-bold serif mb-0">Đơn hàng đã được ghi nhận</p>
+            <p class="text-uppercase small fw-semibold mb-1 text-white-50" style="letter-spacing: 0.1em;">Phương thức thanh toán: @Model.PaymentMethod</p>
+            @if (Model.IsPaid)
+            {
+                <p class="display-6 fw-bold serif mb-0">Đã thanh toán thành công ✨</p>
+            }
+            else
+            {
+                <p class="display-6 fw-bold serif mb-0">Đơn hàng đã được ghi nhận</p>
+            }
         </div>
 
         <div class="card-body p-5 text-center">
-            <p class="mb-3 mx-auto text-muted-custom" style="max-width: 36rem; line-height: 2;">
-                Cảm ơn bạn đã đặt hàng tại SaleStore. Đơn hàng của bạn đã được gửi đi thành công và sẽ được đội ngũ cửa hàng xử lý trong thời gian sớm nhất.
-            </p>
+            @if (Model.IsPaid)
+            {
+                <p class="mb-3 mx-auto text-muted-custom" style="max-width: 36rem; line-height: 2;">
+                    Cảm ơn bạn! Giao dịch của bạn đã hoàn tất. Chúng tôi đã nhận được thanh toán cho đơn hàng #@Model.Id qua @Model.PaymentMethod.
+                </p>
+            }
+            else
+            {
+                <p class="mb-3 mx-auto text-muted-custom" style="max-width: 36rem; line-height: 2;">
+                    Đơn hàng #@Model.Id của bạn đã được gửi đi thành công. Vui lòng chuẩn bị số tiền <strong>@Model.TotalAmount.ToString("N0") ₫</strong> để thanh toán khi nhận hàng.
+                </p>
+            }
             <p class="small mb-0 text-muted-custom">
-                Bạn sẽ được chuyển về trang chủ sau vài giây.
+                Bạn sẽ được chuyển về trang chủ trong giây lát.
             </p>
         </div>
     </div>

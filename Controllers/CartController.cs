@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using SaleStore.Data; // Đổi thành Ecommerce_Coffee_Shop.Data nếu bạn dùng namespace đó
-using SaleStore.Models; // Đổi thành Ecommerce_Coffee_Shop.Models nếu bạn dùng namespace đó
+using SaleStore.Data;
+using SaleStore.Models;
 using SaleStore.Models.ViewModels;
+using SaleStore.Services;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -13,10 +14,13 @@ public class CartController : Controller
 {
     // 1. "Tiêm" ApplicationDbContext để gọi tới Supabase
     private readonly ApplicationDbContext _context;
+    private readonly IVnPayService _vnPayService;
+    // MoMoService removed
 
-    public CartController(ApplicationDbContext context)
+    public CartController(ApplicationDbContext context, IVnPayService vnPayService)
     {
         _context = context;
+        _vnPayService = vnPayService;
     }
 
     // GET: /Cart/Checkout
@@ -97,6 +101,8 @@ public class CartController : Controller
             Status = OrderStatus.Pending,
             TotalAmount = cartItems.Sum(c => c.Price * c.Quantity), // Tính tổng tiền
             CreatedAt = DateTime.UtcNow,
+            PaymentMethod = model.PaymentMethod,
+            IsPaid = false,
             
             // Xây dựng Chi tiết đơn hàng (Lưu vào bảng order_items)
             OrderItems = cartItems.Select(c => new OrderItem
@@ -112,8 +118,81 @@ public class CartController : Controller
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(); // Hàm này sẽ tự động lưu cả Order và OrderItems
 
-        // Chuyển hướng sang trang thành công với ID mới tạo
+        // Xử lý thanh toán theo phương thức đã chọn
+        if (model.PaymentMethod == "VNPAY")
+        {
+            var url = _vnPayService.CreatePaymentUrl(HttpContext, order);
+            return Redirect(url);
+        }
+
+        // Mặc định hoặc COD: Chuyển hướng sang trang thành công với ID mới tạo
         return RedirectToAction("Success", new { id = order.Id });
+    }
+
+    [Authorize]
+    [HttpGet]
+    [Route("Cart/VnPayReturn")]
+    public async Task<IActionResult> VnPayReturn()
+    {
+        var response = _vnPayService.PaymentExecute(Request.Query);
+        
+        if (!response.Success)
+        {
+            TempData["Message"] = $"Lỗi thanh toán VNPAY: {response.VnPayResponseCode}";
+            return RedirectToAction("PaymentFail");
+        }
+
+        return RedirectToAction("Success", new { id = long.Parse(response.OrderId) });
+    }
+
+    [HttpGet]
+    [Route("Cart/VnPayIpn")]
+    public async Task<IActionResult> VnPayIpn()
+    {
+        var response = _vnPayService.PaymentExecute(Request.Query);
+        
+        try
+        {
+            if (!long.TryParse(response.OrderId, out var orderId))
+                return Json(new { RspCode = "01", Message = "Order not found" });
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return Json(new { RspCode = "01", Message = "Order not found" });
+
+            if (order.TotalAmount != response.Amount)
+                return Json(new { RspCode = "04", Message = "Invalid amount" });
+
+            if (order.IsPaid)
+                return Json(new { RspCode = "02", Message = "Order already confirmed" });
+
+            if (response.Success)
+            {
+                order.IsPaid = true;
+                order.TransactionId = response.TransactionId;
+                order.Status = OrderStatus.Ready;
+                await _context.SaveChangesAsync();
+                
+                return Json(new { RspCode = "00", Message = "Confirm Success" });
+            }
+            else
+            {
+                // Payment failed at VNPAY
+                return Json(new { RspCode = "00", Message = "Confirm Success (Payment failed status recorded)" });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { RspCode = "99", Message = "Unknown error: " + ex.Message });
+        }
+    }
+
+    [HttpGet]
+    [Route("Cart/PaymentFail")]
+    public IActionResult PaymentFail()
+    {
+        return View();
     }
 
     // GET: /Cart/Success/{id}
@@ -131,4 +210,4 @@ public class CartController : Controller
         
         return View(order);
     }
-}
+}
