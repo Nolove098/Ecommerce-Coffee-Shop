@@ -84,7 +84,7 @@
                             <p class="mb-0 text-white-50" style="font-size: 0.75rem;">Thành viên SaleStore</p>
                         </div>
                     </div>
-                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-none d-sm-block">
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-none d-sm-block" onsubmit="if(window.CartSync)CartSync.onBeforeLogout();">
                         <button type="submit" class="btn btn-outline-light btn-sm rounded-xl">Đăng xuất</button>
                     </form>
                 }
@@ -426,7 +426,7 @@
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <span class="text-white-50">Xin chào, @User.Identity.Name</span>
-                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="d-inline" onsubmit="if(window.CartSync)CartSync.onBeforeLogout();">
                         <button type="submit" class="btn btn-link btn-sm text-white-50 text-decoration-none p-0">Đăng xuất</button>
                     </form>
                 }
@@ -513,6 +513,8 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
+<script>window.__isAuthenticated = @(User.Identity?.IsAuthenticated == true ? "true" : "false");</script>
+<script src="/js/cart-sync.js"></script>
 <script>
     // ── Navbar scroll ──
     window.addEventListener('scroll', () => {
@@ -528,14 +530,13 @@
         });
     }
 
-    // ── Cart state ──
-    const CART_KEY = 'ss_cart_v1';
+    // ── Cart state (dùng CartSync để đồng bộ với server) ──
+    const CART_KEY = CartSync.CART_KEY;
     function getCart() {
-        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
-        catch { return []; }
+        return CartSync.getCart();
     }
     function saveCart(cart) {
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        CartSync.saveCart(cart);
         renderCart();
         updateBadges();
     }
@@ -566,7 +567,7 @@
     }
     function clearCart() {
         if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
-        localStorage.removeItem(CART_KEY);
+        CartSync.clearCart();
         renderCart(); updateBadges();
     }
 
@@ -690,8 +691,12 @@
     }
 
     // ── Init ──
-    updateBadges();
-    
+    // Tải giỏ hàng từ server (nếu đã đăng nhập) rồi mới render
+    CartSync.loadFromServer().then(() => {
+        updateBadges();
+        renderCart();
+    });
+
     // Initialize Bootstrap Offcanvas when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initCartOffcanvas);

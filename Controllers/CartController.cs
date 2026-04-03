@@ -210,4 +210,88 @@ public class CartController : Controller
         
         return View(order);
     }
-}
+
+    // ── Cart API: Lưu giỏ hàng theo user trên Supabase ──
+
+    [Authorize]
+    [HttpGet]
+    [Route("api/cart")]
+    public async Task<IActionResult> GetCartApi()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var items = await _context.UserCartItems
+            .Where(c => c.UserId == userId.Value)
+            .Select(c => new {
+                productId = (int)c.ProductId,
+                productName = c.ProductName,
+                price = c.Price,
+                quantity = c.Quantity,
+                imageUrl = c.ImageUrl,
+                category = c.Category
+            })
+            .ToListAsync();
+
+        return Json(items);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [Route("api/cart")]
+    public async Task<IActionResult> SaveCartApi([FromBody] List<CartItem> items)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        // Xóa giỏ hàng cũ
+        var existing = await _context.UserCartItems
+            .Where(c => c.UserId == userId.Value)
+            .ToListAsync();
+        _context.UserCartItems.RemoveRange(existing);
+
+        // Thêm giỏ hàng mới
+        if (items != null && items.Any())
+        {
+            var now = DateTime.UtcNow;
+            var newItems = items.Select(i => new UserCartItem
+            {
+                UserId = userId.Value,
+                ProductId = i.ProductId,
+                ProductName = i.ProductName,
+                Price = i.Price,
+                Quantity = i.Quantity,
+                ImageUrl = i.ImageUrl,
+                Category = i.Category,
+                UpdatedAt = now
+            }).ToList();
+            _context.UserCartItems.AddRange(newItems);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpDelete]
+    [Route("api/cart")]
+    public async Task<IActionResult> ClearCartApi()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var items = await _context.UserCartItems
+            .Where(c => c.UserId == userId.Value)
+            .ToListAsync();
+        _context.UserCartItems.RemoveRange(items);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    private long? GetCurrentUserId()
+    {
+        var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return long.TryParse(claim, out var id) ? id : null;
+    }
+}

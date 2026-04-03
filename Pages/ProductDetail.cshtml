@@ -375,10 +375,12 @@
     <span id="toast-text">Đã thêm vào giỏ hàng!</span>
 </div>
 
+<script>window.__isAuthenticated = @(User.Identity?.IsAuthenticated == true ? "true" : "false");</script>
+<script src="/js/cart-sync.js"></script>
 <script>
-    const CART_KEY = 'ss_cart_v1';
+    const CART_KEY = CartSync.CART_KEY;
     function getCart() {
-        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; }
+        return CartSync.getCart();
     }
     function showToast(name) {
         const t = document.getElementById('toast-cart');
@@ -397,7 +399,7 @@
         const existing = cart.find(i => i.productId === id);
         if (existing) { existing.quantity += 1; }
         else { cart.push({ productId: id, productName: name, price: price, imageUrl: img, category: category, quantity: 1 }); }
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        CartSync.saveCart(cart);
         const orig = btn.innerHTML;
         btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Đã thêm!';
         btn.disabled = true;

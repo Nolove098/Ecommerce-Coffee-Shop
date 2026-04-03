@@ -17,6 +17,7 @@ namespace SaleStore.Data
         public DbSet<AppUser> AppUsers { get; set; } = null!;
         public DbSet<AuthActivity> AuthActivities { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
+        public DbSet<UserCartItem> UserCartItems { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +65,16 @@ namespace SaleStore.Data
                       .WithMany()
                       .HasForeignKey(x => x.CreatedByUserId)
                       .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<UserCartItem>(entity =>
+            {
+                entity.ToTable("user_cart_items");
+                entity.HasOne(x => x.User)
+                      .WithMany()
+                      .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(x => new { x.UserId, x.ProductId }).IsUnique();
             });
 
             modelBuilder.Entity<Review>(entity =>

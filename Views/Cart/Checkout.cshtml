@@ -198,11 +198,12 @@
     </form>
 </main>
 
+<script>window.__isAuthenticated = @(User.Identity?.IsAuthenticated == true ? "true" : "false");</script>
+<script src="/js/cart-sync.js"></script>
 <script>
-    const CART_KEY = 'ss_cart_v1';
+    const CART_KEY = CartSync.CART_KEY;
     function getCart() {
-        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
-        catch { return []; }
+        return CartSync.getCart();
     }
 
     const cart = getCart();
