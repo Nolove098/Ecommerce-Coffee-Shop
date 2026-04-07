@@ -106,9 +106,12 @@ namespace SaleStore.Data
                 CREATE INDEX IF NOT EXISTS ix_reviews_product_id
                 ON reviews (product_id);";
 
-            const string createReviewsUniqueIndex = @"
-                CREATE UNIQUE INDEX IF NOT EXISTS ix_reviews_product_user
-                ON reviews (product_id, user_id);";
+            const string dropReviewsUniqueIndex = @"
+                DROP INDEX IF EXISTS ix_reviews_product_user;";
+
+            const string createReviewsUserIndex = @"
+                CREATE INDEX IF NOT EXISTS ix_reviews_user_id
+                ON reviews (user_id);";
 
             const string createUserCartItemsTable = @"
                 CREATE TABLE IF NOT EXISTS user_cart_items (
@@ -130,7 +133,8 @@ namespace SaleStore.Data
             var allTablesSql = createUsersTable + addUsernameColumn + addRoleColumn + createUsersEmailIndex + createUsersUsernameIndex +
                                createActivitiesTable + createActivitiesIndex + addCreatedByUserIdColumn + createOrdersCreatedByIndex +
                                addOrderCustomerNameColumn + addOrderTableNumberColumn + addOrderPaymentMethodColumn + addOrderIsPaidColumn +
-                               addOrderTransactionIdColumn + createReviewsTable + createReviewsIndex + createReviewsUniqueIndex +
+                               addOrderTransactionIdColumn + createReviewsTable + createReviewsIndex +
+                               dropReviewsUniqueIndex + createReviewsUserIndex +
                                createUserCartItemsTable + createUserCartItemsIndex;
 
             await context.Database.ExecuteSqlRawAsync(allTablesSql);

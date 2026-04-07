@@ -36,6 +36,22 @@
         .floating { animation: float 3.5s ease-in-out infinite; }
         .nav-solid { background: rgba(26,14,8,0.96); backdrop-filter: blur(16px); }
         .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        /* Testimonial Carousel */
+        .testi-carousel { position: relative; }
+        .testi-viewport { overflow: hidden; }
+        .testi-track { display: flex; transition: transform .45s cubic-bezier(.4,0,.2,1); }
+        .testi-slide { flex-shrink: 0; padding: 0 .75rem; box-sizing: border-box; }
+        .testi-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); backdrop-filter: blur(8px); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .25s; }
+        .testi-btn:hover:not(:disabled) { background: var(--bs-secondary); color: #1a0e08; border-color: var(--bs-secondary); }
+        .testi-btn:disabled { opacity: .25; cursor: not-allowed; }
+        .testi-btn.prev { left: -22px; }
+        .testi-btn.next { right: -22px; }
+        .testi-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1.5rem; }
+        .testi-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.25); border: none; padding: 0; cursor: pointer; transition: all .25s; }
+        .testi-dot.active { background: var(--bs-secondary); transform: scale(1.3); }
+        @@media (max-width: 767.98px) { .testi-slide { min-width: 100%; } .testi-btn.prev { left: -8px; } .testi-btn.next { right: -8px; } }
+        @@media (min-width: 768px) and (max-width: 991.98px) { .testi-slide { min-width: 50%; } }
+        @@media (min-width: 992px) { .testi-slide { min-width: calc(100%/3); } }
     </style>
 </head>
 <body class="bg-cream overflow-x-hidden">
@@ -320,62 +336,75 @@
             <span class="text-secondary small fw-bold text-uppercase" style="letter-spacing: 0.2em;">Khách hàng nói gì</span>
             <h2 class="display-4 fw-bold text-white mt-2 serif">Phản hồi từ cộng đồng</h2>
         </div>
-        <div class="row g-4">
-            @{
-                var dbReviews = _context.Reviews
-                    .Include(r => r.User)
-                    .Include(r => r.Product)
-                    .OrderByDescending(r => r.Rating)
-                    .ThenByDescending(r => r.CreatedAt)
-                    .Take(6)
-                    .ToList();
-            }
-            @if (dbReviews.Any())
-            {
-                @foreach (var r in dbReviews)
-                {
-                    var initials = r.User?.FullName?.Length >= 2
-                        ? r.User.FullName.Substring(0, 1).ToUpper() + r.User.FullName.Split(' ').Last().Substring(0, 1).ToUpper()
-                        : "??";
-                    <div class="col-12 col-md-4">
-                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
-                            <div class="d-flex gap-1 mb-3">@for(int i=0;i<r.Rating;i++){<span class="text-secondary fs-5">★</span>}@for(int i=r.Rating;i<5;i++){<span class="text-white-50 fs-5">★</span>}</div>
-                            @if (!string.IsNullOrWhiteSpace(r.Comment))
-                            {
-                                <p class="text-white-50 small mb-3 fst-italic">"@r.Comment"</p>
-                            }
-                            <p class="text-secondary small mb-3 fw-semibold">@(r.Product?.Name ?? "Sản phẩm")</p>
-                            <div class="d-flex align-items-center gap-3 mt-auto">
-                                <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@initials</div>
-                                <div>
-                                    <p class="text-white fw-semibold small mb-0">@(r.User?.FullName ?? "Khách hàng")</p>
-                                    <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
+
+        @{
+            var dbReviews = _context.Reviews
+                .Include(r => r.User)
+                .Include(r => r.Product)
+                .OrderByDescending(r => r.Rating)
+                .ThenByDescending(r => r.CreatedAt)
+                .Take(12)
+                .ToList();
+        }
+
+        <div class="testi-carousel" id="testiCarousel">
+            <button class="testi-btn prev" id="testiPrev" disabled aria-label="Trước">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button class="testi-btn next" id="testiNext" aria-label="Tiếp">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="testi-viewport">
+                <div class="testi-track" id="testiTrack">
+                    @if (dbReviews.Any())
+                    {
+                        @foreach (var r in dbReviews)
+                        {
+                            var initials = r.User?.FullName?.Length >= 2
+                                ? r.User.FullName.Substring(0, 1).ToUpper() + r.User.FullName.Split(' ').Last().Substring(0, 1).ToUpper()
+                                : "??";
+                            <div class="testi-slide">
+                                <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
+                                    <div class="d-flex gap-1 mb-3">@for(int i=0;i<r.Rating;i++){<span class="text-secondary fs-5">★</span>}@for(int i=r.Rating;i<5;i++){<span class="text-white-50 fs-5">★</span>}</div>
+                                    @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                    {
+                                        <p class="text-white-50 small mb-3 fst-italic">"@r.Comment"</p>
+                                    }
+                                    <p class="text-secondary small mb-3 fw-semibold">@(r.Product?.Name ?? "Sản phẩm")</p>
+                                    <div class="d-flex align-items-center gap-3 mt-auto">
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@initials</div>
+                                        <div>
+                                            <p class="text-white fw-semibold small mb-0">@(r.User?.FullName ?? "Khách hàng")</p>
+                                            <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                var defaultReviews = new[]{new{name="Nguyễn Văn An",role="Khách hàng thân thiết",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà.",stars=5,avatar="NA"},new{name="Trần Thị Bích",role="Food Blogger",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB"},new{name="Lê Hữu Phúc",role="Sinh viên",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng.",stars=5,avatar="LP"}};
-                @foreach (var r in defaultReviews)
-                {
-                    <div class="col-12 col-md-4">
-                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
-                            <div class="d-flex gap-1 mb-4">@for(int i=0;i<r.stars;i++){<span class="text-secondary fs-5">★</span>}</div>
-                            <p class="text-white-50 small mb-4 fst-italic">"@r.text"</p>
-                            <div class="d-flex align-items-center gap-3 mt-auto">
-                                <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@r.avatar</div>
-                                <div>
-                                    <p class="text-white fw-semibold small mb-0">@r.name</p>
-                                    <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.role</p>
+                        }
+                    }
+                    else
+                    {
+                        var defaultReviews = new[]{new{name="Nguyễn Văn An",role="Khách hàng thân thiết",text="Caramel Macchiato ở đây ngon nhất Hà Nội mình từng uống. Hương vị thật sự khác biệt, không quá ngọt mà vẫn đậm đà.",stars=5,avatar="NA"},new{name="Trần Thị Bích",role="Food Blogger",text="Không gian xinh xắn, đồ uống ngon, giá hợp lý. Mình đã ghé đây 3 lần và lần nào cũng hài lòng!",stars=5,avatar="TB"},new{name="Lê Hữu Phúc",role="Sinh viên",text="Cà phê Espresso ở đây đánh thức cảm giác tỉnh táo hoàn toàn. Rất phù hợp với các buổi ôn bài căng thẳng.",stars=5,avatar="LP"}};
+                        @foreach (var r in defaultReviews)
+                        {
+                            <div class="testi-slide">
+                                <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 rounded-4 p-4 h-100">
+                                    <div class="d-flex gap-1 mb-4">@for(int i=0;i<r.stars;i++){<span class="text-secondary fs-5">★</span>}</div>
+                                    <p class="text-white-50 small mb-4 fst-italic">"@r.text"</p>
+                                    <div class="d-flex align-items-center gap-3 mt-auto">
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle text-dark fw-bold small shadow-lg bg-gradient-secondary" style="width: 40px; height: 40px;">@r.avatar</div>
+                                        <div>
+                                            <p class="text-white fw-semibold small mb-0">@r.name</p>
+                                            <p class="text-white-50 mb-0" style="font-size: 0.75rem;">@r.role</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                }
-            }
+                        }
+                    }
+                </div>
+            </div>
+            <div class="testi-dots" id="testiDots"></div>
         </div>
     </div>
 </section>
@@ -453,7 +482,7 @@
 
 <!-- ===== FLOATING CART BUTTON ===== -->
 <button onclick="toggleCart()" id="floatingCartBtn" aria-label="Open shopping cart"
-        class="btn btn-primary position-fixed bottom-0 end-0 rounded-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; margin-bottom: 32px; margin-right: 32px; z-index: 1040;">
+        class="btn btn-primary position-fixed bottom-0 end-0 rounded-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; margin-bottom: 100px; margin-right: 32px; z-index: 1040;">
     <div class="position-relative">
         <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5H19m-5-5v5m-4-5v5"/>
@@ -505,7 +534,7 @@
 </div>
 
 <!-- ===== TOAST ===== -->
-<div id="toast" class="position-fixed bottom-0 end-0 bg-dark text-white rounded-3 shadow-lg d-flex align-items-center gap-3 border border-secondary border-opacity-25" style="margin-bottom: 112px; margin-right: 32px; padding: 14px 20px; z-index: 1060; transform: translateX(128px); opacity: 0;">
+<div id="toast" class="position-fixed bottom-0 end-0 bg-dark text-white rounded-3 shadow-lg d-flex align-items-center gap-3 border border-secondary border-opacity-25" style="margin-bottom: 180px; margin-right: 32px; padding: 14px 20px; z-index: 1060; transform: translateX(128px); opacity: 0;">
     <div class="d-flex align-items-center justify-content-center bg-secondary rounded-xl flex-shrink-0" style="width: 28px; height: 28px;">
         <svg width="16" height="16" class="text-dark" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
     </div>
@@ -703,10 +732,81 @@
     } else {
         initCartOffcanvas();
     }
+
+    // ── Testimonial Carousel ──
+    (function() {
+        const track = document.getElementById('testiTrack');
+        if (!track) return;
+        const slides  = track.querySelectorAll('.testi-slide');
+        const total   = slides.length;
+        if (total === 0) return;
+
+        const prevBtn = document.getElementById('testiPrev');
+        const nextBtn = document.getElementById('testiNext');
+        const dotsBox = document.getElementById('testiDots');
+
+        function getPerPage() {
+            if (window.innerWidth < 768) return 1;
+            if (window.innerWidth < 992) return 2;
+            return 3;
+        }
+
+        let perPage = getPerPage();
+        let page = 0;
+
+        function maxPage() { return Math.max(0, Math.ceil(total / perPage) - 1); }
+
+        function renderDots() {
+            const count = maxPage() + 1;
+            dotsBox.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'testi-dot' + (i === page ? ' active' : '');
+                dot.setAttribute('aria-label', 'Trang ' + (i + 1));
+                dot.addEventListener('click', () => goTo(i));
+                dotsBox.appendChild(dot);
+            }
+        }
+
+        function goTo(p) {
+            page = Math.max(0, Math.min(p, maxPage()));
+            const offset = page * perPage;
+            track.style.transform = 'translateX(-' + (offset * (100 / total)) + '%)';
+            prevBtn.disabled = page === 0;
+            nextBtn.disabled = page >= maxPage();
+            dotsBox.querySelectorAll('.testi-dot').forEach((d, i) => d.classList.toggle('active', i === page));
+        }
+
+        function refresh() {
+            perPage = getPerPage();
+            slides.forEach(s => { s.style.minWidth = (100 / perPage) + '%'; });
+            if (page > maxPage()) page = maxPage();
+            renderDots();
+            goTo(page);
+        }
+
+        prevBtn.addEventListener('click', () => goTo(page - 1));
+        nextBtn.addEventListener('click', () => goTo(page + 1));
+
+        // Touch swipe
+        let startX = 0, dragging = false;
+        track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; dragging = true; }, { passive: true });
+        track.addEventListener('touchend', e => {
+            if (!dragging) return;
+            dragging = false;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) > 50) goTo(page + (diff < 0 ? 1 : -1));
+        }, { passive: true });
+
+        window.addEventListener('resize', refresh);
+        refresh();
+    })();
 </script>
 
 <!-- Bootstrap 5.3 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+@await Html.PartialAsync("_ChatBotWidget")
 
 </body>
 </html>

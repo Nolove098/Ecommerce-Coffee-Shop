@@ -55,28 +55,15 @@ namespace SaleStore.Controllers
             if (product == null)
                 return NotFound("Sản phẩm không tồn tại.");
 
-            // Check if user already reviewed this product
-            var existing = await _context.Reviews
-                .FirstOrDefaultAsync(r => r.ProductId == productId && r.UserId == user.Id);
-
-            if (existing != null)
+            // Always create a new review (allow multiple reviews per user)
+            _context.Reviews.Add(new Review
             {
-                // Update existing review
-                existing.Rating = rating;
-                existing.Comment = comment?.Trim();
-                existing.CreatedAt = DateTime.UtcNow;
-            }
-            else
-            {
-                _context.Reviews.Add(new Review
-                {
-                    ProductId = productId,
-                    UserId = user.Id,
-                    Rating = rating,
-                    Comment = comment?.Trim(),
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
+                ProductId = productId,
+                UserId = user.Id,
+                Rating = rating,
+                Comment = comment?.Trim(),
+                CreatedAt = DateTime.UtcNow
+            });
 
             await _context.SaveChangesAsync();
 

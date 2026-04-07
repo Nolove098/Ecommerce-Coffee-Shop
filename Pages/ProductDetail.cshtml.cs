@@ -21,8 +21,6 @@ public class ProductDetailModel : PageModel
     public List<Review> Reviews { get; set; } = new();
     public double AverageRating { get; set; }
     public int ReviewCount { get; set; }
-    public Review? UserReview { get; set; }
-
     [BindProperty]
     public int Rating { get; set; } = 5;
 
@@ -37,22 +35,6 @@ public class ProductDetailModel : PageModel
 
         Product = product;
         await LoadRelatedDataAsync(id);
-
-        // Load existing review for the current user
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (long.TryParse(userIdClaim, out var userId))
-            {
-                UserReview = await _context.Reviews
-                    .FirstOrDefaultAsync(r => r.ProductId == id && r.UserId == userId);
-                if (UserReview != null)
-                {
-                    Rating = UserReview.Rating;
-                    Comment = UserReview.Comment;
-                }
-            }
-        }
 
         return Page();
     }
@@ -80,26 +62,14 @@ public class ProductDetailModel : PageModel
         if (user == null)
             return Forbid();
 
-        var existing = await _context.Reviews
-            .FirstOrDefaultAsync(r => r.ProductId == id && r.UserId == userId);
-
-        if (existing != null)
+        _context.Reviews.Add(new Review
         {
-            existing.Rating = Rating;
-            existing.Comment = Comment?.Trim();
-            existing.CreatedAt = DateTime.UtcNow;
-        }
-        else
-        {
-            _context.Reviews.Add(new Review
-            {
-                ProductId = id,
-                UserId = userId,
-                Rating = Rating,
-                Comment = Comment?.Trim(),
-                CreatedAt = DateTime.UtcNow
-            });
-        }
+            ProductId = id,
+            UserId = userId,
+            Rating = Rating,
+            Comment = Comment?.Trim(),
+            CreatedAt = DateTime.UtcNow
+        });
 
         await _context.SaveChangesAsync();
         TempData["ReviewSuccess"] = "Đã gửi đánh giá thành công!";

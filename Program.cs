@@ -65,6 +65,9 @@ builder.Services.AddServerSideBlazor();
 // Payment Services
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 
+// ChatBot Service
+builder.Services.AddSingleton<IChatBotService, GeminiChatService>();
+
 // 2. Session để hỗ trợ giỏ hàng (Giữ nguyên của bạn)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

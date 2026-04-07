@@ -51,6 +51,24 @@
         .ingredient-chip { background: #F5F0EB; border-radius: 999px; padding: .35rem .85rem; font-size: .82rem; font-weight: 500; color: #3D2010; display: inline-block; border: 1px solid #e0d5ca; }
         .highlight-chip { background: rgba(255,255,255,.1); border-radius: .75rem; padding: .85rem .6rem; text-align: center; }
         .review-avatar { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        /* Review Carousel */
+        .review-carousel { position: relative; overflow: hidden; }
+        .review-track { display: flex; transition: transform .4s cubic-bezier(.4,0,.2,1); }
+        .review-slide { min-width: calc(100% / 3); padding: 0 .5rem; box-sizing: border-box; flex-shrink: 0; }
+        .review-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d5ccc3; background: #fff; color: #3D2010; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.1); transition: all .2s; }
+        .review-nav-btn:hover:not(:disabled) { background: #3D2010; color: #fff; border-color: #3D2010; }
+        .review-nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+        .review-nav-btn.prev { left: -4px; }
+        .review-nav-btn.next { right: -4px; }
+        .review-dots { display: flex; justify-content: center; gap: 6px; margin-top: .75rem; }
+        .review-dot { width: 8px; height: 8px; border-radius: 50%; background: #d5ccc3; border: none; padding: 0; cursor: pointer; transition: all .25s; }
+        .review-dot.active { background: #3D2010; transform: scale(1.25); }
+        @@media (max-width: 767.98px) {
+            .review-slide { min-width: 100%; }
+        }
+        @@media (min-width: 768px) and (max-width: 991.98px) {
+            .review-slide { min-width: 50%; }
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100" style="background:#f7f2ed;">
@@ -233,22 +251,20 @@
                                 <form method="post" asp-page="/ProductDetail" asp-route-id="@Model.Product.Id" id="reviewForm">
                                     @Html.AntiForgeryToken()
                                     <div class="mb-2">
-                                        <label class="form-label fw-semibold small">
-                                            @(Model.UserReview != null ? "Cập nhật đánh giá của bạn" : "Đánh giá của bạn")
-                                        </label>
+                                        <label class="form-label fw-semibold small">Đánh giá của bạn</label>
                                         <div id="starPicker" class="d-flex gap-1 mb-2" style="cursor:pointer; font-size:1.5rem;">
                                             @for (int i = 1; i <= 5; i++)
                                             {
                                                 <button type="button" class="star-pick btn btn-link p-0 text-decoration-none" style="color:#adb5bd; font-size:1.5rem;" data-value="@i" aria-label="@($"{i} sao")">★</button>
                                             }
                                         </div>
-                                        <input type="hidden" name="Rating" id="ratingInput" value="@Model.Rating" />
+                                        <input type="hidden" name="Rating" id="ratingInput" value="5" />
                                     </div>
                                     <div class="mb-2">
-                                        <textarea name="Comment" class="form-control" rows="2" maxlength="1000" placeholder="Viết nhận xét của bạn (không bắt buộc)...">@Model.Comment</textarea>
+                                        <textarea name="Comment" class="form-control" rows="2" maxlength="1000" placeholder="Viết nhận xét của bạn (không bắt buộc)..."></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
-                                        @(Model.UserReview != null ? "Cập nhật đánh giá" : "Gửi đánh giá")
+                                        Gửi đánh giá
                                     </button>
                                 </form>
                             </div>
@@ -262,28 +278,37 @@
 
                         @if (Model.Reviews.Any())
                         {
-                            <div class="row g-3">
-                                @foreach (var r in Model.Reviews)
-                                {
-                                    var initial = r.User?.FullName?.Substring(0, 1).ToUpper() ?? "?";
-                                    var starHtml = string.Concat(Enumerable.Repeat("★", r.Rating)) + string.Concat(Enumerable.Repeat("☆", 5 - r.Rating));
-                                    <div class="col-md-4">
-                                        <div class="bg-light rounded-3 p-3 h-100">
-                                            <div class="d-flex align-items-center gap-3 mb-2">
-                                                <div class="review-avatar bg-primary text-white">@initial</div>
-                                                <div>
-                                                    <div class="fw-semibold small">@(r.User?.FullName ?? "Khách hàng")</div>
-                                                    <div class="star small">@starHtml</div>
+                            <div class="review-carousel" id="reviewCarousel">
+                                <button class="review-nav-btn prev" id="reviewPrev" disabled aria-label="Trước">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                                </button>
+                                <button class="review-nav-btn next" id="reviewNext" aria-label="Tiếp">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                </button>
+                                <div class="review-track" id="reviewTrack">
+                                    @foreach (var r in Model.Reviews)
+                                    {
+                                        var initial = r.User?.FullName?.Substring(0, 1).ToUpper() ?? "?";
+                                        var starHtml = string.Concat(Enumerable.Repeat("★", r.Rating)) + string.Concat(Enumerable.Repeat("☆", 5 - r.Rating));
+                                        <div class="review-slide">
+                                            <div class="bg-light rounded-3 p-3 h-100">
+                                                <div class="d-flex align-items-center gap-3 mb-2">
+                                                    <div class="review-avatar bg-primary text-white">@initial</div>
+                                                    <div>
+                                                        <div class="fw-semibold small">@(r.User?.FullName ?? "Khách hàng")</div>
+                                                        <div class="star small">@starHtml</div>
+                                                    </div>
                                                 </div>
+                                                @if (!string.IsNullOrWhiteSpace(r.Comment))
+                                                {
+                                                    <p class="text-muted small mb-1">"@r.Comment"</p>
+                                                }
+                                                <p class="text-muted mb-0" style="font-size:0.7rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
                                             </div>
-                                            @if (!string.IsNullOrWhiteSpace(r.Comment))
-                                            {
-                                                <p class="text-muted small mb-1">"@r.Comment"</p>
-                                            }
-                                            <p class="text-muted mb-0" style="font-size:0.7rem;">@r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")</p>
                                         </div>
-                                    </div>
-                                }
+                                    }
+                                </div>
+                                <div class="review-dots" id="reviewDots"></div>
                             </div>
                         }
                         else
@@ -418,11 +443,80 @@
     }
     document.addEventListener('DOMContentLoaded', () => {
         const ratingInput = document.getElementById('ratingInput');
-        if (!ratingInput) return;
-        document.querySelectorAll('.star-pick').forEach(s => {
-            s.addEventListener('click', () => pickStar(parseInt(s.dataset.value)));
-        });
-        pickStar(parseInt(ratingInput.value) || 5);
+        if (ratingInput) {
+            document.querySelectorAll('.star-pick').forEach(s => {
+                s.addEventListener('click', () => pickStar(parseInt(s.dataset.value)));
+            });
+            pickStar(parseInt(ratingInput.value) || 5);
+        }
+
+        // ── Review Carousel ──
+        const track = document.getElementById('reviewTrack');
+        if (!track) return;
+        const slides = track.querySelectorAll('.review-slide');
+        const total  = slides.length;
+        if (total === 0) return;
+
+        const prevBtn = document.getElementById('reviewPrev');
+        const nextBtn = document.getElementById('reviewNext');
+        const dotsBox = document.getElementById('reviewDots');
+
+        function getPerPage() {
+            if (window.innerWidth < 768) return 1;
+            if (window.innerWidth < 992) return 2;
+            return 3;
+        }
+
+        let perPage = getPerPage();
+        let page = 0;
+
+        function maxPage() { return Math.max(0, Math.ceil(total / perPage) - 1); }
+
+        function renderDots() {
+            const count = maxPage() + 1;
+            dotsBox.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'review-dot' + (i === page ? ' active' : '');
+                dot.setAttribute('aria-label', 'Trang ' + (i + 1));
+                dot.addEventListener('click', () => goTo(i));
+                dotsBox.appendChild(dot);
+            }
+        }
+
+        function goTo(p) {
+            page = Math.max(0, Math.min(p, maxPage()));
+            track.style.transform = 'translateX(-' + (page * 100) + '%)';
+            prevBtn.disabled = page === 0;
+            nextBtn.disabled = page >= maxPage();
+            dotsBox.querySelectorAll('.review-dot').forEach((d, i) => d.classList.toggle('active', i === page));
+        }
+
+        function refresh() {
+            perPage = getPerPage();
+            slides.forEach(s => {
+                s.style.minWidth = (100 / perPage) + '%';
+            });
+            if (page > maxPage()) page = maxPage();
+            renderDots();
+            goTo(page);
+        }
+
+        prevBtn.addEventListener('click', () => goTo(page - 1));
+        nextBtn.addEventListener('click', () => goTo(page + 1));
+
+        // Touch swipe support
+        let startX = 0, dragging = false;
+        track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; dragging = true; }, { passive: true });
+        track.addEventListener('touchend', e => {
+            if (!dragging) return;
+            dragging = false;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) > 50) goTo(page + (diff < 0 ? 1 : -1));
+        }, { passive: true });
+
+        window.addEventListener('resize', refresh);
+        refresh();
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
