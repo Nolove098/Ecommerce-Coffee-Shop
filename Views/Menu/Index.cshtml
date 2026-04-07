@@ -64,8 +64,30 @@
 
     <!-- Search -->
     <div class="row justify-content-center mb-4">
-        <div class="col-12 col-md-6 col-lg-4">
-            <input type="text" id="menuSearch" class="form-control rounded-xl border" placeholder="Tìm kiếm thức uống..." oninput="filterMenu(this.value)">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="position-relative">
+                <input type="text" id="menuSearch" class="form-control rounded-xl border pe-5" placeholder="Tìm kiếm thức uống..." oninput="filterMenu(this.value)">
+            </div>
+            <!-- AI Smart Search -->
+            <div class="mt-2 text-center">
+                <div class="input-group">
+                    <input type="text" id="aiSearchInput" class="form-control rounded-start-xl border" placeholder="🤖 Tìm bằng AI: vd. &quot;đồ uống ngọt lạnh cho ngày nóng&quot;" maxlength="200">
+                    <button onclick="aiSmartSearch()" id="aiSearchBtn" class="btn btn-primary rounded-end-xl px-3 fw-semibold" style="white-space:nowrap;">
+                        <svg class="me-1" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>AI Search
+                    </button>
+                </div>
+                <div id="aiSearchLoading" class="d-none mt-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <span class="text-muted small ms-2">AI đang tìm kiếm...</span>
+                </div>
+                <div id="aiSearchResult" class="d-none mt-3 text-start">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <small class="fw-semibold text-primary">🤖 Kết quả AI:</small>
+                        <button onclick="clearAiSearch()" class="btn btn-sm btn-outline-secondary rounded-pill">Xóa</button>
+                    </div>
+                    <div id="aiSearchCards" class="row g-3"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -140,6 +162,66 @@
             card.style.display = (!q || card.dataset.name.includes(q)) ? '' : 'none';
         });
     }
+
+    async function aiSmartSearch() {
+        const input = document.getElementById('aiSearchInput');
+        const query = input.value.trim();
+        if (!query) return;
+
+        const btn = document.getElementById('aiSearchBtn');
+        const loading = document.getElementById('aiSearchLoading');
+        const result = document.getElementById('aiSearchResult');
+        const cards = document.getElementById('aiSearchCards');
+
+        btn.disabled = true;
+        loading.classList.remove('d-none');
+        result.classList.add('d-none');
+
+        try {
+            const res = await fetch('/api/Ai/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const data = await res.json();
+            loading.classList.add('d-none');
+
+            if (data.results && data.results.length > 0) {
+                cards.innerHTML = data.results.map(r => `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="/san-pham/${r.id}" class="text-decoration-none">
+                            <div class="card h-100 border rounded-3 shadow-sm p-3 menu-card text-center">
+                                <div class="fs-2 mb-1">☕</div>
+                                <h6 class="fw-bold text-dark serif mb-1" style="font-size:0.85rem">${r.name}</h6>
+                                <span class="badge bg-cream text-primary rounded-pill mb-1" style="font-size:0.7rem">${r.category}</span>
+                                <p class="text-primary fw-bold small mb-1">${Number(r.price).toLocaleString()} ₫</p>
+                                <p class="text-muted mb-0" style="font-size:0.7rem">${r.relevance || ''}</p>
+                            </div>
+                        </a>
+                    </div>
+                `).join('');
+                result.classList.remove('d-none');
+            } else {
+                const debugMsg = data.debug ? `<br><small class="text-danger">${data.debug}</small>` : '';
+                cards.innerHTML = `<div class="col-12 text-center text-muted small">Không tìm thấy sản phẩm phù hợp.${debugMsg}</div>`;
+                result.classList.remove('d-none');
+            }
+        } catch {
+            loading.classList.add('d-none');
+            cards.innerHTML = '<div class="col-12 text-center text-danger small">Có lỗi. Vui lòng thử lại.</div>';
+            result.classList.remove('d-none');
+        }
+        btn.disabled = false;
+    }
+
+    function clearAiSearch() {
+        document.getElementById('aiSearchResult').classList.add('d-none');
+        document.getElementById('aiSearchInput').value = '';
+    }
+
+    document.getElementById('aiSearchInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); aiSmartSearch(); }
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>

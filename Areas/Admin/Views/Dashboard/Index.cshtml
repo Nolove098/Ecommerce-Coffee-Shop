@@ -98,6 +98,37 @@
     </div>
 </div>
 
+<!-- ===== AI Business Insights ===== -->
+<div class="card shadow-sm mt-4">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center justify-content-center rounded-3 bg-primary bg-opacity-10" style="width: 2.5rem; height: 2.5rem;">
+                    <svg class="text-primary" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">AI Phân tích kinh doanh</h5>
+                    <small id="aiInsightsTime" class="text-muted-custom"></small>
+                </div>
+            </div>
+            <button onclick="loadAiInsights()" id="aiInsightsBtn" class="btn btn-primary btn-sm rounded-pill px-3">
+                <svg class="me-1" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Phân tích
+            </button>
+        </div>
+        <div id="aiInsightsLoading" class="d-none text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted-custom mt-2 mb-0 small">AI đang phân tích dữ liệu kinh doanh...</p>
+        </div>
+        <div id="aiInsightsContent" class="d-none">
+            <div id="aiInsightsText" class="p-3 bg-cream rounded-3" style="white-space: pre-wrap; line-height: 1.7;"></div>
+        </div>
+        <div id="aiInsightsEmpty" class="text-center text-muted-custom py-3">
+            <p class="mb-0 small">Nhấn <strong>Phân tích</strong> để AI đưa ra nhận xét về tình hình kinh doanh</p>
+        </div>
+    </div>
+</div>
+
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
@@ -172,5 +203,39 @@
     });
 
     orderConnection.start().then(() => orderConnection.invoke('JoinAdminDashboard'));
+
+    // AI Insights
+    async function loadAiInsights() {
+        const btn = document.getElementById('aiInsightsBtn');
+        const loading = document.getElementById('aiInsightsLoading');
+        const content = document.getElementById('aiInsightsContent');
+        const text = document.getElementById('aiInsightsText');
+        const empty = document.getElementById('aiInsightsEmpty');
+        const time = document.getElementById('aiInsightsTime');
+
+        btn.disabled = true;
+        empty.classList.add('d-none');
+        content.classList.add('d-none');
+        loading.classList.remove('d-none');
+
+        try {
+            const res = await fetch('/api/Ai/admin/insights');
+            const data = await res.json();
+            loading.classList.add('d-none');
+
+            if (data.insights) {
+                text.textContent = data.insights;
+                time.textContent = 'Cập nhật: ' + data.updatedAt;
+                content.classList.remove('d-none');
+            } else {
+                empty.classList.remove('d-none');
+            }
+        } catch {
+            loading.classList.add('d-none');
+            text.textContent = 'Không thể tải phân tích. Vui lòng thử lại.';
+            content.classList.remove('d-none');
+        }
+        btn.disabled = false;
+    }
 </script>
 }

@@ -8,6 +8,7 @@ namespace SaleStore.Services;
 public interface IChatBotService
 {
     Task<string> GetResponseAsync(List<ChatMessage> history);
+    Task<string> GenerateAsync(string systemPrompt, string userMessage);
 }
 
 public class ChatMessage
@@ -117,6 +118,59 @@ THÔNG TIN CỬA HÀNG:
         {
             _logger.LogError(ex, "Chatbot error");
             return "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.";
+        }
+    }
+
+    public async Task<string> GenerateAsync(string systemPrompt, string userMessage)
+    {
+        if (string.IsNullOrEmpty(_apiKey))
+            return "";
+
+        try
+        {
+            var contents = new List<object>
+            {
+                new { role = "user", parts = new[] { new { text = systemPrompt } } },
+                new { role = "model", parts = new[] { new { text = "Tôi hiểu." } } },
+                new { role = "user", parts = new[] { new { text = userMessage } } }
+            };
+
+            var body = new
+            {
+                contents,
+                generationConfig = new { temperature = 0.7, maxOutputTokens = 500, topP = 0.9 }
+            };
+
+            var json = JsonConvert.SerializeObject(body);
+            var request = new HttpRequestMessage(HttpMethod.Post,
+                $"https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key={_apiKey}");
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _http.SendAsync(request);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Gemini GenerateAsync error {StatusCode}: {Body}", (int)response.StatusCode, responseBody);
+                try
+                {
+                    var errObj = JObject.Parse(responseBody);
+                    var errMsg = errObj["error"]?["message"]?.ToString() ?? responseBody;
+                    return $"[ERROR:{(int)response.StatusCode}] {errMsg}";
+                }
+                catch
+                {
+                    return $"[ERROR:{(int)response.StatusCode}] {responseBody}";
+                }
+            }
+
+            var result = JObject.Parse(responseBody);
+            return result["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.ToString() ?? "";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GenerateAsync error");
+            return "";
         }
     }
 }
