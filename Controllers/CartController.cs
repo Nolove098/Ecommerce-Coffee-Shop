@@ -91,10 +91,15 @@ public class CartController : Controller
             await _context.SaveChangesAsync();
         }
 
+        // Lấy UserId của người đang đăng nhập
+        var currentEmail = User.FindFirstValue(ClaimTypes.Email);
+        var currentUser = await _context.AppUsers.FirstOrDefaultAsync(u => u.Email == currentEmail);
+
         // 3. Xây dựng Đơn hàng (Lưu vào bảng orders)
         var order = new Order
         {
             CustomerId = customer.Id, // Gắn ID khách hàng vào đơn
+            CreatedByUserId = currentUser?.Id, // Gắn ID tài khoản người đặt
             CustomerName = inputCustomerName,
             ShippingAddress = model.Address,
             Note = model.Note,

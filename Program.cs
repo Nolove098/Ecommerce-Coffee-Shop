@@ -68,6 +68,10 @@ builder.Services.AddScoped<IVnPayService, VnPayService>();
 // ChatBot Service
 builder.Services.AddSingleton<IChatBotService, GeminiChatService>();
 
+// ML.NET Services
+builder.Services.AddSingleton<SalesForecastService>();
+builder.Services.AddSingleton<ProductRecommendService>();
+
 // 2. Session để hỗ trợ giỏ hàng (Giữ nguyên của bạn)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -84,6 +88,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
     await AuthDbInitializer.EnsureCreatedAsync(dbContext, passwordHasher);
+    await MlDataSeeder.SeedAsync(dbContext);
 }
 
 app.UseRequestLogging();

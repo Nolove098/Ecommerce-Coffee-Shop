@@ -100,6 +100,48 @@
 
 <!-- ===== AI Business Insights ===== -->
 <div class="card shadow-sm mt-4">
+
+<!-- ===== ML Sales Forecast ===== -->
+<div class="card shadow-sm mt-4">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center justify-content-center rounded-3 bg-success bg-opacity-10" style="width: 2.5rem; height: 2.5rem;">
+                    <svg class="text-success" style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">ML Dự đoán doanh thu</h5>
+                    <small class="text-muted-custom">Dùng ML.NET (SSA Time Series) để dự đoán</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <select id="forecastDays" class="form-select form-select-sm rounded-pill" style="width: auto;">
+                    <option value="7" selected>7 ngày</option>
+                    <option value="14">14 ngày</option>
+                    <option value="30">30 ngày</option>
+                </select>
+                <button onclick="loadForecast()" id="forecastBtn" class="btn btn-success btn-sm rounded-pill px-3">
+                    <svg class="me-1" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Dự đoán
+                </button>
+            </div>
+        </div>
+        <div id="forecastLoading" class="d-none text-center py-4">
+            <div class="spinner-border text-success" role="status"></div>
+            <p class="text-muted-custom mt-2 mb-0 small">ML đang phân tích và dự đoán...</p>
+        </div>
+        <div id="forecastError" class="d-none alert alert-warning small mb-0"></div>
+        <div id="forecastChart" class="d-none">
+            <canvas id="mlForecastCanvas" height="280"></canvas>
+        </div>
+        <div id="forecastEmpty" class="text-center text-muted-custom py-3">
+            <p class="mb-0 small">Nhấn <strong>Dự đoán</strong> để ML.NET dự đoán doanh thu tương lai dựa trên dữ liệu lịch sử</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== AI Business Insights (existing) ===== -->
+<div class="card shadow-sm mt-4">
     <div class="card-body p-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div class="d-flex align-items-center gap-2">
@@ -203,6 +245,136 @@
     });
 
     orderConnection.start().then(() => orderConnection.invoke('JoinAdminDashboard'));
+
+    // ── ML Sales Forecast ──
+    let forecastChartInstance = null;
+    async function loadForecast() {
+        const btn = document.getElementById('forecastBtn');
+        const loading = document.getElementById('forecastLoading');
+        const chartDiv = document.getElementById('forecastChart');
+        const empty = document.getElementById('forecastEmpty');
+        const errorDiv = document.getElementById('forecastError');
+        const days = document.getElementById('forecastDays').value;
+
+        btn.disabled = true;
+        empty.classList.add('d-none');
+        chartDiv.classList.add('d-none');
+        errorDiv.classList.add('d-none');
+        loading.classList.remove('d-none');
+
+        try {
+            const res = await fetch('/api/Ai/admin/forecast?days=' + days);
+            const data = await res.json();
+            loading.classList.add('d-none');
+
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.classList.remove('d-none');
+                btn.disabled = false;
+                return;
+            }
+
+            const histLabels = data.historical.map(h => h.date.substring(5));
+            const histValues = data.historical.map(h => h.revenue);
+            const fcLabels = data.forecast.map(f => f.date.substring(5));
+            const fcValues = data.forecast.map(f => f.revenue);
+            const fcLower = data.forecast.map(f => f.lowerBound);
+            const fcUpper = data.forecast.map(f => f.upperBound);
+
+            const allLabels = [...histLabels, ...fcLabels];
+            const historicalLine = [...histValues, ...new Array(fcValues.length).fill(null)];
+            const forecastLine = [...new Array(histValues.length).fill(null)];
+            forecastLine[histValues.length - 1] = histValues[histValues.length - 1];
+            fcValues.forEach(v => forecastLine.push(v));
+
+            const lowerLine = [...new Array(histValues.length).fill(null)];
+            lowerLine[histValues.length - 1] = histValues[histValues.length - 1];
+            fcLower.forEach(v => lowerLine.push(v));
+
+            const upperLine = [...new Array(histValues.length).fill(null)];
+            upperLine[histValues.length - 1] = histValues[histValues.length - 1];
+            fcUpper.forEach(v => upperLine.push(v));
+
+            if (forecastChartInstance) forecastChartInstance.destroy();
+
+            const ctx = document.getElementById('mlForecastCanvas').getContext('2d');
+            forecastChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allLabels,
+                    datasets: [
+                        {
+                            label: 'Doanh thu thực tế',
+                            data: historicalLine,
+                            borderColor: '#6366F1',
+                            backgroundColor: 'rgba(99,102,241,0.08)',
+                            borderWidth: 2.5,
+                            fill: false,
+                            tension: 0.3,
+                            pointRadius: 2,
+                            pointHoverRadius: 5,
+                        },
+                        {
+                            label: 'Dự đoán ML',
+                            data: forecastLine,
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16,185,129,0.08)',
+                            borderWidth: 2.5,
+                            borderDash: [6, 3],
+                            fill: false,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#10B981',
+                            pointHoverRadius: 6,
+                        },
+                        {
+                            label: 'Khoảng tin cậy (trên)',
+                            data: upperLine,
+                            borderColor: 'rgba(16,185,129,0.2)',
+                            backgroundColor: 'rgba(16,185,129,0.08)',
+                            borderWidth: 1,
+                            borderDash: [3, 3],
+                            fill: '+1',
+                            tension: 0.3,
+                            pointRadius: 0,
+                        },
+                        {
+                            label: 'Khoảng tin cậy (dưới)',
+                            data: lowerLine,
+                            borderColor: 'rgba(16,185,129,0.2)',
+                            backgroundColor: 'rgba(16,185,129,0.08)',
+                            borderWidth: 1,
+                            borderDash: [3, 3],
+                            fill: false,
+                            tension: 0.3,
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 11 } } },
+                        tooltip: {
+                            backgroundColor: 'white', borderColor: '#e5e7eb', borderWidth: 1,
+                            titleColor: '#111', bodyColor: '#333', padding: 12, displayColors: true,
+                            callbacks: { label: c => c.dataset.label + ': ' + (c.parsed.y !== null ? c.parsed.y.toLocaleString() + ' ₫' : '') }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 11 }, callback: v => v.toLocaleString() + ' ₫' } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45 } }
+                    }
+                }
+            });
+            chartDiv.classList.remove('d-none');
+        } catch (ex) {
+            loading.classList.add('d-none');
+            errorDiv.textContent = 'Không thể tải dự đoán. Vui lòng thử lại.';
+            errorDiv.classList.remove('d-none');
+        }
+        btn.disabled = false;
+    }
 
     // AI Insights
     async function loadAiInsights() {

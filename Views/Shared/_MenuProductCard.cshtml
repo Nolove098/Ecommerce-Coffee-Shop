@@ -1,0 +1,34 @@
+@model SaleStore.Models.Product
+
+<div class="col product-card" data-cat="@Model.Category">
+    <div class="card h-100 border rounded-4 overflow-hidden shadow-sm position-relative" style="cursor:pointer; transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+        <div class="position-relative bg-light-brown" style="height: 208px;">
+            @if(!string.IsNullOrEmpty(Model.ImageUrl)){
+                <img src="@Model.ImageUrl" alt="@Model.Name" class="w-100 h-100 object-fit-cover" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'w-100 h-100 d-flex align-items-center justify-content-center display-3\'>☕</div>'"/>
+            }else{
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center display-3">☕</div>
+            }
+            <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary rounded-pill small fw-bold">@Model.Category</span>
+            @if(Model.Stock < 20){ <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-white rounded-pill small fw-bold">Sắp hết</span> }
+        </div>
+        <div class="card-body">
+            <h3 class="card-title fw-bold small mb-1 serif">
+                <a href="/san-pham/@Model.Id" class="text-decoration-none text-dark stretched-link">@Model.Name</a>
+            </h3>
+            @if(!string.IsNullOrEmpty(Model.Description)){
+                <p class="card-text text-muted line-clamp-2 mb-3" style="font-size: 0.75rem;">@Model.Description</p>
+            }else{ <div class="mb-3"></div> }
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-primary fw-bold fs-5">@Model.Price.ToString("N0")</span>
+                    <span class="text-muted-custom small">₫</span>
+                </div>
+                <button onclick="event.stopPropagation();event.preventDefault();addToCart(@Model.Id,'@Model.Name.Replace("'","\\'")',@Model.Price,'@(Model.ImageUrl ?? "")','@Model.Category')"
+                        class="btn btn-primary btn-sm rounded-xl d-flex align-items-center gap-1 fw-semibold shadow-sm position-relative" style="z-index:2;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    Thêm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,27 +26,16 @@ public class OrderController : Controller
         if (string.IsNullOrEmpty(email))
             return RedirectToAction("Login", "Auth");
 
-        // Tìm customer theo email → phone match qua AppUser
         var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null)
             return RedirectToAction("Index", "Home");
 
-        // Tìm customer bằng phone hoặc tên
-        var phone = user.Phone;
-        var orders = new List<Order>();
-
-        if (!string.IsNullOrWhiteSpace(phone))
-        {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == phone);
-            if (customer != null)
-            {
-                orders = await _context.Orders
-                    .Include(o => o.OrderItems)
-                    .Where(o => o.CustomerId == customer.Id)
-                    .OrderByDescending(o => o.CreatedAt)
-                    .ToListAsync();
-            }
-        }
+        // Lấy đơn hàng theo CreatedByUserId (tách riêng theo tài khoản)
+        var orders = await _context.Orders
+            .Include(o => o.OrderItems)
+            .Where(o => o.CreatedByUserId == user.Id)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
 
         return View(orders);
     }
@@ -64,18 +53,11 @@ public class OrderController : Controller
         if (user == null)
             return RedirectToAction("Index", "Home");
 
-        var phone = user.Phone;
-        if (string.IsNullOrWhiteSpace(phone))
-            return NotFound();
-
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == phone);
-        if (customer == null)
-            return NotFound();
-
+        // Chỉ cho xem đơn hàng của chính tài khoản đang đăng nhập
         var order = await _context.Orders
             .Include(o => o.Customer)
             .Include(o => o.OrderItems)
-            .FirstOrDefaultAsync(o => o.Id == id && o.CustomerId == customer.Id);
+            .FirstOrDefaultAsync(o => o.Id == id && o.CreatedByUserId == user.Id);
 
         if (order == null)
             return NotFound();

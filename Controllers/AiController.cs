@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SaleStore.Data;
 using SaleStore.Services;
+using System.Security.Claims;
 
 namespace SaleStore.Controllers;
 
@@ -11,11 +12,16 @@ public class AiController : ControllerBase
 {
     private readonly IChatBotService _ai;
     private readonly ApplicationDbContext _context;
+    private readonly SalesForecastService _forecast;
+    private readonly ProductRecommendService _recommend;
 
-    public AiController(IChatBotService ai, ApplicationDbContext context)
+    public AiController(IChatBotService ai, ApplicationDbContext context,
+        SalesForecastService forecast, ProductRecommendService recommend)
     {
         _ai = ai;
         _context = context;
+        _forecast = forecast;
+        _recommend = recommend;
     }
 
     /// <summary>
@@ -218,6 +224,68 @@ QUY TẮC:
         var reply = await _ai.GenerateAsync(systemPrompt, dataForAI);
 
         return Ok(new { insights = string.IsNullOrEmpty(reply) ? "AI không trả về kết quả." : reply, updatedAt = now.ToString("HH:mm dd/MM/yyyy") });
+    }
+
+    /// <summary>
+    /// ML.NET Dự đoán doanh thu (Sales Forecasting)
+    /// </summary>
+    [HttpGet("admin/forecast")]
+    public async Task<IActionResult> SalesForecast([FromQuery] int days = 7)
+    {
+        if (days < 1 || days > 30) days = 7;
+        var result = await _forecast.ForecastAsync(days);
+
+        return Ok(new
+        {
+            historical = result.Historical.Select(h => new { date = h.Date.ToString("yyyy-MM-dd"), revenue = h.Revenue }),
+            forecast = result.Forecast.Select(f => new { date = f.Date.ToString("yyyy-MM-dd"), revenue = Math.Round(f.Revenue), lowerBound = Math.Round(f.LowerBound), upperBound = Math.Round(f.UpperBound) }),
+            error = result.Error
+        });
+    }
+
+    /// <summary>
+    /// ML.NET Gợi ý sản phẩm theo lịch sử mua (Product Recommendation)
+    /// </summary>
+    [HttpGet("recommend/ml")]
+    public async Task<IActionResult> MlRecommend([FromQuery] long? productId)
+    {
+        long customerId = 0;
+        bool hasHistory = false;
+
+        // Map AppUser → Customer
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (!string.IsNullOrEmpty(email))
+        {
+            var appUser = await _context.AppUsers.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+            if (appUser != null && !string.IsNullOrEmpty(appUser.Phone))
+            {
+                var customer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Phone == appUser.Phone);
+                if (customer != null)
+                {
+                    customerId = customer.Id;
+                    // Kiểm tra user thật sự có lịch sử mua hàng
+                    hasHistory = await _context.Orders.AsNoTracking()
+                        .AnyAsync(o => o.CustomerId == customerId && o.Status == Models.OrderStatus.Delivered);
+                }
+            }
+        }
+
+        var recommendations = await _recommend.GetRecommendationsAsync(
+            hasHistory ? customerId : 0, productId, 4);
+
+        return Ok(new
+        {
+            recommendations = recommendations.Select(r => new
+            {
+                r.ProductId,
+                r.Name,
+                r.Category,
+                r.Price,
+                r.ImageUrl,
+                r.Score
+            }),
+            isPersonalized = hasHistory
+        });
     }
 }
 
