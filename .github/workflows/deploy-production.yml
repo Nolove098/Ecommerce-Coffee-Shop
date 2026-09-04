@@ -1,0 +1,99 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: railway-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Release build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ./SaleStore.csproj
+
+      - name: Build
+        run: dotnet build ./SaleStore.csproj --configuration Release --no-restore
+
+      - name: Run safe tests
+        run: dotnet test ./SaleStore.csproj --configuration Release --no-build
+
+  deploy:
+    name: Railway production
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+      BootstrapAdmin__Username: ${{ secrets.BOOTSTRAP_ADMIN_USERNAME }}
+      BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+      BootstrapStaff__Username: ${{ secrets.BOOTSTRAP_STAFF_USERNAME }}
+      BootstrapStaff__Password: ${{ secrets.BOOTSTRAP_STAFF_PASSWORD }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli@5.49.1
+
+      - name: Deploy existing Railway service
+        run: >-
+          railway up --ci
+          --project "${{ vars.RAILWAY_PROJECT_ID }}"
+          --environment production
+          --service "${{ vars.RAILWAY_SERVICE_ID }}"
+
+      - name: Verify production health
+        shell: bash
+        run: |
+          test -n "$PRODUCTION_URL"
+          health_url="${PRODUCTION_URL%/}/health"
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error --max-time 15 "$health_url" > /dev/null; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 12 ]; then
+              sleep 10
+            fi
+          done
+          exit 1
+
+      - name: Install Playwright dependencies
+        if: ${{ env.BootstrapAdmin__Username != '' && env.BootstrapAdmin__Password != '' && env.BootstrapStaff__Username != '' && env.BootstrapStaff__Password != '' }}
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run five critical production tests
+        if: ${{ env.BootstrapAdmin__Username != '' && env.BootstrapAdmin__Password != '' && env.BootstrapStaff__Username != '' && env.BootstrapStaff__Password != '' }}
+        run: npm run test:critical
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ vars.PRODUCTION_URL }}
