@@ -45,6 +45,8 @@ jobs:
     environment: production
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+      RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
       PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
       BootstrapAdmin__Username: ${{ secrets.BOOTSTRAP_ADMIN_USERNAME }}
       BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
@@ -64,18 +66,18 @@ jobs:
       - name: Install Railway CLI
         run: npm install --global @railway/cli@5.49.1
 
-      - name: Link existing Railway service
-        run: >-
-          railway link
-          --project "${{ vars.RAILWAY_PROJECT_ID }}"
-          --environment production
-          --service "${{ vars.RAILWAY_SERVICE_ID }}"
+      - name: Verify scoped Railway target
+        shell: bash
+        run: |
+          target="$(railway status --json)"
+          jq --exit-status \
+            --arg project "$RAILWAY_PROJECT_ID" \
+            --arg service "$RAILWAY_SERVICE_ID" \
+            '.id == $project and any(.services.edges[]; .node.id == $service)' \
+            <<< "$target" > /dev/null
 
       - name: Deploy existing Railway service
-        run: >-
-          railway up --ci
-          --environment production
-          --service "${{ vars.RAILWAY_SERVICE_ID }}"
+        run: railway up --ci --service "$RAILWAY_SERVICE_ID"
 
       - name: Verify production health
         shell: bash
