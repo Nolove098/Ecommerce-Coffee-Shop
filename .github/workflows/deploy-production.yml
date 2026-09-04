@@ -66,18 +66,8 @@ jobs:
       - name: Install Railway CLI
         run: npm install --global @railway/cli@5.49.1
 
-      - name: Verify scoped Railway target
-        shell: bash
-        run: |
-          target="$(railway status --json)"
-          jq --exit-status \
-            --arg project "$RAILWAY_PROJECT_ID" \
-            --arg service "$RAILWAY_SERVICE_ID" \
-            '.id == $project and any(.services.edges[]; .node.id == $service)' \
-            <<< "$target" > /dev/null
-
       - name: Deploy existing Railway service
-        run: railway up --ci --service "$RAILWAY_SERVICE_ID"
+        run: railway up --ci --environment production
 
       - name: Verify production health
         shell: bash
