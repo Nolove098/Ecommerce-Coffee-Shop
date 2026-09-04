@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SaleStore.Data;
 using SaleStore.Services;
@@ -165,6 +166,7 @@ QUY TẮC:
     /// AI Phân tích doanh thu cho Admin
     /// </summary>
     [HttpGet("admin/insights")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AdminInsights()
     {
         // Collect data
@@ -230,6 +232,7 @@ QUY TẮC:
     /// ML.NET Dự đoán doanh thu (Sales Forecasting)
     /// </summary>
     [HttpGet("admin/forecast")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> SalesForecast([FromQuery] int days = 7)
     {
         if (days < 1 || days > 30) days = 7;

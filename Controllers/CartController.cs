@@ -229,7 +229,7 @@ public class CartController : Controller
         var items = await _context.UserCartItems
             .Where(c => c.UserId == userId.Value)
             .Select(c => new {
-                productId = (int)c.ProductId,
+                productId = c.ProductId,
                 productName = c.ProductName,
                 price = c.Price,
                 quantity = c.Quantity,

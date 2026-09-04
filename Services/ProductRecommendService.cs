@@ -152,7 +152,7 @@ public class ProductRecommendService
             var scored = new List<RecommendedProduct>();
             foreach (var product in products)
             {
-                if (product.Id == currentProductId) continue;
+                if (product.Id == currentProductId || boughtProductIds.Contains(product.Id)) continue;
 
                 var prediction = engine.Predict(new ProductRating
                 {
@@ -208,7 +208,8 @@ public class ProductRecommendService
         // Fallback: best-selling products
         var topProducts = await context.OrderItems
             .AsNoTracking()
-            .Where(oi => !excludeAll.Contains(oi.ProductId))
+            .Where(oi => oi.Order.Status == Models.OrderStatus.Delivered &&
+                         !excludeAll.Contains(oi.ProductId))
             .GroupBy(oi => oi.ProductId)
             .Select(g => new { ProductId = g.Key, TotalQty = g.Sum(x => x.Quantity) })
             .OrderByDescending(x => x.TotalQty)

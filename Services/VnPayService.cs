@@ -20,10 +20,10 @@ public class VnPayService : IVnPayService
 
     public string CreatePaymentUrl(HttpContext context, Order order)
     {
-        var vnp_TmnCode = _config["VNPAY:TmnCode"];
-        var vnp_HashSecret = _config["VNPAY:HashSecret"];
-        var vnp_Url = _config["VNPAY:BaseUrl"];
-        var vnp_Returnurl = _config["VNPAY:ReturnUrl"];
+        var vnp_TmnCode = RequireConfiguration("VNPAY:TmnCode");
+        var vnp_HashSecret = RequireConfiguration("VNPAY:HashSecret");
+        var vnp_Url = RequireConfiguration("VNPAY:BaseUrl");
+        var vnp_Returnurl = RequireConfiguration("VNPAY:ReturnUrl");
 
         VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -63,7 +63,7 @@ public class VnPayService : IVnPayService
         var vnp_AmountRaw = vnpay.GetResponseData("vnp_Amount");
         var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
 
-        bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _config["VNPAY:HashSecret"]);
+        bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, RequireConfiguration("VNPAY:HashSecret"));
         
         decimal amount = 0;
         if (decimal.TryParse(vnp_AmountRaw, out var amt)) amount = amt / 100;
@@ -78,6 +78,15 @@ public class VnPayService : IVnPayService
             TransactionStatus = vnp_TransactionStatus,
             Amount = amount
         };
+    }
+
+    private string RequireConfiguration(string key)
+    {
+        var value = _config[key];
+        if (string.IsNullOrWhiteSpace(value))
+            throw new InvalidOperationException($"Missing required payment configuration: {key}");
+
+        return value;
     }
 }
 

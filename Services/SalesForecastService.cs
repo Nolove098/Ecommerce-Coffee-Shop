@@ -120,9 +120,19 @@ public class SalesForecastService
                 confidenceLowerBoundColumn: nameof(RevenuePrediction.LowerBound),
                 confidenceUpperBoundColumn: nameof(RevenuePrediction.UpperBound));
 
-            var model = pipeline.Fit(dataView);
-            var engine = model.CreateTimeSeriesEngine<DailyRevenue, RevenuePrediction>(_mlContext);
-            var prediction = engine.Predict();
+            RevenuePrediction prediction;
+            try
+            {
+                var model = pipeline.Fit(dataView);
+                var engine = model.CreateTimeSeriesEngine<DailyRevenue, RevenuePrediction>(_mlContext);
+                prediction = engine.Predict();
+            }
+            catch (Exception ex) when (HasMissingNativeDependency(ex))
+            {
+                _logger.LogWarning(
+                    "ML.NET native SSA dependencies are unavailable; using the managed revenue forecast fallback.");
+                return BuildManagedForecast(dailyData, horizonDays);
+            }
 
             var forecastPoints = new List<ForecastPoint>();
             var lastDate = dailyData.Last().Date;
@@ -146,7 +156,56 @@ public class SalesForecastService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Sales forecast failed");
-            return new ForecastResult { Error = "Lỗi dự đoán: " + ex.Message };
+            return new ForecastResult { Error = "Sales forecast is temporarily unavailable." };
         }
+    }
+
+    private static bool HasMissingNativeDependency(Exception exception)
+    {
+        for (var current = exception; current != null; current = current.InnerException)
+        {
+            if (current is DllNotFoundException)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static ForecastResult BuildManagedForecast(
+        IReadOnlyList<DailyRevenue> dailyData,
+        int horizonDays)
+    {
+        var recent = dailyData.TakeLast(Math.Min(7, dailyData.Count)).ToList();
+        var previous = dailyData
+            .Skip(Math.Max(0, dailyData.Count - 14))
+            .Take(Math.Min(7, Math.Max(0, dailyData.Count - 7)))
+            .ToList();
+
+        var recentAverage = recent.Average(x => x.Revenue);
+        var previousAverage = previous.Count == 0
+            ? recentAverage
+            : previous.Average(x => x.Revenue);
+        var dailyTrend = (recentAverage - previousAverage) / 7f;
+        var lastDate = dailyData[^1].Date;
+
+        var forecast = Enumerable.Range(1, horizonDays)
+            .Select(day =>
+            {
+                var revenue = Math.Max(0, recentAverage + dailyTrend * day);
+                return new ForecastPoint
+                {
+                    Date = lastDate.AddDays(day),
+                    Revenue = revenue,
+                    LowerBound = Math.Max(0, revenue * 0.8f),
+                    UpperBound = revenue * 1.2f
+                };
+            })
+            .ToList();
+
+        return new ForecastResult
+        {
+            Historical = dailyData.TakeLast(30).ToList(),
+            Forecast = forecast
+        };
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore; // Bắt buộc phải có để dùng Async và Include()
 using SaleStore.Data;
 using SaleStore.Models;
+using Microsoft.AspNetCore.SignalR;
+using SaleStore.Hubs;
 
 namespace SaleStore.Areas.Admin.Controllers
 {
@@ -12,10 +14,12 @@ namespace SaleStore.Areas.Admin.Controllers
     {
         // 1. Gọi Database Context
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<OrderHub> _orderHub;
 
-        public OrderController(ApplicationDbContext context)
+        public OrderController(ApplicationDbContext context, IHubContext<OrderHub> orderHub)
         {
             _context = context;
+            _orderHub = orderHub;
         }
 
         // GET: /Admin/Order
@@ -64,6 +68,11 @@ namespace SaleStore.Areas.Admin.Controllers
                 
                 // Lưu thay đổi vào Supabase
                 await _context.SaveChangesAsync();
+
+                await _orderHub.Clients.Group($"order-{order.Id}")
+                    .SendAsync("OrderStatusChanged", order.Id, newStatus.ToString(), newStatus.ToVietnamese());
+                await _orderHub.Clients.Group("admin-dashboard")
+                    .SendAsync("OrderUpdated", order.Id, newStatus.ToString(), newStatus.ToVietnamese());
                 
                 TempData["Success"] = $"Đã cập nhật trạng thái đơn #{order.Id} thành \"{newStatus.ToVietnamese()}\".";
             }

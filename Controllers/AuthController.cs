@@ -45,7 +45,8 @@ namespace SaleStore.Controllers
                 return View(model);
 
             var normalizedLoginId = NormalizeLoginId(model.LoginId);
-            var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.Email == normalizedLoginId || x.Username == normalizedLoginId);
+            var user = await _context.AppUsers.FirstOrDefaultAsync(x =>
+                x.Email.ToLower() == normalizedLoginId || x.Username.ToLower() == normalizedLoginId);
 
             if (user == null || !_passwordHasher.Verify(model.Password, user.PasswordHash, user.PasswordSalt))
             {
@@ -174,6 +175,27 @@ namespace SaleStore.Controllers
         public IActionResult AccessDenied()
         {
             return RedirectByRole();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("Auth/CurrentUser")]
+        public IActionResult CurrentUser()
+        {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return Unauthorized(new
+                {
+                    Authenticated = false,
+                    Role = (string?)null
+                });
+            }
+
+            return Ok(new
+            {
+                Authenticated = User.Identity?.IsAuthenticated == true,
+                Role = User.FindFirstValue(ClaimTypes.Role)
+            });
         }
 
         private IActionResult RedirectByRole(string? role = null)

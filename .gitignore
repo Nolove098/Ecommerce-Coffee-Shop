@@ -15,11 +15,16 @@ yarn-error.log*
 # Playwright
 test-results/
 playwright-report/
+playwright-results-*/
 playwright/.cache/
+pw-results-*/
+pw-results-phase4-*/
+.tools/
 
 # IDE
 .vs/
 .vscode/
+.railway/
 .idea/
 *.swp
 *.swo
@@ -30,6 +35,15 @@ playwright/.cache/
 Thumbs.db
 
 # Build artifacts
+artifacts/
 *.dll
 *.exe
 *.pdb
+
+# Local configuration and secrets
+appsettings.Local.json
+appsettings.Secrets.json
+.env
+.env.*
+*.publishsettings
+secrets.json

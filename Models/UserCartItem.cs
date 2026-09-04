@@ -6,7 +6,7 @@ namespace SaleStore.Models
     {
         public long Id { get; set; }
         public long UserId { get; set; }
-        public int ProductId { get; set; }
+        public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int Quantity { get; set; }
@@ -15,5 +15,6 @@ namespace SaleStore.Models
         public DateTime UpdatedAt { get; set; }
 
         public AppUser? User { get; set; }
+        public Product? Product { get; set; }
     }
 }

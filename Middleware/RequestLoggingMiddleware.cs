@@ -18,11 +18,11 @@ public class RequestLoggingMiddleware
         var stopwatch = Stopwatch.StartNew();
         var method = context.Request.Method;
         var path = context.Request.Path;
-        var query = context.Request.QueryString;
         var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-        _logger.LogInformation("[Request] {Method} {Path}{Query} from {IP}",
-            method, path, query, ip);
+        // Query strings can contain payment signatures or tokens.
+        _logger.LogInformation("[Request] {Method} {Path} from {IP}",
+            method, path, ip);
 
         try
         {

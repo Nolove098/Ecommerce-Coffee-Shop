@@ -62,10 +62,26 @@
             </div>
         </div>
 
-        <!-- Status timeline (Blazor interactive component) -->
+        <!-- Status update uses a normal MVC POST so it remains reliable on every
+             supported cloud transport. The controller publishes the private
+             SignalR notification after the transaction commits. -->
         <div class="col-12 col-md-6">
-            <component type="typeof(SaleStore.Components.OrderStatusUpdater)" render-mode="ServerPrerendered"
-                       param-OrderId="Model.Id" param-InitialStatus="@Model.Status.ToString()" />
+            <div class="card shadow-soft h-100">
+                <div class="card-body p-4">
+                    <h4 class="small fw-bold text-coffee text-uppercase mb-3">Cập nhật trạng thái</h4>
+                    <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post"
+                          class="d-flex align-items-center gap-2">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <select name="status" class="form-select flex-grow-1" aria-label="Trạng thái đơn hàng">
+                            @foreach (var status in Enum.GetValues<OrderStatus>())
+                            {
+                                <option value="@status" selected="@(status == Model.Status)">@status.ToVietnamese()</option>
+                            }
+                        </select>
+                        <button class="btn btn-coffee text-nowrap" type="submit">Cập nhật</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 

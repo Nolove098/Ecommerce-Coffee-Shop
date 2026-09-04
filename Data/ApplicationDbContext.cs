@@ -31,7 +31,6 @@ namespace SaleStore.Data
                 entity.Property(x => x.Email).HasMaxLength(180);
                 entity.Property(x => x.Phone).HasMaxLength(30);
                 entity.Property(x => x.Role).HasMaxLength(20).HasDefaultValue(AppRoles.User);
-                entity.Property(x => x.IsActive).HasDefaultValue(true);
                 entity.HasIndex(x => x.Email).IsUnique();
                 entity.HasIndex(x => x.Username).IsUnique();
             });
@@ -73,6 +72,10 @@ namespace SaleStore.Data
                 entity.HasOne(x => x.User)
                       .WithMany()
                       .HasForeignKey(x => x.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(x => x.Product)
+                      .WithMany()
+                      .HasForeignKey(x => x.ProductId)
                       .OnDelete(DeleteBehavior.Cascade);
                 entity.HasIndex(x => new { x.UserId, x.ProductId }).IsUnique();
             });

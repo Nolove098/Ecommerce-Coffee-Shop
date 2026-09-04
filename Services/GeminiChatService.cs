@@ -24,9 +24,9 @@ public class GeminiChatService : IChatBotService
     private readonly string _systemPrompt;
     private readonly ILogger<GeminiChatService> _logger;
 
-    public GeminiChatService(IConfiguration config, ILogger<GeminiChatService> logger)
+    public GeminiChatService(HttpClient http, IConfiguration config, ILogger<GeminiChatService> logger)
     {
-        _http = new HttpClient();
+        _http = http;
         _logger = logger;
         _apiKey = config["Gemini:ApiKey"] ?? "";
         _systemPrompt = @"Bạn là trợ lý tư vấn AI của SaleStore – một cửa hàng cà phê trực tuyến.
@@ -92,11 +92,13 @@ THÔNG TIN CỬA HÀNG:
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _http.SendAsync(request);
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = response.IsSuccessStatusCode
+                ? await response.Content.ReadAsStringAsync()
+                : string.Empty;
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Gemini API error {StatusCode}: {Body}", (int)response.StatusCode, responseBody);
+                _logger.LogWarning("Gemini API request failed with status {StatusCode}", (int)response.StatusCode);
                 // Hiển thị lỗi gốc từ Google để debug
                 try
                 {
@@ -116,7 +118,7 @@ THÔNG TIN CỬA HÀNG:
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Chatbot error");
+            _logger.LogError("Gemini chat request failed ({ExceptionType})", ex.GetType().Name);
             return "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.";
         }
     }
@@ -147,11 +149,13 @@ THÔNG TIN CỬA HÀNG:
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _http.SendAsync(request);
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = response.IsSuccessStatusCode
+                ? await response.Content.ReadAsStringAsync()
+                : string.Empty;
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Gemini GenerateAsync error {StatusCode}: {Body}", (int)response.StatusCode, responseBody);
+                _logger.LogWarning("Gemini generation request failed with status {StatusCode}", (int)response.StatusCode);
                 try
                 {
                     var errObj = JObject.Parse(responseBody);
@@ -169,7 +173,7 @@ THÔNG TIN CỬA HÀNG:
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GenerateAsync error");
+            _logger.LogError("Gemini generation request failed ({ExceptionType})", ex.GetType().Name);
             return "";
         }
     }
