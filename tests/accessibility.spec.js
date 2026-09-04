@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 /**
@@ -14,7 +14,8 @@ const AxeBuilder = require('@axe-core/playwright').default;
  * - General accessibility violations
  */
 
-const BASE_URL = 'http://localhost:5000';
+// Relative URLs resolve through playwright.config.js use.baseURL.
+const BASE_URL = '';
 
 // Helper function to run axe and report violations
 async function checkAccessibility(page, pageName) {

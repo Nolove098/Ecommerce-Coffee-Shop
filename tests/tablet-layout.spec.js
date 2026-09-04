@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 
 /**
  * Task 12.3: Verify tablet layouts (width >= 768px and < 992px)
@@ -739,4 +739,3 @@ test.describe('Tablet Breakpoint Edge Cases', () => {
   });
   
 });
-

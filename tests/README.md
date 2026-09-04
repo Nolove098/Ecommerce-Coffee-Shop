@@ -19,7 +19,7 @@ This task validates that all pages in the SaleStore application respond correctl
 
 - Node.js 16+ installed
 - .NET 6.0 SDK installed
-- SaleStore application running on `http://localhost:5000`
+- SaleStore application running at `PLAYWRIGHT_BASE_URL` (defaults to `http://localhost:5005`)
 
 ### Installation
 
@@ -45,7 +45,21 @@ npm run test:headed
 
 # Run only responsive breakpoint tests
 npm run test:responsive
+
+# Critical recruiter/demo flows (must pass before Phase 2 is ready)
+npm run test:critical
+
+# Extended UI/accessibility/responsive regression suite
+npm run test:extended
 ```
+
+`PLAYWRIGHT_BASE_URL` is the single application URL override and defaults to
+`http://localhost:5005`. The suite defaults to one worker because the hosted
+database is shared. Set `PLAYWRIGHT_WORKERS=2` only after a serial run is stable.
+
+Authenticated Admin/Staff critical checks use the protected bootstrap environment
+keys documented in `docs/PHASE2_RUNTIME_SECURITY.md`. They skip when those keys
+are absent and never contain fallback passwords.
 
 ## Test Files
 
@@ -128,7 +142,7 @@ If tests fail with connection errors:
    dotnet run
    ```
 
-2. Verify it's running on `http://localhost:5000`
+2. Verify it is running at `PLAYWRIGHT_BASE_URL` (defaults to `http://localhost:5005`)
 
 3. Run tests again
 

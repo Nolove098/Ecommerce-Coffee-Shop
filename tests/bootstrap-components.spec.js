@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 
 /**
  * Bootstrap Component Visual Correctness and Animations (Task 15.5 & 15.6)
