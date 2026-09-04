@@ -64,10 +64,16 @@ jobs:
       - name: Install Railway CLI
         run: npm install --global @railway/cli@5.49.1
 
+      - name: Link existing Railway service
+        run: >-
+          railway link
+          --project "${{ vars.RAILWAY_PROJECT_ID }}"
+          --environment production
+          --service "${{ vars.RAILWAY_SERVICE_ID }}"
+
       - name: Deploy existing Railway service
         run: >-
           railway up --ci
-          --project "${{ vars.RAILWAY_PROJECT_ID }}"
           --environment production
           --service "${{ vars.RAILWAY_SERVICE_ID }}"
 
