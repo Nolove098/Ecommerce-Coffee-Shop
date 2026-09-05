@@ -68,8 +68,13 @@ test.describe.serial('critical recruiter/demo flows', () => {
   test('public pages and protected-route behavior', async ({ page }) => {
     test.setTimeout(90000);
     await reduceExternalNoise(page);
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('button[onclick*="addToCart"]').first()).toBeVisible();
+    await expect.poll(async () => {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      return page.locator('button[onclick*="addToCart"]').first().isVisible().catch(() => false);
+    }, {
+      message: 'Database-backed product controls should become visible after deployment cutover',
+      timeout: 60000
+    }).toBe(true);
 
     await expect.poll(async () => {
       const recommendations = await page.context().request.get('/api/Ai/recommend/ml');
