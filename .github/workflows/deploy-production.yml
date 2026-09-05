@@ -131,3 +131,60 @@ jobs:
 
           check_status "/" "200"
           check_status "/css/custom.css" "200"
+
+      - name: Validate production E2E credential presence
+        shell: bash
+        env:
+          BootstrapAdmin__Username: ${{ secrets.BOOTSTRAP_ADMIN_USERNAME }}
+          BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+          BootstrapStaff__Username: ${{ secrets.BOOTSTRAP_STAFF_USERNAME }}
+          BootstrapStaff__Password: ${{ secrets.BOOTSTRAP_STAFF_PASSWORD }}
+        run: |
+          missing=0
+          for name in BootstrapAdmin__Username BootstrapAdmin__Password BootstrapStaff__Username BootstrapStaff__Password; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required production E2E credential is missing: $name"
+              missing=1
+            fi
+          done
+          test "$missing" = "0"
+
+      - name: Install Playwright dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run five critical production tests
+        id: critical-e2e
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ vars.PRODUCTION_URL }}
+          BootstrapAdmin__Username: ${{ secrets.BOOTSTRAP_ADMIN_USERNAME }}
+          BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+          BootstrapStaff__Username: ${{ secrets.BOOTSTRAP_STAFF_USERNAME }}
+          BootstrapStaff__Password: ${{ secrets.BOOTSTRAP_STAFF_PASSWORD }}
+        shell: bash
+        run: |
+          origin="${PLAYWRIGHT_BASE_URL%/}"
+          case "$origin" in
+            https://*) ;;
+            http://*) origin="https://${origin#http://}" ;;
+            *) echo "::error::PLAYWRIGHT_BASE_URL must be an HTTP(S) origin"; exit 1 ;;
+          esac
+          export PLAYWRIGHT_BASE_URL="$origin"
+          npx playwright test tests/critical-demo.spec.js \
+            --workers=1 \
+            --retries=0 \
+            --trace=off \
+            --reporter=line \
+            --output="pw-results-ci-${{ github.run_id }}-${{ github.run_attempt }}"
+
+      - name: Upload safe Playwright failure diagnostics
+        if: ${{ failure() && steps.critical-e2e.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            pw-results-ci-${{ github.run_id }}-${{ github.run_attempt }}/**/*.png
+            pw-results-ci-${{ github.run_id }}-${{ github.run_attempt }}/**/error-context.md
+          if-no-files-found: ignore
+          retention-days: 7

@@ -44,9 +44,18 @@ The public URL variable points at the canonical Railway HTTPS origin. The workfl
 
 ## Production role E2E
 
-Credentialed Admin/Staff Playwright validation is optional and is not configured in GitHub yet. It must never run for pull requests or untrusted forks. If later enabled in the protected `CoffeeShop-Demo` Environment, use secret names only and run the five-test suite after successful deployment and health validation.
+After Railway deploy, health, and public smoke validation succeed, the protected deployment job installs Chromium and runs `tests/critical-demo.spec.js` serially against `PRODUCTION_URL`. It covers public/customer flows, Admin, Staff, Gemini, and the private SignalR order update. The suite requires exactly five passing tests with no failures or skips.
 
-The Phase 6 public validation was completed independently with 5 passed, 0 failed, and 0 skipped.
+The following secret names exist only in the protected `CoffeeShop-Demo` Environment:
+
+- `BOOTSTRAP_ADMIN_USERNAME`
+- `BOOTSTRAP_ADMIN_PASSWORD`
+- `BOOTSTRAP_STAFF_USERNAME`
+- `BOOTSTRAP_STAFF_PASSWORD`
+
+They are mapped only for the E2E presence-check and execution steps to the `BootstrapAdmin__Username`, `BootstrapAdmin__Password`, `BootstrapStaff__Username`, and `BootstrapStaff__Password` variables consumed by the tests. They are not available to the pull-request workflow and are never written to files or artifacts.
+
+Only Chromium is installed. Each run uses a unique output directory with retries and tracing disabled to avoid retaining credential-bearing browser traces. If the critical step fails, screenshots and page-context diagnostics are retained for seven days; the workflow never creates or uploads reusable authentication storage state.
 
 ## Database and seed policy
 
