@@ -85,9 +85,16 @@ jobs:
       - name: Verify production health
         shell: bash
         run: |
-          health_url="${PRODUCTION_URL%/}/health"
+          origin="${PRODUCTION_URL%/}"
+          case "$origin" in
+            https://*) ;;
+            http://*) origin="https://${origin#http://}" ;;
+            *) echo "::error::PRODUCTION_URL must be an HTTP(S) origin"; exit 1 ;;
+          esac
+          health_url="$origin/health"
           for attempt in {1..12}; do
-            if curl --fail --silent --show-error --max-time 15 "$health_url" > /dev/null; then
+            status="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 15 "$health_url" || true)"
+            if [ "$status" = "200" ]; then
               exit 0
             fi
             if [ "$attempt" -lt 12 ]; then
@@ -100,6 +107,11 @@ jobs:
         shell: bash
         run: |
           origin="${PRODUCTION_URL%/}"
+          case "$origin" in
+            https://*) ;;
+            http://*) origin="https://${origin#http://}" ;;
+            *) echo "::error::PRODUCTION_URL must be an HTTP(S) origin"; exit 1 ;;
+          esac
           check_status() {
             local path="$1"
             local expected="$2"
@@ -113,7 +125,7 @@ jobs:
                 sleep 10
               fi
             done
-            echo "::error::Smoke check failed for $path (expected HTTP $expected)"
+            echo "::error::Smoke check failed for $path (expected HTTP $expected, received HTTP $status)"
             return 1
           }
 
