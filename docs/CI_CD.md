@@ -55,7 +55,7 @@ The following secret names exist only in the protected `CoffeeShop-Demo` Environ
 
 They are mapped only for the E2E presence-check and execution steps to the `BootstrapAdmin__Username`, `BootstrapAdmin__Password`, `BootstrapStaff__Username`, and `BootstrapStaff__Password` variables consumed by the tests. They are not available to the pull-request workflow and are never written to files or artifacts.
 
-Only Chromium is installed. Each run uses a unique output directory with retries and tracing disabled to avoid retaining credential-bearing browser traces. If the critical step fails, screenshots and page-context diagnostics are retained for seven days; the workflow never creates or uploads reusable authentication storage state.
+Only Chromium is installed. Each run uses a unique output directory with retries and tracing disabled to avoid retaining credential-bearing browser traces. A JSON summary gate requires exactly five passes with zero failures and zero skips. If the critical step fails, screenshots and page-context diagnostics are retained for seven days; the workflow never creates or uploads reusable authentication storage state.
 
 ## Database and seed policy
 
@@ -70,7 +70,7 @@ For rollback, revert the faulty commit and push the revert through the same pipe
 ## Troubleshooting
 
 - Restore/build failure: reproduce the exact Release commands locally.
-- Railway authentication failure: confirm the project-scoped token exists in the `production` Environment without printing it.
+- Railway authentication failure: confirm the project-scoped token exists in the `CoffeeShop-Demo` Environment without printing it.
 - Wrong target: confirm the three GitHub variable names and their Environment scope.
 - Deployment accepted but unhealthy: inspect safe Railway startup logs, then verify `/health` and the public origin.
 - Do not dump GitHub secrets, Railway variables, environment values, connection strings, or authentication state into logs or artifacts.

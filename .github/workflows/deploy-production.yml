@@ -189,8 +189,41 @@ jobs:
             --reporter=line,json \
             --output="pw-results-ci-${{ github.run_id }}-${{ github.run_attempt }}"
 
+      - name: Require exactly five passing critical tests
+        id: critical-summary
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const report = require('./playwright-results.json');
+          const totals = { passed: 0, failed: 0, skipped: 0, durationMs: 0 };
+
+          function walk(suite) {
+            for (const spec of suite.specs || []) {
+              for (const test of spec.tests || []) {
+                const results = test.results || [];
+                const finalResult = results.at(-1);
+                totals.durationMs += results.reduce((sum, result) => sum + (result.duration || 0), 0);
+                if (finalResult?.status === 'passed') totals.passed++;
+                else if (finalResult?.status === 'skipped' || test.status === 'skipped') totals.skipped++;
+                else totals.failed++;
+              }
+            }
+            for (const child of suite.suites || []) walk(child);
+          }
+
+          for (const suite of report.suites || []) walk(suite);
+          const duration = `${(totals.durationMs / 1000).toFixed(1)}s`;
+          const summary = `${totals.passed} passed, ${totals.failed} failed, ${totals.skipped} skipped (${duration})`;
+          console.log(`Critical Playwright result: ${summary}`);
+          require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Critical Playwright\n\n${summary}\n`);
+          if (totals.passed !== 5 || totals.failed !== 0 || totals.skipped !== 0) {
+            console.log(`::error::Critical Playwright gate requires exactly 5 passed, 0 failed, 0 skipped; received ${summary}`);
+            process.exit(1);
+          }
+          NODE
+
       - name: Report failed critical test names
-        if: ${{ failure() && steps.critical-e2e.outcome == 'failure' }}
+        if: ${{ failure() && (steps.critical-e2e.outcome == 'failure' || steps.critical-summary.outcome == 'failure') }}
         shell: bash
         run: |
           if [ ! -f playwright-results.json ]; then
