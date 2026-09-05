@@ -20,7 +20,7 @@ It has no Railway token, no production environment, and no deployment job. The m
 
 ## Production deployment
 
-Pushes to `main` and manual dispatches run the production workflow. Its validation job repeats the Release gate without production credentials. Only the dependent deploy job is attached to the GitHub Environment `production`.
+Pushes to `main` and manual dispatches run the production workflow. Its validation job repeats the Release gate without production credentials. Only the dependent deploy job is attached to the GitHub Environment `CoffeeShop-Demo`.
 
 The deploy job uses Railway CLI `5.49.1` with an environment-scoped project token. Project and service identifiers are supplied explicitly so CI cannot deploy an unrelated service. One deployment runs at a time through the `railway-production` concurrency group.
 
@@ -28,7 +28,7 @@ Railway runtime secrets are neither passed through the deployment command nor du
 
 ## GitHub configuration
 
-GitHub Environment: `production`
+GitHub Environment: `CoffeeShop-Demo`
 
 Required secret name:
 
@@ -44,7 +44,7 @@ The public URL variable points at the canonical Railway HTTPS origin. The workfl
 
 ## Production role E2E
 
-Credentialed Admin/Staff Playwright validation is optional and is not configured in GitHub yet. It must never run for pull requests or untrusted forks. If later enabled in the protected `production` Environment, use secret names only and run the five-test suite after successful deployment and health validation.
+Credentialed Admin/Staff Playwright validation is optional and is not configured in GitHub yet. It must never run for pull requests or untrusted forks. If later enabled in the protected `CoffeeShop-Demo` Environment, use secret names only and run the five-test suite after successful deployment and health validation.
 
 The Phase 6 public validation was completed independently with 5 passed, 0 failed, and 0 skipped.
 

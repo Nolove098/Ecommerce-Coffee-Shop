@@ -87,4 +87,4 @@ Rollback by selecting the last known-good Railway deployment or redeploying its 
 
 ## GitHub Actions
 
-Phase 7 adds separate pull-request CI and `main` production deployment workflows. The production job uses the protected GitHub Environment `production`, a scoped Railway project token, explicit project/service identifiers, and the public URL for bounded post-deploy validation. Railway retains all application runtime secrets. See `docs/CI_CD.md` for triggers, required key names, database policy, troubleshooting, and rollback.
+Phase 7 adds separate pull-request CI and `main` production deployment workflows. The production job uses the protected GitHub Environment `CoffeeShop-Demo`, a scoped Railway project token, explicit project/service identifiers, and the public URL for bounded post-deploy validation. Railway retains all application runtime secrets. See `docs/CI_CD.md` for triggers, required key names, database policy, troubleshooting, and rollback.

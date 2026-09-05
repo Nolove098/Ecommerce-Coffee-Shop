@@ -42,7 +42,8 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: production
+    environment:
+      name: CoffeeShop-Demo
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
