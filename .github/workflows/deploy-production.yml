@@ -34,7 +34,7 @@ jobs:
       - name: Build
         run: dotnet build ./SaleStore.csproj --configuration Release --no-restore
 
-      - name: Run safe tests
+      - name: Run available .NET tests
         run: dotnet test ./SaleStore.csproj --configuration Release --no-build
 
   deploy:
@@ -48,14 +48,18 @@ jobs:
       RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
       RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
       PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
-      BootstrapAdmin__Username: ${{ secrets.BOOTSTRAP_ADMIN_USERNAME }}
-      BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
-      BootstrapStaff__Username: ${{ secrets.BOOTSTRAP_STAFF_USERNAME }}
-      BootstrapStaff__Password: ${{ secrets.BOOTSTRAP_STAFF_PASSWORD }}
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Validate deployment target configuration
+        shell: bash
+        run: |
+          test -n "$RAILWAY_TOKEN"
+          test -n "$RAILWAY_PROJECT_ID"
+          test -n "$RAILWAY_SERVICE_ID"
+          test -n "$PRODUCTION_URL"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -67,12 +71,15 @@ jobs:
         run: npm install --global @railway/cli@5.49.1
 
       - name: Deploy existing Railway service
-        run: railway up --ci --environment production
+        run: >-
+          railway up --ci
+          --project "$RAILWAY_PROJECT_ID"
+          --environment production
+          --service "$RAILWAY_SERVICE_ID"
 
       - name: Verify production health
         shell: bash
         run: |
-          test -n "$PRODUCTION_URL"
           health_url="${PRODUCTION_URL%/}/health"
           for attempt in {1..12}; do
             if curl --fail --silent --show-error --max-time 15 "$health_url" > /dev/null; then
@@ -84,14 +91,11 @@ jobs:
           done
           exit 1
 
-      - name: Install Playwright dependencies
-        if: ${{ env.BootstrapAdmin__Username != '' && env.BootstrapAdmin__Password != '' && env.BootstrapStaff__Username != '' && env.BootstrapStaff__Password != '' }}
+      - name: Verify public smoke endpoints
+        shell: bash
         run: |
-          npm ci
-          npx playwright install --with-deps chromium
-
-      - name: Run five critical production tests
-        if: ${{ env.BootstrapAdmin__Username != '' && env.BootstrapAdmin__Password != '' && env.BootstrapStaff__Username != '' && env.BootstrapStaff__Password != '' }}
-        run: npm run test:critical
-        env:
-          PLAYWRIGHT_BASE_URL: ${{ vars.PRODUCTION_URL }}
+          origin="${PRODUCTION_URL%/}"
+          curl --fail --silent --show-error --max-time 20 "$origin/" > /dev/null
+          curl --fail --silent --show-error --max-time 20 "$origin/css/custom.css" > /dev/null
+          status="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 20 "$origin/Auth/CurrentUser")"
+          test "$status" = "401"

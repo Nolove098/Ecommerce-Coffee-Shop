@@ -28,5 +28,5 @@ jobs:
       - name: Build
         run: dotnet build ./SaleStore.csproj --configuration Release --no-restore
 
-      - name: Run safe tests
+      - name: Run available .NET tests
         run: dotnet test ./SaleStore.csproj --configuration Release --no-build
