@@ -22,7 +22,7 @@ It has no Railway token, no production environment, and no deployment job. The m
 
 Pushes to `main` and manual dispatches run the production workflow. Its validation job repeats the Release gate without production credentials. Only the dependent deploy job is attached to the GitHub Environment `CoffeeShop-Demo`.
 
-The deploy job uses Railway CLI `5.49.1` with an environment-scoped project token. Project and service identifiers are supplied explicitly so CI cannot deploy an unrelated service. One deployment runs at a time through the `railway-production` concurrency group.
+The deploy job uses Railway CLI `5.49.1` with an environment-scoped project token. Project and service identifiers are supplied explicitly so CI cannot deploy an unrelated service. One deployment runs at a time through the `railway-production` concurrency group. A failed CLI upload/deploy receives one bounded retry to tolerate transient network failures; the job remains failed if both attempts fail.
 
 Railway runtime secrets are neither passed through the deployment command nor duplicated in GitHub.
 

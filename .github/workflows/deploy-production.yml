@@ -76,11 +76,21 @@ jobs:
         run: npm install --global @railway/cli@5.49.1
 
       - name: Deploy existing Railway service
-        run: >-
-          railway up --ci
-          --project "$RAILWAY_PROJECT_ID"
-          --environment production
-          --service "$RAILWAY_SERVICE_ID"
+        shell: bash
+        run: |
+          for attempt in 1 2; do
+            if railway up --ci \
+              --project "$RAILWAY_PROJECT_ID" \
+              --environment production \
+              --service "$RAILWAY_SERVICE_ID"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 2 ]; then
+              echo "Railway upload/deploy attempt failed; retrying once."
+              sleep 10
+            fi
+          done
+          exit 1
 
       - name: Verify production health
         shell: bash
