@@ -56,10 +56,14 @@ jobs:
       - name: Validate deployment target configuration
         shell: bash
         run: |
-          test -n "$RAILWAY_TOKEN"
-          test -n "$RAILWAY_PROJECT_ID"
-          test -n "$RAILWAY_SERVICE_ID"
-          test -n "$PRODUCTION_URL"
+          missing=0
+          for name in RAILWAY_TOKEN RAILWAY_PROJECT_ID RAILWAY_SERVICE_ID PRODUCTION_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required production configuration is missing: $name"
+              missing=1
+            fi
+          done
+          test "$missing" = "0"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
