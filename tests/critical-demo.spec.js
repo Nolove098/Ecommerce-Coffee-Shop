@@ -66,14 +66,20 @@ async function login(page, loginId, password, expectedRole) {
 
 test.describe.serial('critical recruiter/demo flows', () => {
   test('public pages and protected-route behavior', async ({ page }) => {
+    test.setTimeout(90000);
     await reduceExternalNoise(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('button[onclick*="addToCart"]').first()).toBeVisible();
 
-    const recommendations = await page.context().request.get('/api/Ai/recommend/ml');
-    expect(recommendations.status()).toBe(200);
-    const recommendationBody = await recommendations.json();
-    expect(recommendationBody.recommendations.length).toBeGreaterThan(0);
+    await expect.poll(async () => {
+      const recommendations = await page.context().request.get('/api/Ai/recommend/ml');
+      if (recommendations.status() !== 200) return false;
+      const recommendationBody = await recommendations.json();
+      return recommendationBody.recommendations.length > 0;
+    }, {
+      message: 'Public ML recommendations should become available after deployment cutover',
+      timeout: 60000
+    }).toBe(true);
 
     await page.goto('/Admin/Dashboard', { waitUntil: 'domcontentloaded' });
     expect(new URL(page.url()).pathname).toBe('/Auth/Login');
