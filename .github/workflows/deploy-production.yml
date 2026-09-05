@@ -131,4 +131,3 @@ jobs:
 
           check_status "/" "200"
           check_status "/css/custom.css" "200"
-          check_status "/Auth/CurrentUser?ci_run=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" "401"

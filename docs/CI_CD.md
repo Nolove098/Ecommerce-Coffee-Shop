@@ -40,7 +40,7 @@ Required variable names:
 - `RAILWAY_SERVICE_ID`
 - `PRODUCTION_URL`
 
-The public URL variable points at the canonical Railway HTTPS origin. The workflow validates `/health`, the home page, a static stylesheet, and the unauthenticated JSON behavior of `/Auth/CurrentUser`.
+The public URL variable points at the canonical Railway HTTPS origin. The workflow validates `/health`, the database-backed home page, and a static stylesheet. Authentication behavior remains covered by the credentialed critical Playwright suite rather than the infrastructure smoke gate.
 
 ## Production role E2E
 
