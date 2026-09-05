@@ -180,6 +180,7 @@ namespace SaleStore.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("Auth/CurrentUser")]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult CurrentUser()
         {
             if (User.Identity?.IsAuthenticated != true)
