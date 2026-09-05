@@ -40,7 +40,7 @@ Required variable names:
 - `RAILWAY_SERVICE_ID`
 - `PRODUCTION_URL`
 
-The public URL variable points at the canonical Railway HTTPS origin. The workflow validates `/health`, the database-backed home page, and a static stylesheet. Authentication behavior remains covered by the credentialed critical Playwright suite rather than the infrastructure smoke gate.
+The public URL variable points at the canonical Railway HTTPS origin: `https://coffeeshop-demo-production.up.railway.app`. The workflow validates `/health`, the database-backed home page, and a static stylesheet. Authentication behavior remains covered by the credentialed critical Playwright suite rather than the infrastructure smoke gate.
 
 ## Production role E2E
 
@@ -56,6 +56,8 @@ The following secret names exist only in the protected `CoffeeShop-Demo` Environ
 They are mapped only for the E2E presence-check and execution steps to the `BootstrapAdmin__Username`, `BootstrapAdmin__Password`, `BootstrapStaff__Username`, and `BootstrapStaff__Password` variables consumed by the tests. They are not available to the pull-request workflow and are never written to files or artifacts.
 
 Only Chromium is installed. Each run uses a unique output directory with retries and tracing disabled to avoid retaining credential-bearing browser traces. A JSON summary gate requires exactly five passes with zero failures and zero skips. If the critical step fails, screenshots and page-context diagnostics are retained for seven days; the workflow never creates or uploads reusable authentication storage state.
+
+The first complete production gate passed in GitHub Actions run 21: five tests passed, with zero failures and zero skips. The tests targeted the canonical Railway origin through `PRODUCTION_URL`; providing this variable disables Playwright's local web server.
 
 ## Database and seed policy
 
