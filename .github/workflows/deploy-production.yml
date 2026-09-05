@@ -203,7 +203,18 @@ jobs:
             for (const spec of suite.specs || []) {
               const failed = (spec.tests || []).some(test =>
                 (test.results || []).some(result => result.status !== 'passed' && result.status !== 'skipped'));
-              if (failed) console.log(`::error::Critical E2E failed: ${[...scope, spec.title].join(' > ')}`);
+              if (failed) {
+                console.log(`::error::Critical E2E failed: ${[...scope, spec.title].join(' > ')}`);
+                if (spec.title === 'public pages and protected-route behavior') {
+                  const result = (spec.tests || []).flatMap(test => test.results || [])
+                    .find(item => item.status !== 'passed' && item.status !== 'skipped');
+                  const message = String(result?.error?.message || 'No error message available')
+                    .replace(/\x1b\[[0-9;]*m/g, '')
+                    .replace(/[\r\n]+/g, ' ')
+                    .slice(0, 800);
+                  console.log(`::error::Public test diagnostic: ${message}`);
+                }
+              }
             }
             for (const child of suite.suites || []) walk(child, scope);
           }
