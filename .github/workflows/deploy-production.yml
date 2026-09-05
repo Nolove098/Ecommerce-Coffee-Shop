@@ -162,6 +162,7 @@ jobs:
           BootstrapAdmin__Password: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
           BootstrapStaff__Username: ${{ secrets.BOOTSTRAP_STAFF_USERNAME }}
           BootstrapStaff__Password: ${{ secrets.BOOTSTRAP_STAFF_PASSWORD }}
+          PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-results.json
         shell: bash
         run: |
           origin="${PLAYWRIGHT_BASE_URL%/}"
@@ -175,8 +176,29 @@ jobs:
             --workers=1 \
             --retries=0 \
             --trace=off \
-            --reporter=line \
+            --reporter=line,json \
             --output="pw-results-ci-${{ github.run_id }}-${{ github.run_attempt }}"
+
+      - name: Report failed critical test names
+        if: ${{ failure() && steps.critical-e2e.outcome == 'failure' }}
+        shell: bash
+        run: |
+          if [ ! -f playwright-results.json ]; then
+            exit 0
+          fi
+          node - <<'NODE'
+          const report = require('./playwright-results.json');
+          function walk(suite, parents = []) {
+            const scope = suite.title ? [...parents, suite.title] : parents;
+            for (const spec of suite.specs || []) {
+              const failed = (spec.tests || []).some(test =>
+                (test.results || []).some(result => result.status !== 'passed' && result.status !== 'skipped'));
+              if (failed) console.log(`::error::Critical E2E failed: ${[...scope, spec.title].join(' > ')}`);
+            }
+            for (const child of suite.suites || []) walk(child, scope);
+          }
+          for (const suite of report.suites || []) walk(suite);
+          NODE
 
       - name: Upload safe Playwright failure diagnostics
         if: ${{ failure() && steps.critical-e2e.outcome == 'failure' }}
