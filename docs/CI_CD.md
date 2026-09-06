@@ -14,13 +14,19 @@ The `CI` workflow has read-only repository permissions and performs:
 2. setup of .NET 10;
 3. `dotnet restore`;
 4. Release build;
-5. any .NET tests discoverable from the current project.
+5. all backend tests from `Ecommerce-Coffee-Shop.sln`, including `SaleStore.Tests`.
+
+Both restore and Release build target the solution. Tests use `--no-build
+--no-restore` and produce isolated TRX results under `artifacts/backend-tests`,
+uploaded with seven-day retention even when tests fail.
 
 It has no Railway token, no production environment, and no deployment job. The mutable hosted Playwright suite and the larger extended UI suite are deliberately excluded from untrusted pull requests.
 
 ## Production deployment
 
-Pushes to `main` and manual dispatches run the production workflow. Its validation job repeats the Release gate without production credentials. Only the dependent deploy job is attached to the GitHub Environment `CoffeeShop-Demo`.
+Pushes to `main` and manual dispatches run the production workflow. Its validation job restores the solution, builds Release, and runs the backend
+.NET tests without production credentials. Deployment has `needs: validate`, so
+a failed restore, build, or test blocks Railway deployment. Only the dependent deploy job is attached to the GitHub Environment `CoffeeShop-Demo`.
 
 The deploy job uses Railway CLI `5.49.1` with an environment-scoped project token. Project and service identifiers are supplied explicitly so CI cannot deploy an unrelated service. One deployment runs at a time through the `railway-production` concurrency group. A failed CLI upload/deploy receives one bounded retry to tolerate transient network failures; the job remains failed if both attempts fail.
 
@@ -76,3 +82,27 @@ For rollback, revert the faulty commit and push the revert through the same pipe
 - Wrong target: confirm the three GitHub variable names and their Environment scope.
 - Deployment accepted but unhealthy: inspect safe Railway startup logs, then verify `/health` and the public origin.
 - Do not dump GitHub secrets, Railway variables, environment values, connection strings, or authentication state into logs or artifacts.
+
+## Phase 8 local validation and pending hosted gate
+
+On 2026-09-06, solution restore and Release build passed with zero warnings/errors.
+The xUnit suite executed 74 tests, all passing with zero skips, on three consecutive
+runs. Coverage and isolation details are in [TESTING.md](TESTING.md).
+
+The production job uses exactly `environment: CoffeeShop-Demo`. The existing
+Railway target arguments, HTTPS health, session-independent public smoke, protected
+E2E credentials, disabled Playwright retries/traces, and exact five-pass summary
+gate are preserved from remote Phase 7 commit 6250794. PR CI has no deployment,
+GitHub Environment, production Supabase, or role E2E credential requirement.
+
+The local Git metadata is read-only: fetch was denied for .git/FETCH_HEAD. Remote
+main is 18 commits ahead of local HEAD e1884d3. No Phase 8 commit or push has occurred;
+CI/main deployment, health/smoke, and production Playwright have not been rerun for
+Phase 8. The Phase 7 run mentioned above is historical, not Phase 8 evidence.
+Before pushing, integrate remote main in a Git-writable session, preserving the
+Phase 8 test gates and remote application/E2E fixes, rerun local validation, scan
+secrets, review staged files, commit, then push normally and monitor both workflows.
+
+Actionlint 1.7.12 passed both local workflows; Gitleaks 8.30.1 reported no leaks
+across all 14 intended Phase 8 files. Generated backend/coverage files and the
+production Playwright JSON report are ignored and must not be committed.
