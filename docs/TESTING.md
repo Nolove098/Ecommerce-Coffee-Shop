@@ -29,12 +29,29 @@ Microsoft.EntityFrameworkCore.Relational is explicitly aligned to the existing
 Design package at 10.0.11 so project-reference consumers resolve the same runtime
 EF assemblies. This removes MSB3277 version conflicts without changing app logic.
 
-Phase 8 is not yet complete: this session cannot write repository Git metadata
-(fetch fails with permission denied for .git/FETCH_HEAD). No Phase 8 commit/push
-or hosted gate execution has occurred. Remote main is 18 commits ahead of local
-HEAD; integrate those commits in a Git-writable session before committing and
-rerun local gates on that integrated tree. The reviewed remote Phase 7 deployment
-job has been preserved in the local workflow, including its exact 5/0/0 E2E gate.
+Phase 8 hosted validation passed on 2026-09-06. [PR #3](https://github.com/Nolove098/Ecommerce-Coffee-Shop/pull/3)
+was validated by [CI run #1](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/runs/34007722746)
+and merged normally as `755bfab196b34d9e0937f17368e5875e000b1f48`.
+[Deploy production run #23](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/runs/34008065465)
+then completed successfully on that merge commit:
+
+- Hosted restore and Release build passed with zero warnings and zero errors.
+- Hosted .NET tests: 74 passed, 0 failed, 0 skipped, matching PR CI and the local baseline.
+- Railway deployed the existing `CoffeeShop-Demo` project / `coffeeshop-demo` service;
+  a read-only Railway status check confirmed a successful active deployment and a running instance.
+- HTTPS health returned HTTP 200; production smoke passed for `/` and `/css/custom.css`.
+- Production critical Playwright: 5 passed, 0 failed, 0 skipped. Customer registration,
+  login, cart, COD checkout/history, Admin/Staff pages, Gemini, and private customer
+  SignalR updates passed against `vars.PRODUCTION_URL`, with no localhost fallback.
+
+The GitHub Environment remains `CoffeeShop-Demo`. PR CI uses no production secrets,
+production database, live Gemini, or payment integration. Only the protected production
+E2E job exercises the existing demo application and creates its own users/orders.
+No schema changes, automatic migrations, or production reseeding were introduced or run.
+Read-only runtime verification confirmed `DemoSeed__Enabled=false` and
+`DataInitialization__EnableBootstrapUsers=false`; demo-data initialization retains
+its production configuration default of false. Runtime secrets remain in Railway.
+No secrets were introduced or exposed, and no force push was used.
 
 The middle integration layer is intentionally deferred. `Program.cs` requires
 PostgreSQL configuration at startup and can initialize data when enabled.
@@ -175,5 +192,4 @@ so test sources, packages and results are not included in application publish.
 Gitleaks 8.30.1 scanned all 14 intended Phase 8 files with full redaction and
 reported no leaks. Manual review confirmed all credential-like test inputs are
 synthetic. Actionlint 1.7.12 passed both workflows (optional external ShellCheck
-and Pyflakes integrations were disabled). Neither result substitutes for hosted
-CI or the pending Git integration/commit/push.
+and Pyflakes integrations were disabled). The hosted PR and post-merge gates above independently validated committed content.

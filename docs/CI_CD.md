@@ -83,26 +83,34 @@ For rollback, revert the faulty commit and push the revert through the same pipe
 - Deployment accepted but unhealthy: inspect safe Railway startup logs, then verify `/health` and the public origin.
 - Do not dump GitHub secrets, Railway variables, environment values, connection strings, or authentication state into logs or artifacts.
 
-## Phase 8 local validation and pending hosted gate
+## Phase 8 verified hosted results
 
-On 2026-09-06, solution restore and Release build passed with zero warnings/errors.
-The xUnit suite executed 74 tests, all passing with zero skips, on three consecutive
-runs. Coverage and isolation details are in [TESTING.md](TESTING.md).
+Phase 8 hosted validation passed on 2026-09-06. [PR #3](https://github.com/Nolove098/Ecommerce-Coffee-Shop/pull/3)
+was validated by [CI run #1](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/runs/34007722746)
+and merged normally as `755bfab196b34d9e0937f17368e5875e000b1f48`.
+[Deploy production run #23](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/runs/34008065465)
+then completed successfully on that merge commit:
 
-The production job uses exactly `environment: CoffeeShop-Demo`. The existing
-Railway target arguments, HTTPS health, session-independent public smoke, protected
-E2E credentials, disabled Playwright retries/traces, and exact five-pass summary
-gate are preserved from remote Phase 7 commit 6250794. PR CI has no deployment,
-GitHub Environment, production Supabase, or role E2E credential requirement.
+- Hosted restore and Release build passed with zero warnings and zero errors.
+- Hosted .NET tests: 74 passed, 0 failed, 0 skipped, matching PR CI and the local baseline.
+- Railway deployed the existing `CoffeeShop-Demo` project / `coffeeshop-demo` service;
+  a read-only Railway status check confirmed a successful active deployment and a running instance.
+- HTTPS health returned HTTP 200; production smoke passed for `/` and `/css/custom.css`.
+- Production critical Playwright: 5 passed, 0 failed, 0 skipped. Customer registration,
+  login, cart, COD checkout/history, Admin/Staff pages, Gemini, and private customer
+  SignalR updates passed against `vars.PRODUCTION_URL`, with no localhost fallback.
 
-The local Git metadata is read-only: fetch was denied for .git/FETCH_HEAD. Remote
-main is 18 commits ahead of local HEAD e1884d3. No Phase 8 commit or push has occurred;
-CI/main deployment, health/smoke, and production Playwright have not been rerun for
-Phase 8. The Phase 7 run mentioned above is historical, not Phase 8 evidence.
-Before pushing, integrate remote main in a Git-writable session, preserving the
-Phase 8 test gates and remote application/E2E fixes, rerun local validation, scan
-secrets, review staged files, commit, then push normally and monitor both workflows.
+The GitHub Environment remains `CoffeeShop-Demo`. PR CI uses no production secrets,
+production database, live Gemini, or payment integration. Only the protected production
+E2E job exercises the existing demo application and creates its own users/orders.
+No schema changes, automatic migrations, or production reseeding were introduced or run.
+Read-only runtime verification confirmed `DemoSeed__Enabled=false` and
+`DataInitialization__EnableBootstrapUsers=false`; demo-data initialization retains
+its production configuration default of false. Runtime secrets remain in Railway.
+No secrets were introduced or exposed, and no force push was used.
 
-Actionlint 1.7.12 passed both local workflows; Gitleaks 8.30.1 reported no leaks
-across all 14 intended Phase 8 files. Generated backend/coverage files and the
-production Playwright JSON report are ignored and must not be committed.
+Local Release validation also passed with zero warnings/errors and 74 passed, 0 failed,
+0 skipped on three consecutive runs. Coverage is informational; see [TESTING.md](TESTING.md).
+Gitleaks 8.30.1 found no leaks with full redaction. Actionlint 1.7.12 passed both
+workflows with optional external ShellCheck/Pyflakes disabled. Generated logs, test
+results, coverage, and audit artifacts remain excluded from commits.
