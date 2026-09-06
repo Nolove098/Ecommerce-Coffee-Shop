@@ -5,15 +5,21 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseAppHost>false</UseAppHost>
-    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**;pw-results*/**;playwright-results*/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**;pw-results*/**;playwright-results*/**;SaleStore.Tests/**</DefaultItemExcludes>
     <!-- Suppress nullable dereference warnings in Razor-generated code (ViewBag dynamic) -->
     <NoWarn>$(NoWarn);CS8602;CS8604</NoWarn>
     <UserSecretsId>5214febd-0101-440a-800b-ea1ff8126fb2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SaleStore.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.11" />
+    <!-- Keep runtime EF dependencies aligned with Design for project-reference consumers. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

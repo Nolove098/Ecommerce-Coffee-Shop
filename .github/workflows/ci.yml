@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Release build
+    name: Release build and backend tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -23,10 +23,19 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore dependencies
-        run: dotnet restore ./SaleStore.csproj
+        run: dotnet restore ./Ecommerce-Coffee-Shop.sln
 
       - name: Build
-        run: dotnet build ./SaleStore.csproj --configuration Release --no-restore
+        run: dotnet build ./Ecommerce-Coffee-Shop.sln --configuration Release --no-restore
 
-      - name: Run available .NET tests
-        run: dotnet test ./SaleStore.csproj --configuration Release --no-build
+      - name: Run backend unit tests
+        run: dotnet test ./Ecommerce-Coffee-Shop.sln --configuration Release --no-build --no-restore --logger "trx;LogFileName=backend.trx" --results-directory ./artifacts/backend-tests
+
+      - name: Upload backend test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: artifacts/backend-tests/*.trx
+          if-no-files-found: ignore
+          retention-days: 7

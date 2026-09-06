@@ -14,7 +14,9 @@ yarn-error.log*
 
 # Playwright
 test-results/
+TestResults/
 playwright-report/
+playwright-results.json
 playwright-results-*/
 playwright/.cache/
 pw-results-*/
