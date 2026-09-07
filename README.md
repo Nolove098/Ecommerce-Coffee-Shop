@@ -1,552 +1,257 @@
-<div align="center">
+# Coffee Shop E-Commerce Platform
 
-# ☕ Ecommerce Coffee Shop
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
+[![CI](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Nolove098/Ecommerce-Coffee-Shop/actions/workflows/ci.yml)
 
-### Nền tảng Thương mại Điện tử Cà phê — Tích hợp AI & Machine Learning
+A production-deployed ASP.NET Core coffee-shop e-commerce and management system connecting online ordering with Staff POS and Admin operations. It combines PostgreSQL persistence, realtime order updates, AI-assisted menu discovery, automated testing, and CI/CD in one web application.
 
-[![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-6.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![ML.NET](https://img.shields.io/badge/ML.NET-3.0-792EE5?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/apps/machinelearning-ai/ml-dotnet)
-[![Gemini AI](https://img.shields.io/badge/Gemini_AI-API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![SignalR](https://img.shields.io/badge/SignalR-Realtime-FF4500?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/apps/aspnet/signalr)
-[![VNPay](https://img.shields.io/badge/VNPay-Payment-00457C?style=for-the-badge&logo=visa&logoColor=white)](https://vnpay.vn/)
+## Live Demo
 
-<br/>
+**[Open the live application](https://coffeeshop-demo-production.up.railway.app)** · [Source code](https://github.com/Nolove098/Ecommerce-Coffee-Shop)
 
-<p align="center">
-  <em>
-    Ứng dụng web bán cà phê full-stack với hệ thống gợi ý sản phẩm bằng ML.NET,<br/>
-    chatbot tư vấn AI Gemini, thanh toán VNPay, và real-time order tracking bằng SignalR.
-  </em>
-</p>
+Hosted on **Railway**, with **Supabase PostgreSQL**. Browse the menu or register your own customer account to try the shopping flow. The application UI is primarily Vietnamese. VNPay is a sandbox integration; use COD for the demonstrated checkout flow. Admin and Staff credentials are not published.
 
-<br/>
+[Features](#key-features) · [Architecture](#architecture) · [Testing](#testing) · [Local setup](#local-setup)
 
-[Tính năng](#-tính-năng-nổi-bật) •
-[Công nghệ](#-công-nghệ-sử-dụng) •
-[Kiến trúc](#-kiến-trúc-hệ-thống) •
-[AI & ML](#-ai--ml-features-chi-tiết) •
-[Cài đặt](#-cài-đặt--chạy-dự-án) •
-[Tác giả](#-tác-giả)
+## Key Features
 
-</div>
+| Workflow | Implemented functionality |
+|---|---|
+| Customer | Registration/login, menu and category browsing, persistent cart, COD checkout, order history, product reviews |
+| Staff | POS order creation, customer/table assignment, invoice display |
+| Admin | Product and category-field editing, order status management, user and Staff management, revenue dashboard and statistics |
+| Realtime | Private customer order updates and an Admin dashboard group through SignalR |
+| AI / ML | Drink recommendations, natural-language menu search, business insights, purchase-history recommendations, revenue forecasting |
 
----
+## My Contributions
 
-## ✨ Tính năng nổi bật
+**Primary role: Full-Stack / Backend & AI Developer.** My focus within this collaborative project includes:
 
-<table>
-<tr>
-<td width="50%">
+- Developing MVC customer, Staff, and Admin workflows, cookie authentication, and role authorization.
+- Extending EF Core data access, cart/order persistence, and database configuration.
+- Integrating SignalR order notifications and server-side Gemini and ML.NET services.
+- Hardening production configuration and Supabase connection normalization, and deploying the application on Railway.
+- Adding GitHub Actions build/deployment gates, deterministic backend tests, and critical browser validation.
 
-### 🤖 AI & Machine Learning
-- **Chatbot AI (Gemini)** — Tư vấn cà phê theo tâm trạng, sở thích
-- **Gợi ý thông minh (ML.NET)** — Matrix Factorization dựa trên lịch sử mua
-- **Tìm kiếm ngữ nghĩa** — Tìm sản phẩm bằng ngôn ngữ tự nhiên qua AI
-- **Dự đoán doanh thu (SSA)** — Forecasting 7–30 ngày tiếp theo
-- **AI Business Insights** — Phân tích & đề xuất chiến lược kinh doanh
+The repository has multiple contributors, including database and VNPay integration work. This section describes my focus, not sole authorship of every component; the commit history preserves attribution.
 
-</td>
-<td width="50%">
+## Tech Stack
 
-### 💳 Thanh toán & Đơn hàng
-- **VNPay Integration** — Thanh toán trực tuyến an toàn
-- **COD** — Thanh toán khi nhận hàng
-- **Real-time Order Tracking** — Theo dõi đơn hàng live qua SignalR
-- **Quản lý trạng thái** — Pending → Ready → Delivered / Cancelled
-- **Lịch sử đơn hàng** — Xem chi tiết toàn bộ đơn đã đặt
+| Area | Verified implementation |
+|---|---|
+| Backend | .NET 10, ASP.NET Core MVC, Razor Pages, dependency injection |
+| Persistence | EF Core Relational/Design 10.0.11, Npgsql EF provider 10.0.0, PostgreSQL hosted on Supabase |
+| Frontend | Razor, HTML, CSS, JavaScript, Bootstrap; selected Blazor Server components |
+| Realtime | ASP.NET Core SignalR |
+| AI / ML | Google Gemini API integration, ML.NET 3.0.1, Recommender 0.21.1, TimeSeries 3.0.1 |
+| Tests | xUnit 2.9.3, Coverlet collector 6.0.4, Playwright (lockfile: 1.58.2) |
+| Delivery | GitHub Actions, Railway, multi-stage .NET Dockerfile |
 
-</td>
-</tr>
-<tr>
-<td width="50%">
+Package versions are defined in [SaleStore.csproj](SaleStore.csproj), [the test project](SaleStore.Tests/SaleStore.Tests.csproj), and [package-lock.json](package-lock.json).
 
-### 👤 Hệ thống người dùng
-- **3 vai trò**: Admin · Staff · Customer
-- **Cookie Authentication** — Sliding expiration 14 ngày
-- **Password Hashing** — HMAC-SHA512 với random salt
-- **User Management** — Quản lý tài khoản & trạng thái
-- **Auth Activity Logging** — Ghi lại hoạt động đăng nhập
-
-</td>
-<td width="50%">
-
-### 📊 Admin Dashboard
-- **Thống kê doanh thu** — Biểu đồ real-time
-- **Top sản phẩm bán chạy** — Ranking theo doanh thu
-- **Quản lý sản phẩm** — CRUD đầy đủ với upload ảnh
-- **Quản lý đơn hàng** — Cập nhật trạng thái real-time
-- **Quản lý nhân viên** — Tạo tài khoản Staff, phân quyền
-
-</td>
-</tr>
-</table>
-
-### 🏪 Staff POS (Point of Sale)
-> Hệ thống bán hàng tại quầy cho nhân viên — tạo đơn hàng nhanh, chọn sản phẩm, gán bàn, và xử lý thanh toán trực tiếp.
-
----
-
-## 🛠 Công nghệ sử dụng
-
-| Thành phần | Công nghệ | Mô tả |
-|:---|:---|:---|
-| **Backend** | ASP.NET Core 6.0 MVC | Framework chính · Razor Views · Areas |
-| **Frontend** | Razor + Bootstrap + JS | Server-side rendering · Responsive UI |
-| **Database** | PostgreSQL (Supabase) | Cloud database với SSL |
-| **ORM** | Entity Framework Core 6 | Snake_case naming convention |
-| **AI Chatbot** | Google Gemini API (Gemma 3 27B) | Tư vấn sản phẩm · Tìm kiếm ngữ nghĩa |
-| **ML Recommendation** | ML.NET Matrix Factorization | Collaborative filtering gợi ý sản phẩm |
-| **ML Forecasting** | ML.NET SSA (Time Series) | Dự đoán doanh thu theo chuỗi thời gian |
-| **Real-time** | SignalR | WebSocket cho order tracking |
-| **Interactive UI** | Blazor Server | Component cập nhật trạng thái đơn hàng |
-| **Payment** | VNPay | Cổng thanh toán trực tuyến Việt Nam |
-| **Authentication** | Cookie-based + HMAC-SHA512 | Custom password hashing with salt |
-
----
-
-## 🏗 Kiến trúc hệ thống
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CLIENT LAYER                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────────┐  │
-│  │ Customer │  │  Admin   │  │  Staff   │  │  AI ChatBot    │  │
-│  │   UI     │  │Dashboard │  │   POS    │  │    Widget      │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬────────┘  │
-│       │              │             │                │           │
-├───────┼──────────────┼─────────────┼────────────────┼───────────┤
-│       │         APPLICATION LAYER  │                │           │
-│  ┌────▼──────────────▼─────────────▼────────────────▼────────┐  │
-│  │              ASP.NET Core 6.0 MVC + Razor Pages           │  │
-│  │  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌────────────┐  │  │
-│  │  │Controllers│ │   Areas   │ │ViewComps │ │  Blazor    │  │  │
-│  │  │  (MVC)   │ │Admin/Staff│ │(Charts)  │ │ Components │  │  │
-│  │  └──────────┘ └───────────┘ └──────────┘ └────────────┘  │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    SERVICE LAYER                           │  │
-│  │  ┌─────────────┐ ┌──────────────┐ ┌───────────────────┐   │  │
-│  │  │  GeminiChat │ │  VnPay       │ │  PasswordHasher   │   │  │
-│  │  │  Service    │ │  Service     │ │                   │   │  │
-│  │  └─────────────┘ └──────────────┘ └───────────────────┘   │  │
-│  │  ┌─────────────────────┐ ┌─────────────────────────────┐  │  │
-│  │  │  ProductRecommend   │ │     SalesForecast           │  │  │
-│  │  │  Service (ML.NET)   │ │     Service (ML.NET SSA)    │  │  │
-│  │  └─────────────────────┘ └─────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐   │
-│  │   SignalR    │  │  EF Core 6   │  │   Request Logging    │   │
-│  │  (OrderHub)  │  │  (ORM)       │  │   Middleware         │   │
-│  └──────┬───────┘  └──────┬───────┘  └──────────────────────┘   │
-│         │                 │                                     │
-├─────────┼─────────────────┼─────────────────────────────────────┤
-│         │           DATA LAYER                                  │
-│         │          ┌──────▼──────┐      ┌─────────────────┐     │
-│         │          │ PostgreSQL  │      │   Gemini API    │     │
-│         └──────────│ (Supabase)  │      │   (Google AI)   │     │
-│                    └─────────────┘      └─────────────────┘     │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🔐 Phân quyền hệ thống
+## Architecture
 
 ```mermaid
-graph LR
-    A[Guest] -->|Đăng ký| B[Customer]
-    B -->|Duyệt menu · Đặt hàng| C[Thanh toán VNPay/COD]
-    B -->|Chat AI| D[Chatbot tư vấn]
-    
-    E[Admin] -->|Quản lý| F[Dashboard · Thống kê]
-    E -->|AI Insights| G[Phân tích · Dự đoán]
-    E -->|CRUD| H[Sản phẩm · Đơn hàng]
-    E -->|Quản lý| I[Users · Staff]
-    
-    J[Staff] -->|POS| K[Bán hàng tại quầy]
-    J -->|Cập nhật| L[Trạng thái đơn hàng]
-
-    style A fill:#94a3b8,stroke:#64748b,color:#fff
-    style B fill:#3b82f6,stroke:#2563eb,color:#fff
-    style E fill:#ef4444,stroke:#dc2626,color:#fff
-    style J fill:#f59e0b,stroke:#d97706,color:#fff
+flowchart LR
+    Browser[Browser: Customer / Staff / Admin] --> MVC[ASP.NET Core MVC / Razor]
+    MVC --> Services[Application services]
+    MVC --> EF[EF Core / ApplicationDbContext]
+    Services --> EF
+    EF --> DB[(Supabase PostgreSQL)]
+    Services --> Gemini[Gemini API]
+    Services --> ML[ML.NET]
+    MVC --> Hub[SignalR OrderHub]
+    Hub <--> Browser
+    GitHub[GitHub main] --> Actions[GitHub Actions]
+    Actions --> Railway[Railway Dockerfile deployment]
+    Railway --> MVC
 ```
 
-| Vai trò | Quyền hạn |
-|:---|:---|
-| **Admin** | Full access — Dashboard, CRUD sản phẩm, quản lý đơn hàng, quản lý users, AI insights, ML forecast |
-| **Staff** | POS bán hàng tại quầy, cập nhật trạng thái đơn hàng |
-| **Customer** | Xem menu, giỏ hàng, checkout, theo dõi đơn hàng, chat AI, xem gợi ý ML |
+## Backend Architecture
 
----
+Controllers handle HTTP requests, authorization, and view/API responses. Dependency-injected services encapsulate AI, recommendation, forecasting, password hashing, and payment integration. Services and several controllers access `ApplicationDbContext` directly: this is an MVC application with a service layer, not a strict separation of all persistence behind services.
 
-## 🤖 AI & ML Features (Chi tiết)
+`Program.cs` configures dependency injection, authentication, session state, and routing. Custom request-logging middleware records requests. Form ViewModels use validation attributes, including `StrongPasswordAttribute`; controllers check model validity where applicable. Admin and Staff functionality lives in MVC Areas.
 
-### 1. Chatbot AI — Tư vấn cà phê thông minh
-Sử dụng **Google Gemini API (Gemma 3 27B)** với system prompt chuyên biệt cho quán cà phê:
-- 💬 Tư vấn loại cà phê theo tâm trạng, thời tiết
-- 📖 Giải thích cách pha chế, so sánh các loại cà phê
-- 🔍 Gợi ý sản phẩm dựa trên mô tả ngôn ngữ tự nhiên
-- 🚫 Tự động từ chối câu hỏi ngoài phạm vi (domain-restricted)
+## Database
 
-### 2. Product Recommendation — Gợi ý sản phẩm
-Sử dụng **ML.NET Matrix Factorization** (Collaborative Filtering):
-```
-User Purchase History ──▶ Matrix Factorization ──▶ Personalized Recommendations
-                                                              │
-                                                   Fallback: Best-sellers
-```
-- 🔄 Huấn luyện tự động mỗi 1 giờ với dữ liệu mua hàng mới
-- 🆕 Fallback sang sản phẩm bán chạy nhất cho user mới
-- 🔒 Thread-safe với lock pattern
+PostgreSQL is hosted on Supabase and accessed server-side through Npgsql using the **Session Pooler**. `ApplicationDbContext` maps `AppUsers`, `Customers`, `Products`, `Orders`, `OrderItems`, `Reviews`, `UserCartItems`, and `AuthActivities`. Category is a product field, rather than a separate entity.
 
-### 3. Sales Forecasting — Dự đoán doanh thu
-Sử dụng **ML.NET SSA (Singular Spectrum Analysis)**:
-- 📥 Input: Dữ liệu doanh thu 90 ngày gần nhất
-- 📤 Output: Forecast 7–30 ngày kèm confidence interval (95%)
-- 🕐 Tự động fill missing dates, xử lý timezone VN
+EF Core migrations are versioned under [Migrations](Migrations). Relationships, unique indexes, and the computed order-item total are configured in the context. Production schema changes are manually controlled: neither application startup nor CI/CD automatically applies migrations.
 
-### 4. AI Business Insights — Phân tích kinh doanh
-- 📊 Tổng hợp dữ liệu 7/30 ngày → AI phân tích & đề xuất chiến lược
-- 🏆 Nhận diện top sản phẩm, xu hướng doanh thu
-- 💡 Gợi ý cải thiện kinh doanh cụ thể
+## Roles & Authorization
 
----
+| Role | Access |
+|---|---|
+| Customer (stored as `User`) | Shopping, personal cart and order history |
+| Staff | POS; also accessible to Admin |
+| Admin | Protected management pages, order status updates, analytics and AI insights |
 
-## 📐 Database Schema
+Cookie authentication revalidates the user's active state and role against the database. `OrderHub` requires authentication; a customer may join only their own order group, while Staff/Admin may join order groups. The dashboard group requires Admin.
 
-```mermaid
-erDiagram
-    APP_USERS {
-        bigint id PK
-        string username
-        string full_name
-        string email
-        string phone
-        string password_hash
-        string password_salt
-        string role
-        boolean is_active
-        datetime created_at
-    }
-    
-    PRODUCTS {
-        bigint id PK
-        string name
-        string description
-        decimal price
-        string category
-        string image_url
-        int stock
-        boolean is_active
-    }
-    
-    CUSTOMERS {
-        bigint id PK
-        string name
-        string phone
-    }
-    
-    ORDERS {
-        bigint id PK
-        bigint customer_id FK
-        bigint created_by_user_id FK
-        string shipping_address
-        string status
-        decimal total_amount
-        string payment_method
-        boolean is_paid
-        string transaction_id
-    }
-    
-    ORDER_ITEMS {
-        bigint id PK
-        bigint order_id FK
-        bigint product_id FK
-        int quantity
-        decimal unit_price
-    }
-    
-    REVIEWS {
-        bigint id PK
-        bigint product_id FK
-        int rating
-        string comment
-    }
-    
-    AUTH_ACTIVITIES {
-        bigint id PK
-        bigint user_id FK
-        string activity_type
-    }
+## AI & ML Features
 
-    APP_USERS ||--o{ AUTH_ACTIVITIES : "logs"
-    APP_USERS ||--o{ ORDERS : "creates"
-    CUSTOMERS ||--o{ ORDERS : "places"
-    ORDERS ||--|{ ORDER_ITEMS : "contains"
-    PRODUCTS ||--o{ ORDER_ITEMS : "included_in"
-    PRODUCTS ||--o{ REVIEWS : "has"
-```
+### Gemini Integration
 
----
+The backend sends drink preferences or a natural-language query with current menu data to the API. Returned product IDs are matched to active products before response enrichment. A separate chatbot supports menu-related conversation. The API key stays in server configuration; missing configuration, HTTP errors, and malformed responses have fallback/error paths.
 
-## 📂 Cấu trúc dự án
+### Personalized Recommendation
 
-```
+`ProductRecommendService` uses ML.NET matrix factorization over purchase history. Best-seller recommendations provide a fallback when personalization or training is unavailable. A personalized result depends on usable customer history and model availability.
+
+### Sales Forecast
+
+`SalesForecastService` builds daily revenue history from delivered orders and uses ML.NET SSA forecasting. A managed forecast fallback handles unavailable native SSA dependencies. The feature does not establish measured prediction accuracy.
+
+### AI Business Insights
+
+The Admin insights endpoint summarizes recent orders, revenue, and top products for AI-generated analysis. It is protected by Admin authorization.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/Ai/recommend` | Drink suggestions |
+| POST | `/api/Ai/search` | Natural-language menu search |
+| GET | `/api/Ai/recommend/ml` | History-based or fallback recommendations |
+| GET | `/api/Ai/admin/forecast?days=7` | Admin revenue forecast |
+| GET | `/api/Ai/admin/insights` | Admin business insights |
+
+## Realtime Order Updates
+
+An Admin changes an order status → the backend saves it → SignalR publishes to the private `order-{id}` group → the authorized customer's order page updates without a reload. The hub is mapped at `/hubs/order`; group authorization is enforced on the server.
+
+## Testing
+
+The validated Phase 8 backend baseline is **74 passed, 0 failed, 0 skipped**, with **three successful consecutive runs**. The xUnit suite covers password hashing, PostgreSQL parsing, Supabase normalization, password validation, order-status display behavior, chatbot input handling, and Gemini behavior with fake HTTP responses. It does not call the production database or live AI service.
+
+Focused deterministic backend coverage was prioritized over artificial coverage-percentage optimization. Informational Coverlet coverage across the instrumented application assembly is **3.44% lines** and **4.87% branches**; this is not browser coverage or a claim of broad business-workflow coverage.
+
+### Critical Playwright Suite
+
+The verified production baseline is **5 passed, 0 failed, 0 skipped**. The five tests cover:
+
+1. Public pages and protected-route behavior.
+2. Customer registration, login, cart, COD checkout, and order history.
+3. A live Gemini response.
+4. Authenticated Admin/Staff pages and selected AI endpoints.
+5. A private customer SignalR update without page reload.
+
+These are critical demo checks, not exhaustive application coverage. See [testing details](docs/TESTING.md) and [the test definitions](tests/critical-demo.spec.js).
+
+## CI/CD
+
+**Pull requests:** GitHub Actions → restore → Release build → backend tests. PR validation has no production deployment.
+
+**Main:** restore → Release build → backend tests → Railway deployment → HTTPS health check → public smoke checks → critical production Playwright validation. The protected deployment job uses GitHub Environment `CoffeeShop-Demo` and requires exactly five passing critical tests with no failures or skips.
+
+See [PR workflow](.github/workflows/ci.yml), [production workflow](.github/workflows/deploy-production.yml), and [CI/CD documentation](docs/CI_CD.md).
+
+## Deployment
+
+Railway builds the repository's [multi-stage Dockerfile](Dockerfile) and runs the ASP.NET Core application behind its HTTPS endpoint. The backend connects to Supabase PostgreSQL through the Session Pooler. [railway.json](railway.json) configures the Dockerfile builder, health check, and restart policy.
+
+[`/health`](https://coffeeshop-demo-production.up.railway.app/health) is an application liveness endpoint; it does not query the database. CI smoke checks also request the database-backed home page and a stylesheet. Production has `DemoSeed` disabled, and deployment performs no automatic database migrations.
+
+## Security Practices
+
+- Runtime secrets use environment configuration; local development supports .NET user-secrets.
+- Role-protected management routes and authorization-aware SignalR groups.
+- Production authentication/session cookies use `Secure` and `HttpOnly` settings.
+- Production exception handling, HSTS, and HTTPS redirection.
+- Explicit opt-in for account bootstrap and demo seeding; DemoSeed stays off in production.
+- Secret scanning forms part of the development validation process.
+
+See [configuration](docs/CONFIGURATION.md) and [production configuration](docs/PRODUCTION_CONFIGURATION.md) for implementation details. These practices are not a formal security certification.
+
+## Project Structure
+
+```text
 Ecommerce-Coffee-Shop/
-│
-├── Areas/
-│   ├── Admin/                          # Khu vực quản trị
-│   │   ├── Controllers/
-│   │   │   ├── DashboardController     # Tổng quan, thống kê
-│   │   │   ├── ProductController       # CRUD sản phẩm
-│   │   │   ├── OrderController         # Quản lý đơn hàng
-│   │   │   ├── StatisticsController    # Biểu đồ, báo cáo
-│   │   │   └── UserManagementCtrl      # Quản lý người dùng
-│   │   └── Views/                      # Razor views cho Admin
-│   │
-│   └── Staff/                          # Khu vực nhân viên
-│       ├── Controllers/
-│       │   └── POSController           # Bán hàng tại quầy
-│       └── Views/
-│
-├── Controllers/                        # Controllers chính (Customer)
-│   ├── AiController.cs                 # ★ API AI: recommend, search, forecast
-│   ├── AuthController.cs              # Đăng nhập, đăng ký, phân quyền
-│   ├── CartController.cs              # Giỏ hàng, checkout, VNPay
-│   ├── ChatBotController.cs           # Chatbot widget
-│   ├── HomeController.cs              # Trang chủ
-│   ├── MenuController.cs              # Danh sách sản phẩm
-│   ├── OrderController.cs            # Lịch sử đơn hàng
-│   └── ReviewController.cs           # Đánh giá sản phẩm
-│
-├── Models/
-│   ├── AppUser.cs                     # Người dùng (Admin/Staff/User)
-│   ├── Product.cs                     # Sản phẩm cà phê
-│   ├── Order.cs                       # Đơn hàng
-│   ├── OrderItem.cs                   # Chi tiết đơn hàng
-│   ├── CartItem.cs / UserCartItem.cs  # Giỏ hàng
-│   ├── Customer.cs                    # Khách hàng
-│   ├── Review.cs                      # Đánh giá sản phẩm
-│   ├── OrderStatus.cs                 # Enum trạng thái
-│   ├── Validation/                    # Custom validation
-│   └── ViewModels/                    # ViewModels cho form
-│
-├── Services/                           # ★ Business Logic Layer
-│   ├── GeminiChatService.cs           # Chatbot AI (Gemini API)
-│   ├── ProductRecommendService.cs     # ML.NET gợi ý sản phẩm
-│   ├── SalesForecastService.cs        # ML.NET dự đoán doanh thu
-│   ├── VnPayService.cs               # Tích hợp thanh toán VNPay
-│   └── PasswordHasher.cs             # HMAC-SHA512 password hashing
-│
-├── Data/
-│   ├── ApplicationDbContext.cs        # EF Core DbContext
-│   ├── AuthDbInitializer.cs           # Seed tài khoản mặc định
-│   └── MlDataSeeder.cs               # Seed dữ liệu ML training
-│
-├── Hubs/
-│   └── OrderHub.cs                    # SignalR hub real-time orders
-│
-├── Components/
-│   └── OrderStatusUpdater.razor       # Blazor interactive component
-│
-├── ViewComponents/
-│   ├── RecentOrdersViewComponent      # Widget đơn hàng gần đây
-│   ├── RevenueChartViewComponent      # Widget biểu đồ doanh thu
-│   └── TopProductsViewComponent       # Widget sản phẩm bán chạy
-│
-├── Middleware/
-│   └── RequestLoggingMiddleware.cs    # HTTP request logging
-│
-├── Views/                              # Razor Views (Customer UI)
-│   ├── Home/                          # Trang chủ
-│   ├── Menu/                          # Menu sản phẩm
-│   ├── Cart/                          # Giỏ hàng & Checkout
-│   ├── Order/                         # Lịch sử đơn hàng
-│   ├── Auth/                          # Login & Register
-│   ├── Product/                       # Chi tiết sản phẩm
-│   └── Shared/                        # Layout & Partials
-│
-├── wwwroot/                            # Static Assets
-│   ├── css/custom.css                 # Custom stylesheet
-│   └── js/                            # JavaScript files
-│
-├── Program.cs                          # ★ Application entry point
-├── appsettings.json                   # Configuration
-└── Ecommerce-Coffee-Shop.sln         # Solution file
+├── Areas/                 # Admin and Staff MVC workflows
+├── Controllers/           # Customer routes and AI endpoints
+├── Services/              # AI, ML, authentication helpers, payments
+├── Data/                  # EF context, connection normalization, seeders
+├── Migrations/            # Versioned schema changes
+├── Models/                # Entities, ViewModels, validation
+├── Hubs/                  # SignalR OrderHub
+├── Middleware/            # Request logging
+├── Views/                 # Razor MVC views
+├── Pages/                 # Razor Pages
+├── Components/            # Blazor components
+├── ViewComponents/        # Dashboard widgets
+├── wwwroot/               # CSS, JavaScript, static assets
+├── SaleStore.Tests/        # xUnit backend tests
+├── tests/                 # Playwright tests
+├── .github/workflows/     # PR CI and production deployment
+├── docs/                  # Configuration and validation records
+└── Program.cs             # Startup and dependency registration
 ```
 
----
+## Local Setup
 
-## 🔌 API Endpoints
+Requirements: **.NET 10 SDK**, a separately provisioned development PostgreSQL database, and **Node.js 22** if running Playwright (matching CI).
 
-### AI & ML APIs
-
-| Method | Endpoint | Mô tả |
-|:---|:---|:---|
-| `POST` | `/api/Ai/recommend` | AI gợi ý theo mood / preference / weather |
-| `POST` | `/api/Ai/search` | Tìm kiếm sản phẩm bằng ngôn ngữ tự nhiên |
-| `GET` | `/api/Ai/admin/insights` | AI phân tích kinh doanh |
-| `GET` | `/api/Ai/admin/forecast?days=7` | ML dự đoán doanh thu |
-| `GET` | `/api/Ai/recommend/ml?productId=1` | ML gợi ý sản phẩm cá nhân hóa |
-
-### Customer Routes
-
-| Method | Endpoint | Mô tả |
-|:---|:---|:---|
-| `GET` | `/` | Trang chủ |
-| `GET` | `/Menu` | Danh sách sản phẩm |
-| `GET/POST` | `/Cart/Checkout` | Giỏ hàng & Thanh toán |
-| `GET` | `/Cart/VnPayReturn` | Callback thanh toán VNPay |
-| `GET` | `/Order` | Lịch sử đơn hàng |
-| `GET/POST` | `/Auth/Login` | Đăng nhập |
-| `GET/POST` | `/Auth/Register` | Đăng ký |
-
-### Admin Routes
-
-| Method | Endpoint | Mô tả |
-|:---|:---|:---|
-| `GET` | `/Admin/Dashboard` | Tổng quan quản trị |
-| `CRUD` | `/Admin/Product/*` | Quản lý sản phẩm |
-| `CRUD` | `/Admin/Order/*` | Quản lý đơn hàng |
-| `GET` | `/Admin/Statistics` | Thống kê & biểu đồ |
-| `CRUD` | `/Admin/UserManagement/*` | Quản lý người dùng |
-
-### Staff Routes
-
-| Method | Endpoint | Mô tả |
-|:---|:---|:---|
-| `GET` | `/Staff/POS` | Giao diện POS bán hàng |
-
----
-
-## 🚀 Cài đặt & Chạy dự án
-
-### Yêu cầu hệ thống
-
-| Yêu cầu | Phiên bản |
-|:---|:---|
-| .NET SDK | 6.0+ |
-| PostgreSQL | 12+ |
-| Node.js *(optional, cho E2E tests)* | 16+ |
-
-### Bước 1 — Clone repository
-
-```bash
+```powershell
 git clone https://github.com/Nolove098/Ecommerce-Coffee-Shop.git
 cd Ecommerce-Coffee-Shop
+dotnet restore ./Ecommerce-Coffee-Shop.sln
+dotnet build ./Ecommerce-Coffee-Shop.sln -c Release --no-restore
+dotnet user-secrets init --project ./SaleStore.csproj
 ```
 
-### Bước 2 — Cấu hình
+Configure your development values privately using `dotnet user-secrets set` or environment variables. User-secrets use colon-separated keys; environment variables use double underscores. Do not store real values in tracked settings files.
 
-Tạo file `appsettings.Development.json` hoặc chỉnh sửa `appsettings.json`:
+| User-secrets key | Environment variable | Purpose |
+|---|---|---|
+| `ConnectionStrings:DefaultConnection` | `ConnectionStrings__DefaultConnection` | Required development PostgreSQL connection |
+| `Gemini:ApiKey` | `Gemini__ApiKey` | Required for live Gemini features |
+| `Supabase:ForceSessionPooler` | `Supabase__ForceSessionPooler` | Optional Supabase normalization mode |
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=<host>;Port=5432;Database=<db>;Username=<user>;Password=<pass>"
-  },
-  "Gemini": {
-    "ApiKey": "<your-gemini-api-key>"
-  },
-  "VNPAY": {
-    "TmnCode": "<your-tmncode>",
-    "HashSecret": "<your-hash-secret>",
-    "BaseUrl": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-    "ReturnUrl": "https://<your-domain>/Cart/VnPayReturn"
-  }
-}
+For a local PostgreSQL instance, disable forced Supabase normalization. For Supabase, use your own Session Pooler connection; optional normalization also uses `Supabase:ProjectRef` and `Supabase:PoolerRegion`. See [configuration details](docs/CONFIGURATION.md) for optional sandbox payment and bootstrap settings.
+
+**Database prerequisite:** use a development database with the current schema. The checked-in migration history contains two table-creating baseline migrations (`AddPaymentFields` and `InitialCoffeeShopSchema`); do not blindly apply the entire chain to an empty database. Review and reconcile the baseline for your development database before applying migrations. Fresh-database migration setup is a current limitation; production must not be used for local setup.
+
+Once the development schema and configuration are ready:
+
+```powershell
+dotnet run --project ./SaleStore.csproj --launch-profile SaleStore
 ```
 
-### Bước 3 — Chạy ứng dụng
+Open `http://localhost:5005`. Bootstrap accounts and demo data are separate explicit opt-ins; no default account password is supplied. See [demo data instructions](docs/DEMO_DATA.md) for populating a development/demo database.
 
-```bash
-dotnet restore
-dotnet ef database update
-dotnet run
+### Test Commands
+
+Backend tests require no database or Gemini credentials:
+
+```powershell
+dotnet test ./Ecommerce-Coffee-Shop.sln -c Release
 ```
 
-> [!TIP]
-> Ứng dụng sẽ **tự động seed** dữ liệu tài khoản mặc định và dữ liệu mẫu cho ML training khi khởi động lần đầu.
+For browser tests, configure the local application and a disposable development dataset first:
 
----
-
-## 💡 Điểm nổi bật kỹ thuật
-
-<table>
-<tr>
-<td>
-
-**🔄 Real-time Architecture**
-- SignalR WebSocket cho live order updates
-- Blazor Server component cho interactive UI
-- Auto-reconnect khi mất kết nối
-
-</td>
-<td>
-
-**🧠 ML Pipeline**
-- Auto-retrain mỗi 1 giờ
-- Thread-safe prediction engine
-- Graceful fallback khi thiếu data
-
-</td>
-</tr>
-<tr>
-<td>
-
-**🔒 Security**
-- HMAC-SHA512 password hashing + random salt
-- Cookie auth với sliding expiration 14 ngày
-- Server-side session validation mỗi request
-- Role-based access control (RBAC)
-
-</td>
-<td>
-
-**🏗️ Clean Architecture**
-- MVC pattern với Areas cho phân quyền
-- Dependency Injection toàn bộ services
-- EF Core + snake_case naming convention
-- Custom middleware pipeline
-
-</td>
-</tr>
-</table>
-
----
-
-## 🧪 Testing
-
-```bash
-# Chạy Playwright E2E tests
-npx playwright test
-
-# Chạy tests với UI mode
-npx playwright test --ui
+```powershell
+npm ci
+npx playwright install chromium
+npm run test:critical -- --retries=0 --trace=off
 ```
 
----
+Playwright starts the local application at `http://localhost:5005` by default. The critical suite creates users/orders and calls Gemini; Admin/Staff checks need privately supplied test-account configuration. Missing credentials can cause local skips, which do not satisfy the production acceptance gate. `PLAYWRIGHT_BASE_URL` targets an existing deployment instead of starting a local server. Extended checks are available through `npm run test:extended`.
 
-## 📄 License
+## Current Limitations
 
-Dự án này được phát hành dưới giấy phép [MIT License](LICENSE).
+- Backend unit coverage is focused; database integration and broader business-logic tests remain to be added.
+- Recommendation/forecast algorithms lack dedicated automated accuracy validation; some runtime paths use fallbacks.
+- VNPay remains sandbox-only. Real payment processing is not demonstrated.
+- Production migrations are manual; the historical migration baselines need reconciliation for a straightforward empty-database setup.
 
----
+## Future Improvements
 
-<div align="center">
+- Add isolated PostgreSQL integration tests for cart totals, order ownership, and payment callbacks.
+- Reconcile migration history and automate a disposable local integration database.
+- Broaden business-logic coverage and evaluate recommendation/forecast quality with controlled datasets.
+- Improve structured observability and evaluate caching based on measured needs.
 
-## 👨‍💻 Tác giả
+## Author
 
-**Nolove098**
+**[Nolove098](https://github.com/Nolove098)** — Full-Stack / Backend & AI Developer.
 
-[![GitHub](https://img.shields.io/badge/GitHub-Nolove098-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Nolove098)
-
----
-
-⭐ *Nếu bạn thấy dự án hữu ích, hãy cho một **star** nhé!*
-
-</div>
+Built with contributions recorded in the repository history.
